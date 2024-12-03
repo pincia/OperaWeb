@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperaWeb.Server", "OperaWeb.Server\OperaWeb.Server.csproj", "{80D56270-AB8F-45DA-B59D-5826276EC57B}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "operaweb.client", "operaweb.client\operaweb.client.esproj", "{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.Server.DataClasses", "OperaWeb.Server.DataClasses\OperaWeb.Server.DataClasses.csproj", "{19AE5E6C-32C6-4034-9460-5DCB18FC1E39}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.EmailSender", "OperaWeb.EmailSender\OperaWeb.EmailSender.csproj", "{4D146619-3F0A-4474-96BF-D7471E919925}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.API.Test", "OperaWeb.API.Test\OperaWeb.API.Test.csproj", "{B22A39F8-A1E4-4E98-A9F1-EF613009B405}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80D56270-AB8F-45DA-B59D-5826276EC57B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D56270-AB8F-45DA-B59D-5826276EC57B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D56270-AB8F-45DA-B59D-5826276EC57B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D56270-AB8F-45DA-B59D-5826276EC57B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{19AE5E6C-32C6-4034-9460-5DCB18FC1E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19AE5E6C-32C6-4034-9460-5DCB18FC1E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19AE5E6C-32C6-4034-9460-5DCB18FC1E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19AE5E6C-32C6-4034-9460-5DCB18FC1E39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D146619-3F0A-4474-96BF-D7471E919925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D146619-3F0A-4474-96BF-D7471E919925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D146619-3F0A-4474-96BF-D7471E919925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D146619-3F0A-4474-96BF-D7471E919925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B0586D67-EA35-4D70-8306-CF8FA83E6A75}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@OperaWeb.Server_HostAddress = http://localhost:5041
+
+GET {{OperaWeb.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

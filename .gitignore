@@ -1,0 +1,33 @@
+.DS_Store
+
+# dotnet core
+bin/
+obj/
+project.lock.json
+NuGetScratch/
+
+api/wwwroot/**
+!api/wwwroot/scratch.html
+!api/wwwroot/favicon.ico
+
+# node
+node_modules/
+typings/
+npm-debug.log
+
+# client-react
+operaweb.client/components/*.js
+
+#Server
+OperaWeb.Server/Properties
+
+# other
+*.js.map
+
+# IDE
+.idea/
+.vs/
+
+.config
+
+appsettings.json
