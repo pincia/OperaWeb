@@ -13,13 +13,28 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.*-*</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+	  <PackageReference Include="AutoMapper" Version="13.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+	  <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.35.0" />
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\operaweb.client\operaweb.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\OperaWeb.EmailSender\OperaWeb.EmailSender.csproj" />
+    <ProjectReference Include="..\OperaWeb.Server.DataClasses\OperaWeb.Server.DataClasses.csproj" />
+    <ProjectReference Include="..\OperaWeb.SharedClasses\OperaWeb.SharedClasses.csproj" />
   </ItemGroup>
 
 </Project>

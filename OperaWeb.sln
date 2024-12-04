@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperaWeb.Server", "OperaWeb.Server\OperaWeb.Server.csproj", "{80D56270-AB8F-45DA-B59D-5826276EC57B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.Server", "OperaWeb.Server\OperaWeb.Server.csproj", "{80D56270-AB8F-45DA-B59D-5826276EC57B}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "operaweb.client", "operaweb.client\operaweb.client.esproj", "{E9378EED-DC43-4668-8C4D-C3C8DEC2D29C}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.EmailSender", "OperaWeb.EmailSender\OperaWeb.EmailSender.csproj", "{4D146619-3F0A-4474-96BF-D7471E919925}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.API.Test", "OperaWeb.API.Test\OperaWeb.API.Test.csproj", "{B22A39F8-A1E4-4E98-A9F1-EF613009B405}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperaWeb.SharedClasses", "OperaWeb.SharedClasses\OperaWeb.SharedClasses.csproj", "{73C11C72-2EB1-49E1-9073-6F76D199C253}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B22A39F8-A1E4-4E98-A9F1-EF613009B405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73C11C72-2EB1-49E1-9073-6F76D199C253}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73C11C72-2EB1-49E1-9073-6F76D199C253}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73C11C72-2EB1-49E1-9073-6F76D199C253}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73C11C72-2EB1-49E1-9073-6F76D199C253}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

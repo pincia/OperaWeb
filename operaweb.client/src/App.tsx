@@ -11,8 +11,11 @@ interface Forecast {
 function App() {
     const [forecasts, setForecasts] = useState<Forecast[]>();
 
+    const [testString, setProjectsString] = useState<string>();
+
     useEffect(() => {
         populateWeatherData();
+        populateProjectsString();
     }, []);
 
     const contents = forecasts === undefined
@@ -36,6 +39,7 @@ function App() {
                     </tr>
                 )}
             </tbody>
+            {testString}
         </table>;
 
     return (
@@ -50,6 +54,12 @@ function App() {
         const response = await fetch('weatherforecast');
         const data = await response.json();
         setForecasts(data);
+    }
+
+    async function populateProjectsString() {
+        const response = await fetch('testService');
+        const data = await response.json();
+        setProjectsString(data);
     }
 }
 
