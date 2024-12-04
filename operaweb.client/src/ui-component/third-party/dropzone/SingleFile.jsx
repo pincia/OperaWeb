@@ -1,0 +1,108 @@
+import PropTypes from 'prop-types';
+
+// material-ui
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+
+// third-party
+import { useDropzone } from 'react-dropzone';
+
+// project import
+import RejectionFiles from './RejectionFile';
+import PlaceholderContent from './PlaceHolderContent';
+import FilesPreview from './FilePreview';
+
+const DropzoneWrapper = styled('div')(({ theme }) => ({
+    outline: 'none',
+    overflow: 'hidden',
+    position: 'relative',
+    padding: theme.spacing(5, 1),
+    borderRadius: theme.shape.borderRadius,
+    transition: theme.transitions.create('padding'),
+    backgroundColor: theme.palette.background.paper,
+    border: `1px dashed ${theme.palette.secondary.main}`,
+    '&:hover': { opacity: 0.72, cursor: 'pointer' }
+}));
+
+// ==============================|| UPLOAD - SINGLE FILE ||============================== //
+
+const SingleFileUpload = ({ error, showList = false, file, type, setFieldValue, sx }) => {
+    const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
+        accept: {
+            '.xpve': []
+        },
+        multiple: false,
+        onDrop: (acceptedFiles) => {
+            setFieldValue(
+                'files',
+                acceptedFiles.map((file) =>
+                    Object.assign(file, {
+                        preview: URL.createObjectURL(file)
+                    })
+                )
+            );
+        }
+    });
+
+    const thumbs =
+        file &&
+        file.map((item, index) => (
+            <Box
+                key={index}
+                sx={{ bgcolor: 'background.paper', top: 8, left: 8, borderRadius: 2, position: 'absolute', width: 1, height: 1 }}
+            >
+                <img
+                    alt={item.name}
+                    src={item.preview}
+                    style={{ width: 'calc(100% - 16px)', height: 'calc(100% - 16px)' }}
+                    onLoad={() => {
+                        URL.revokeObjectURL(item.preview);
+                    }}
+                />
+            </Box>
+        ));
+
+    const onRemove = () => {
+        setFieldValue('files', null);
+    };
+
+    return (
+        <Box sx={{ width: '100%', ...sx }}>
+            {(!file || file.length == 0) && <DropzoneWrapper
+                {...getRootProps()}
+                sx={{
+                    ...(isDragActive && { opacity: 0.72 }),
+                    ...((isDragReject || error) && { color: 'error.main', borderColor: 'error.light', bgcolor: 'error.lighter' }),
+                    ...(file && { padding: '12% 0' })
+                }}
+            >
+                <input {...getInputProps()} />
+                <PlaceholderContent />
+                {thumbs}
+            </DropzoneWrapper> }
+
+            {fileRejections.length > 0 && <RejectionFiles fileRejections={fileRejections} />}
+
+            {file && file.length > 0 && <FilesPreview files={file} showList={showList} onRemove={onRemove} type={type} />}
+
+            {/*  {file && file.length > 0 && (
+                <Stack direction="row" justifyContent="flex-end" sx={{ mt: 1.5 }}>
+                    <Button variant="contained" color="error" onClick={onRemove}>
+                        Remove
+                    </Button>
+                </Stack>
+            )}*/}
+        </Box>
+    );
+};
+
+SingleFileUpload.propTypes = {
+    setFieldValue: PropTypes.func,
+    sx: PropTypes.object,
+    error: PropTypes.string,
+    file: PropTypes.array
+};
+
+export default SingleFileUpload;
