@@ -9,6 +9,7 @@ using OperaWeb.SharedClasses.Helpers;
 using System.Globalization;
 using System.Xml;
 using System.Xml.Serialization;
+using Services.UserGroup;
 
 namespace OperaWeb.Server.Services.BLL
 {
@@ -16,9 +17,12 @@ namespace OperaWeb.Server.Services.BLL
   {
     private OperaWebDbContext _context;
 
-    public ProjectServiceManager(OperaWebDbContext context)
+    private  ILogger _logger;
+
+    public ProjectServiceManager(OperaWebDbContext context, ILogger logger)
     {
-      _context = context;
+        _logger = logger;
+        _context = context;
     }
 
     /// <summary>
@@ -28,7 +32,8 @@ namespace OperaWeb.Server.Services.BLL
     /// <param name="newProject"></param>
     public void ImportData(string xmlString, Progetto newProject)
     {
-      
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data for project: {newProject}");
+
       var importedProject = _context.Progetti.Add(newProject);
 
       PweDocumento importedPwe;
@@ -39,8 +44,9 @@ namespace OperaWeb.Server.Services.BLL
         importedPwe = (PweDocumento)serializer.Deserialize(stringReader);
       }
 
-    //dati generali
-    _context.DatiGenerali.Add(new DatiGenerali()
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Dati Generali");
+      //dati generali
+      _context.DatiGenerali.Add(new DatiGenerali()
       {
         PercPrezzi = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.PercPrezzi,
         Comune = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Comune,
@@ -52,6 +58,7 @@ namespace OperaWeb.Server.Services.BLL
         Progetto = importedProject.Entity
       });
 
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Categorie");
       //Categorie
       List<EntityEntry<Categoria>> addedCategories = new List<EntityEntry<Categoria>>();
 
@@ -73,6 +80,7 @@ namespace OperaWeb.Server.Services.BLL
 
       List<EntityEntry<SuperCategoria>> addedSuperCategories = new List<EntityEntry<SuperCategoria>>();
 
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> SuperCategorie");
       foreach (var importedCategoria in importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie)
       {
         addedSuperCategories.Add(_context.SuperCategorie.Add(new SuperCategoria()
@@ -91,6 +99,7 @@ namespace OperaWeb.Server.Services.BLL
 
       List<EntityEntry<SubCategoria>> addedSubCategories = new List<EntityEntry<SubCategoria>>();
 
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> SubCategorie");
       foreach (var importedCategoria in importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie)
       {
         addedSubCategories.Add( _context.SubCategorie.Add(new SubCategoria()
@@ -108,6 +117,7 @@ namespace OperaWeb.Server.Services.BLL
 
       }
 
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> ElencoPrezzi");
       //elenco prezzi
       foreach (var importedPrezzo in importedPwe.PweMisurazioni.PweElencoPrezzi)
       {
@@ -136,6 +146,9 @@ namespace OperaWeb.Server.Services.BLL
         });
       }
 
+      int count = 0;
+
+      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Voci Computo Start");
       //voci computo
       foreach (var voceComputoImported in importedPwe.PweMisurazioni.PweVociComputo)
       {
@@ -199,9 +212,18 @@ namespace OperaWeb.Server.Services.BLL
             Flags = misurazioneImpoerted.Flags,
             VoceComputo = newVoceComputo
           });
-        }        
+        }
+        
+        if(count%10 == 0)
+        {
+          _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Voci Computo Importing -> Count: {count}");
+        }
+
+
+        count++;
       }
 
+      _logger.Log(LogLevel.Information, $"[ImportData] End Import Data");
       _context.SaveChanges();
     }
 

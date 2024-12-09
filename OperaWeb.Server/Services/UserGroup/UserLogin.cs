@@ -18,8 +18,10 @@ namespace Services.UserGroup
     {
         public async Task<AppResponse<UserLoginResponse>> UserLoginAsync(UserLoginRequest request)
         {
+            _logger.Log(LogLevel.Information, "[UserLoginAsync] START");
             var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
+      _logger.Log(LogLevel.Information, "[UserLoginAsync] user found");
+      if (user == null)
             {
 
                 return new AppResponse<UserLoginResponse>().SetErrorResponse("email", "Email not found");

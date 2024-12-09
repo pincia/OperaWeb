@@ -25,7 +25,7 @@ namespace OperaWeb.API.Test
       builder.UseInMemoryDatabase<OperaWebDbContext>("OperaWeb");
       options = builder.Options;
       _context = new OperaWebDbContext(options);
-      _manager = new ProjectServiceManager(_context);
+      _manager = new ProjectServiceManager(_context, null);
       var currentSplittedPath = System.IO.Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]).Split('\\');
       _currentPath = String.Join(@"\", currentSplittedPath.Take(currentSplittedPath.Length - 3));
     }

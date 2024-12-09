@@ -31,12 +31,6 @@ namespace OperaWeb.Server.Controllers
         _logger.LogInformation("Logs from Controller");
         _logger.LogInformation("Get Forecast!!!");
         var toReturn = "";
-        var project = await _projectService.GetAllAsync();
-
-        foreach (var item in project)
-        {
-          toReturn += item.Description;
-        }
 
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {

@@ -5,6 +5,7 @@ using OperaWeb.Server.Models;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.DataClasses.Models;
 using System.Security.Claims;
+using AutoMapper;
 
 namespace OperaWeb.Server.Controllers
 {
@@ -68,7 +69,9 @@ namespace OperaWeb.Server.Controllers
     {
       try
       {
-        var project = await _projectService.GetAllAsync();
+        var userId = User.FindFirstValue("Id");
+
+        var project = await _projectService.GetAllAsync((string) userId ?? "");
         if (project == null || !project.Any())
         {
           return Ok(new { message = "No Projects found", data = new List<Progetto>() });
@@ -131,18 +134,17 @@ namespace OperaWeb.Server.Controllers
     [HttpPost]
     [Route("Create-project-from-file")]
     public async Task<IActionResult> Post(CreateProjectFromFileRequest request)
-    {     
-      //Mock
-      //var username = User.FindFirstValue("UserName");
-      var username = "federicopinciaroli@gmail.com";
-      if (username == null)
+    {
+      var userId = User.FindFirstValue("Id");
+
+      if (userId == null)
       {
         return BadRequest();
       }
 
       if (request.File.Length > 0)
       {
-        var res = await _projectService.ImportNewProject(request,username);
+        var res = await _projectService.ImportNewProject(request, userId);
 
         if (res.Item1)
         {

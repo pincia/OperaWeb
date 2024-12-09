@@ -6,12 +6,12 @@ namespace OperaWeb.Server.Abstractions
 {
   public interface IProjectService
   {
-    Task<IEnumerable<Progetto>> GetAllAsync();
+    Task<IEnumerable<Progetto>> GetAllAsync(string userId);
     Task<Progetto> GetByIdAsync(int id);
     Task CreateProjectAsync(CreateProjectRequest request);
     Task UpdateProjectAsync(UpdateProjectRequest request);
     Task DeleteProjectAsync(int id);
     Task HardDeleteProjectAsync(int id);
-    Task<(bool, string)> ImportNewProject(CreateProjectFromFileRequest request, string username);
+    Task<(bool, string)> ImportNewProject(CreateProjectFromFileRequest request, string userId);
   }
 }

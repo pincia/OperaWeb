@@ -3,15 +3,13 @@ using OperaWeb.Server.Abstractions;
 using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.DataClasses.Context;
 using OperaWeb.Server.DataClasses.Models;
-using OperaWeb.Server.Models.XPVE;
 using System.Text;
-using System.Xml.Serialization;
 using OperaWeb.Server.Models.DTO.Project;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using OperaWeb.Server.Services.BLL;
 using System.Net.NetworkInformation;
 using System.Reflection.PortableExecutable;
 using Microsoft.EntityFrameworkCore;
+using OperaWeb.Server.Models.DTO;
 
 namespace OperaWeb.Server.Services
 {
@@ -28,7 +26,7 @@ namespace OperaWeb.Server.Services
       _logger = logger;
       _mapper = mapper;
       _config = config;
-      _projectServiceManager = new ProjectServiceManager(_context);
+      _projectServiceManager = new ProjectServiceManager(_context, _logger);
     }
     public async Task CreateProjectAsync(CreateProjectRequest request)
     {
@@ -68,9 +66,9 @@ namespace OperaWeb.Server.Services
       }
     }
 
-    public async Task<IEnumerable<Progetto>> GetAllAsync()
+    public async Task<IEnumerable<Progetto>> GetAllAsync(string userId)
     {
-      var projects = _context.Progetti.Where(p => p.isDeleted == false).ToList();
+      var projects = _context.Progetti.Where(p => p.isDeleted == false && p.User.Id == userId).ToList();
       if (projects == null)
       {
         throw new Exception(" No Projects found");
@@ -127,14 +125,20 @@ namespace OperaWeb.Server.Services
       }
     }
 
-    public async Task<(bool, string)> ImportNewProject(CreateProjectFromFileRequest request, string username)
+    /// <summary>
+    /// Import new project from XPV file.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<(bool, string)> ImportNewProject(CreateProjectFromFileRequest request, string userId)
     {
       string fileName = "";
       try
       {
         var uploadedFilePath = _config["OperaWeb:UploadedFilePath"];
 
-        var user = _context.Users.FirstOrDefault(p => p.UserName == username);
+        var user = _context.Users.FirstOrDefault(p => p.Id == userId);
 
         if (user == null)
         {
@@ -149,19 +153,19 @@ namespace OperaWeb.Server.Services
           {
             return (false, $"Project with name {request.Name} already exists!");
           }
-          var filePath = uploadedFilePath + user.UserName;
+          //var filePath = uploadedFilePath + user.UserName;
 
-          bool exists = Directory.Exists(filePath);
+          //bool exists = Directory.Exists(filePath);
 
-          if (!exists)
-            Directory.CreateDirectory(filePath);
+          //if (!exists)
+          //  Directory.CreateDirectory(filePath);
 
-          fileName = filePath + $"\\{request.Name}.XPVE";
+          //fileName = filePath + $"\\{request.Name}.XPVE";
 
-          using (var stream = System.IO.File.Create(fileName))
-          {
-            await request.File.CopyToAsync(stream);
-          }
+          //using (var stream = System.IO.File.Create(fileName))
+          //{
+          //  await request.File.CopyToAsync(stream);
+          //}
 
           StringBuilder sb = new StringBuilder();
           using var reader = new StreamReader(request.File.OpenReadStream());

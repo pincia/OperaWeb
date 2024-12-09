@@ -198,11 +198,11 @@ const ProjectAdd = ({ open, handleCloseDialog }) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <MainCard title="Upload XPV project file">
+                                    <MainCard title="Upload XPWE project file">
                                         <input
                                             type="file"
                                             name="file"
-                                            accept=".xpve"
+                                            accept=".xpwe"
                                             className="block w-full"
                                             onChange={(event) => {
                                                 // Set the field value to the selected file
