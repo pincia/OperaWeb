@@ -80,7 +80,7 @@ namespace OperaWeb.Server.Services
     {
       try
       {
-        var project = _context.Progetti.FirstOrDefault(p => p.ID == id);
+        var project = _context.Progetti.Include(p => p.User).FirstOrDefault(p => p.ID == id);
         if (project == null)
         {
           _logger.LogTrace("Project not found!");

@@ -88,17 +88,22 @@ namespace OperaWeb.Server.Controllers
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteProjectAsync(int id)
+    public async Task<IActionResult> DeleteProjectAsync(DeleteProjectRequest req)
     {
-      var project = await _projectService.GetByIdAsync(id);
+      var project = await _projectService.GetByIdAsync(req.Id);
       if (project == null)
       {
         return BadRequest(new { message = "No Project found" });
       }
+      var userId = User.FindFirstValue("Id");
+      if (project.User.Id != userId)
+      {
+        return BadRequest(new { message = "No Project found for user" });
+      }
 
       try
       {
-        await _projectService.DeleteProjectAsync(id);
+        await _projectService.DeleteProjectAsync(req.Id);
         return Ok(new { message = "Project successfully deleted" });
 
       }

@@ -58,10 +58,10 @@ const ProjectAdd = ({ open, handleCloseDialog }) => {
     const [openLoader, setOpen] = React.useState(false);
 
     const handleClose = () => {
-      setOpen(false);
+        setOpen(false);
     };
     const handleOpen = () => {
-      setOpen(true);
+        setOpen(true);
     };
 
     const formik = useFormik({
@@ -79,32 +79,34 @@ const ProjectAdd = ({ open, handleCloseDialog }) => {
             console.log('INVIO SALVATAGGIO PROGETTO')
             handleOpen()
             dispatch(
-                saveProject(values).then((response) => {
-                    console.log('SALVATAGGIO AVVENUTO CON SUCCESSO')
-                    handleAddClosing(true, JSON.stringify(values, null, 2));
-                    handleClose()
-                    openSnackbar({
-                        open: true,
-                        message: 'Submit Success',
-                        variant: 'alert',
-                        alert: {
-                            color: 'success'
-                        },
-                        close: false
+                saveProject(values).then(
+                    (response) => {
+                        console.log('SALVATAGGIO AVVENUTO CON SUCCESSO')
+                        handleAddClosing(true, JSON.stringify(values, null, 2));
+                        handleClose()
+                        openSnackbar({
+                            open: true,
+                            message: 'Submit Success',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            close: false
+                        })
+                    },
+                    (error) => {
+                        console.log('ERRORE SALVATAGGIO')
+                        handleClose()
+                        openSnackbar({
+                            open: true,
+                            message: 'Submit failed!',
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
                     })
-                }).else((data) => {
-                    console.log('ERRORE SALVATAGGIO')
-                    handleClose()
-                    openSnackbar({
-                        open: true,
-                        message: 'Submit failed!',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                })
 
             );
         }
@@ -206,7 +208,7 @@ const ProjectAdd = ({ open, handleCloseDialog }) => {
                                             className="block w-full"
                                             onChange={(event) => {
                                                 // Set the field value to the selected file
-                                                {formik.setFieldValue("file", event.currentTarget.files[0])};
+                                                { formik.setFieldValue("file", event.currentTarget.files[0]) };
                                             }}
                                         />
                                     </MainCard>
@@ -221,13 +223,13 @@ const ProjectAdd = ({ open, handleCloseDialog }) => {
                                 Close
                             </Button>
                         </DialogActions>
-                            <Backdrop
+                        <Backdrop
                             sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
                             open={openLoader}
                             onClick={handleClose}
-            >
-            <CircularProgress color="inherit" />
-            </Backdrop>
+                        >
+                            <CircularProgress color="inherit" />
+                        </Backdrop>
                     </form>
                 </>
             )}

@@ -13,153 +13,33 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Fab from '@mui/material/Fab';
+import { openSnackbar } from 'store/slices/snackbar';
+import ConfirmationDialog from 'ui-component/custom/ConfirmationDialog';
+
 import IconButton from '@mui/material/IconButton';
 import { GridRowModes, DataGrid, GridActionsCellItem, GridRowEditStopReasons } from '@mui/x-data-grid';
 import React from 'react';
-
+import {
+    Dialog,
+} from "@mui/material"
 // project import
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { CSVExport } from 'views/forms/tables/TableExports';
 
 import ProjectAdd from './ProjectAdd';
-// table columns
-export const columns = [
-    { field: 'id', headerName: 'ID', width: 120 },
-    {
-        field: 'name',
-        headerName:  <FormattedMessage id="name" />,
-        description:   <FormattedMessage id="projectNameDescription" />,
-        sortable: true,
-        flex: 2,
-        minWidth: 160,
-    },
-    { 
-        field: 'totalAmount', 
-        headerName: <FormattedMessage id="totalAmount" />,
-        flex: 1, 
-        minWidth: 164 
-    },
-    { 
-        field: 'localization', 
-        headerName: <FormattedMessage id="localization" />,
-        type: 'actions',
-        flex: 0.75,
-        minWidth: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
+import { deleteProject } from 'api/projects';
 
-            return [
-                <GridActionsCellItem
-                    key={id}
-                    component={IconButton}
-                    size="large"
-                    icon={<FmdGoodIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
-                    label="Edit"
-                    className="textPrimary"
-                    onClick={handleLocalizationClick(id)}
-                    color="inherit"
-                />
-            ];},
-        flex: 0.75, 
-        minWidth: 164 
-    },
-    { 
-        field: 'creationDate', 
-        headerName: <FormattedMessage id="creationDate" />,
-        flex: 1, 
-        minWidth: 164 
-    },
-    { 
-        field: 'lastUpdateDate', 
-        headerName: <FormattedMessage id="lastUpdateDate" />,
-        flex: 1, 
-        minWidth: 164 
-    },
-    {
-        field: 'actions',
-        type: 'actions',
-        headerName: 'Actions',
-        flex: 0.75,
-        minWidth: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-
-            return [
-                <GridActionsCellItem
-                    key={id}
-                    component={IconButton}
-                    size="large"
-                    icon={<EditTwoToneIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
-                    label="Edit"
-                    className="textPrimary"
-                    onClick={handleEditClick(id)}
-                    color="inherit"
-                />,
-                <GridActionsCellItem
-                    key={id}
-                    component={IconButton}
-                    size="large"
-                    icon={<DeleteIcon color="error" sx={{ fontSize: '1.3rem' }} />}
-                    label="Delete"
-                    onClick={handleDeleteClick(id)}
-                    color="inherit"
-                />
-            ];
-        }
-    }
-];
-
-
-const handleEditClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-};
-
-const handleLocalizationClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-};
-
-const handleDeleteClick = (id) => () => {
-};
-
-
-
-function TableDataGrid({ Selected }) {
-         // projects data
-    const initialProjects = useLoaderData();
-    const [rows, setRows] = React.useState(initialProjects.data);   
-    return (
-        <Box sx={{ width: '100%' }}>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                autoHeight
-                initialState={{
-                    pagination: {
-                        paginationModel: {
-                            pageSize: 5
-                        }
-                    }
-                }}
-                
-                pageSizeOptions={[5]}
-            />
-        </Box>
-    );
-}
-
-TableDataGrid.propTypes = {
-    Selected: PropTypes.func,
-    HandleAddRow: PropTypes.func
-};
-
-// ==============================|| TABLE - BASIC DATA GRID ||============================== //
 
 export default function Projects() {
     let headers = [];
-    columns.map((item) => {
-        return headers.push({ label: item.headerName, key: item.field });
-    });
+
+    const initialProjects = useLoaderData();
+    const [rows, setRows] = React.useState(initialProjects.data);
+
+    const deleteRowFromGrid = (id) => {
+        setRows(rows.filter((row, id) => id == row.id));
+    }
 
     const [selectedValue, setSelectedValue] = useState([]);
     const handlerClick = (data) => {
@@ -173,13 +53,153 @@ export default function Projects() {
     };
     const handleCloseDialog = (success, row) => {
         setOpen(false);
-        if(success)
-        {
-
+        if (success) {
+            const [rows, setRows] = React.useState(seLoaderData().Data);
         }
     };
-    const rows = [];
-    let NewValue = selectedValue.length > 0 ? selectedValue : rows;
+
+
+    // table columns
+     const columns = [
+        { field: 'id', headerName: 'ID', width: 120 },
+        {
+            field: 'name',
+            headerName: <FormattedMessage id="name" />,
+            description: <FormattedMessage id="projectNameDescription" />,
+            sortable: true,
+            flex: 2,
+            minWidth: 160,
+        },
+        {
+            field: 'totalAmount',
+            headerName: <FormattedMessage id="totalAmount" />,
+            flex: 1,
+            minWidth: 164
+        },
+        {
+            field: 'localization',
+            headerName: <FormattedMessage id="localization" />,
+            type: 'actions',
+            flex: 0.75,
+            minWidth: 100,
+            cellClassName: 'actions',
+            getActions: ({ id }) => {
+
+                return [
+                    <GridActionsCellItem
+                        key={id}
+                        component={IconButton}
+                        size="large"
+                        icon={<FmdGoodIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
+                        label="Edit"
+                        className="textPrimary"
+                        onClick={handleLocalizationClick(id)}
+                        color="inherit"
+                    />
+                ];
+            },
+            flex: 0.75,
+            minWidth: 164
+        },
+        {
+            field: 'creationDate',
+            headerName: <FormattedMessage id="creationDate" />,
+            flex: 1,
+            minWidth: 164
+        },
+        {
+            field: 'lastUpdateDate',
+            headerName: <FormattedMessage id="lastUpdateDate" />,
+            flex: 1,
+            minWidth: 164
+        },
+        {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            flex: 0.75,
+            minWidth: 100,
+            cellClassName: 'actions',
+            getActions: ({ id }) => {
+
+                return [
+                    <GridActionsCellItem
+                        key={id}
+                        component={IconButton}
+                        size="large"
+                        icon={<EditTwoToneIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
+                        label="Edit"
+                        className="textPrimary"
+                        onClick={handleEditClick(id)}
+                        color="inherit"
+                    />,
+
+                    , <ConfirmationDialog
+                        title="Confirmation"
+                        description="Sei sicuro di voler eliminare il progetto?"
+                        response={handleConfirmation}
+                        value={id}
+                    > {(showDialog) => (
+                        <GridActionsCellItem
+                            key={id}
+                            component={IconButton}
+                            size="large"
+                            icon={<DeleteIcon color="error" sx={{ fontSize: '1.3rem' }} />}
+                            label="Delete"
+                            onClick={showDialog}
+                            color="inherit"
+                        />
+                    )}
+                    </ConfirmationDialog >
+                ];
+            }
+        }
+    ];
+
+    columns.map((item) => {
+        return headers.push({ label: item.headerName, key: item.field });
+    });
+
+    const handleEditClick = (id) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+     
+    };
+
+    const handleLocalizationClick = (id) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    };
+
+
+    const handleConfirmation = (id) => {
+        console.log('Confirmed!' + id);
+
+        deleteProject(id).then(
+            (response) => {
+                console.log('ELIMINAZIONE AVVENUTA CON SUCCESSO')
+                deleteRowFromGrid(id)
+                openSnackbar({
+                    open: true,
+                    message: 'Submit Success',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            },
+            (error) => {
+                console.log('ERRORE ELIMINAZIONE')
+                openSnackbar({
+                    open: true,
+                    message: 'Submit failed!',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            });
+    };
 
     return (
         <Grid container spacing={gridSpacing}>
@@ -189,7 +209,7 @@ export default function Projects() {
                     title="Project List"
                     secondary={
                         <Stack direction="row" spacing={2} alignItems="center">
-                                    <Tooltip title="Import new Project">
+                            <Tooltip title="Import new Project">
                                 <Fab
                                     color="primary"
                                     size="small"
@@ -199,12 +219,26 @@ export default function Projects() {
                                     <AddIcon fontSize="small" />
                                 </Fab>
                             </Tooltip>
-                          <ProjectAdd open={open} handleCloseDialog={handleCloseDialog} />
-                          {/*         <CSVExport data={NewValue} filename={'data-grid-table.csv'} header={headers} /> */}
+                            <ProjectAdd open={open} handleCloseDialog={handleCloseDialog} />
+                            {/*         <CSVExport data={NewValue} filename={'data-grid-table.csv'} header={headers} /> */}
                         </Stack>
                     }
                 >
-                    <TableDataGrid Selected={handlerClick} />
+                    <Box sx={{ width: '100%' }}>
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            autoHeight
+                            initialState={{
+                                pagination: {
+                                    paginationModel: {
+                                        pageSize: 5
+                                    }
+                                }
+                            }}
+                            pageSizeOptions={[5]}
+                        />
+                    </Box>
                 </MainCard>
             </Grid>
         </Grid>

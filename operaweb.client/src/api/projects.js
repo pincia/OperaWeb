@@ -11,7 +11,7 @@ export async function loader() {
 }
 
 
-export async function saveProject( project ) {
+export async function saveProject(project) {
     try {
         console.log('save project called')
         console.log(project)
@@ -23,17 +23,34 @@ export async function saveProject( project ) {
         formData.append("zipCode", project.zipCode);
         formData.append("country", project.country);
         formData.append("file", project.file);
-        
-        const response =  axios.post('/api/projects/create-project-from-file', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        }})
+
+        const response = axios.post('/api/projects/create-project-from-file', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
 
         return response;
     } catch (error) {
         return error;
     }
 }
+export async function deleteProject(projectId) {
+    try {
+        console.log('delete project called')
+
+        const response = axios.delete('/api/projects/', {
+            data: {
+                Id: projectId
+            }         
+        })
+
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
+
 
 export async function getRelatedProducts(id) {
     return await axios.post('/api/product/related', { id });
