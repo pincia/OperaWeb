@@ -14,7 +14,12 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Fab from '@mui/material/Fab';
 import { openSnackbar } from 'store/slices/snackbar';
-import ConfirmationDialog from 'ui-component/custom/ConfirmationDialog';
+import {
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+} from "@mui/material";
 
 import IconButton from '@mui/material/IconButton';
 import { GridRowModes, DataGrid, GridActionsCellItem, GridRowEditStopReasons } from '@mui/x-data-grid';
@@ -26,9 +31,8 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { CSVExport } from 'views/forms/tables/TableExports';
-
 import ProjectAdd from './ProjectAdd';
-import { deleteProject } from 'api/projects';
+import { deleteProject, loader } from 'api/projects';
 
 
 export default function Projects() {
@@ -36,31 +40,84 @@ export default function Projects() {
 
     const initialProjects = useLoaderData();
     const [rows, setRows] = React.useState(initialProjects.data);
+    const [open, setOpen] = React.useState(false);
+    const [selectedRowId, setSelectedRowId] = useState([]);
+    const [openConfirmation, setOpenConfirmation] = useState(false);
 
     const deleteRowFromGrid = (id) => {
-        setRows(rows.filter((row, id) => id == row.id));
+        setRows(rows.filter((el) => el.id != id));
     }
 
-    const [selectedValue, setSelectedValue] = useState([]);
-    const handlerClick = (data) => {
-        setSelectedValue(data);
-    };
-
-    // show a right sidebar when clicked on new product
-    const [open, setOpen] = React.useState(false);
     const handleClickOpenDialog = () => {
         setOpen(true);
     };
+
     const handleCloseDialog = (success, row) => {
         setOpen(false);
         if (success) {
-            const [rows, setRows] = React.useState(seLoaderData().Data);
+            loader().then(
+                (response) => {
+                    setRows(response.data);
+                },
+                (error) => {
+                    openSnackbar({
+                        open: true,
+                        message: 'Submit failed!',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                });
         }
     };
 
+    const showDialogConfirmation = (row) => {
+        setSelectedRowId(row.id)
+        setOpenConfirmation(true);
+    };
 
+    const hideDialogConfirmation = () => {
+        setOpenConfirmation(false);
+    };
+    const renderSummaryDownloadButton = (params) => {
+        return (
+            <strong>
+                <IconButton
+                    aria-label="fingerprint"
+                    color="secondary"
+                    onClick={() => {
+                        showDialogConfirmation(params.row)
+                    }}  >
+                    <DeleteIcon />
+                </IconButton>
+                <Dialog
+                    open={openConfirmation}
+                    onClose={hideDialogConfirmation}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Conferma</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Sei sicuro di voler eliminare il progetto?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleConfirmation} color="primary">
+                            Sì
+                        </Button>
+                        <Button onClick={hideDialogConfirmation} color="primary">
+                            No
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </strong>
+        )
+    }
     // table columns
-     const columns = [
+    const columns = [
         { field: 'id', headerName: 'ID', width: 120 },
         {
             field: 'name',
@@ -84,7 +141,6 @@ export default function Projects() {
             minWidth: 100,
             cellClassName: 'actions',
             getActions: ({ id }) => {
-
                 return [
                     <GridActionsCellItem
                         key={id}
@@ -114,45 +170,11 @@ export default function Projects() {
             minWidth: 164
         },
         {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            flex: 0.75,
-            minWidth: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-
-                return [
-                    <GridActionsCellItem
-                        key={id}
-                        component={IconButton}
-                        size="large"
-                        icon={<EditTwoToneIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-
-                    , <ConfirmationDialog
-                        title="Confirmation"
-                        description="Sei sicuro di voler eliminare il progetto?"
-                        response={handleConfirmation}
-                        value={id}
-                    > {(showDialog) => (
-                        <GridActionsCellItem
-                            key={id}
-                            component={IconButton}
-                            size="large"
-                            icon={<DeleteIcon color="error" sx={{ fontSize: '1.3rem' }} />}
-                            label="Delete"
-                            onClick={showDialog}
-                            color="inherit"
-                        />
-                    )}
-                    </ConfirmationDialog >
-                ];
-            }
+            field: 'delete',
+            headerName: '',
+            width: 150,
+            renderCell: renderSummaryDownloadButton,
+            disableClickEventBubbling: true,
         }
     ];
 
@@ -162,21 +184,20 @@ export default function Projects() {
 
     const handleEditClick = (id) => () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-     
+
     };
 
     const handleLocalizationClick = (id) => () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
+  
 
-    const handleConfirmation = (id) => {
-        console.log('Confirmed!' + id);
-
-        deleteProject(id).then(
+    const handleConfirmation = () => {
+        deleteProject(selectedRowId).then(
             (response) => {
-                console.log('ELIMINAZIONE AVVENUTA CON SUCCESSO')
-                deleteRowFromGrid(id)
+                deleteRowFromGrid(selectedRowId)
+                hideDialogConfirmation()
                 openSnackbar({
                     open: true,
                     message: 'Submit Success',
@@ -188,7 +209,7 @@ export default function Projects() {
                 })
             },
             (error) => {
-                console.log('ERRORE ELIMINAZIONE')
+                hideDialogConfirmation()
                 openSnackbar({
                     open: true,
                     message: 'Submit failed!',
@@ -199,6 +220,7 @@ export default function Projects() {
                     close: false
                 })
             });
+
     };
 
     return (
@@ -237,10 +259,13 @@ export default function Projects() {
                                 }
                             }}
                             pageSizeOptions={[5]}
+                            onRowClick={(rows) => { setSelectedRowId(rows.id) }}
+
                         />
                     </Box>
                 </MainCard>
             </Grid>
         </Grid>
+       
     );
 }

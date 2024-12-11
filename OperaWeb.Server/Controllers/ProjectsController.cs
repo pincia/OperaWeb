@@ -71,12 +71,12 @@ namespace OperaWeb.Server.Controllers
       {
         var userId = User.FindFirstValue("Id");
 
-        var project = await _projectService.GetAllAsync((string) userId ?? "");
-        if (project == null || !project.Any())
+        var projects = await _projectService.GetAllAsync((string) userId ?? "");
+        if (projects == null || !projects.Any())
         {
           return Ok(new { message = "No Projects found", data = new List<Progetto>() });
         }
-        return Ok(new { message = "Successfully retrieved all projects", data = project });
+        return Ok(new { message = "Successfully retrieved all projects", data = projects });
 
       }
       catch (Exception ex)

@@ -101,7 +101,7 @@ namespace OperaWeb.Server.Services
       {
         var project = _context.Progetti
           .Include(p => p.File)
-          .Include(v=>v.VociComputo)
+          .Include(v => v.VociComputo)
           .Include(v => v.Categorie)
           .Include(v => v.SubCategorie)
           .Include(v => v.SuperCategorie)
@@ -116,7 +116,7 @@ namespace OperaWeb.Server.Services
           throw new Exception("Project not found!");
         }
         _context.Progetti.Remove(project);
-         await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
       }
       catch (Exception ex)
       {
@@ -186,6 +186,8 @@ namespace OperaWeb.Server.Services
             Country = request.Country,
             ZipCode = request.ZipCode,
             User = user,
+            CreationDate = DateTime.Now,
+            LastUpdateDate = DateTime.Now,
             File = new DataClasses.Models.File()
             {
               FileName = fileName,
@@ -208,7 +210,7 @@ namespace OperaWeb.Server.Services
         return (false, ex.Message);
       }
     }
-    
+
     public async Task UpdateProjectAsync(UpdateProjectRequest request)
     {
       try

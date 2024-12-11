@@ -51,11 +51,3 @@ export async function deleteProject(projectId) {
     }
 }
 
-
-export async function getRelatedProducts(id) {
-    return await axios.post('/api/product/related', { id });
-}
-
-export async function getProductReviews() {
-    return await axios.get('/api/review/list');
-}

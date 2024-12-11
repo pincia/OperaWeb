@@ -29,7 +29,7 @@ function ConfirmationDialog(props) {
 
     return (
         <>
-            {props.children(showDialog)}
+            {props.children && props.children(showDialog)}
             {open && (
                 <Dialog
                     open={open}
