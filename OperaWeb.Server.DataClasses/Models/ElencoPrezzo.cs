@@ -45,7 +45,7 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public string PweEPAnalisi { get; set; }
 
-    public virtual Progetto Progetto { get; set; }
-    public int ProgettoID { get; set; }
+    public virtual Project Project { get; set; }
+    public int ProjectID { get; set; }
   }
 }

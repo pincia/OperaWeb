@@ -1,6 +1,6 @@
 ﻿namespace OperaWeb.Server.Models.DTO.Project
 {
-    public class CreateProjectRequest
+    public class CreateProjectRequestDTO
     {
         public string Name { get; set; }
         public string Description { get; set; }

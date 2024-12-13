@@ -55,7 +55,7 @@ export const JWTProvider = ({ children }) => {
                 const serviceToken = window.localStorage.getItem('serviceToken');
                 if (serviceToken && verifyToken(serviceToken)) {
                     setSession(serviceToken);
-                    const response = await axios.get('/api/account/me');
+                    const response = await axios.get('/api/user/me');
                     const { user } = response.data;
                     dispatch({
                         type: LOGIN,
@@ -82,6 +82,7 @@ export const JWTProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const response = await axios.post('/api/user/login', { email, password });
+        console.log(response)
         if(response.data.isSucceed){
             const { accessToken, user } = response.data.data;
             setSession(accessToken);
@@ -108,7 +109,7 @@ export const JWTProvider = ({ children }) => {
         
         let user = response.data;
 
-        if(response.data.isSucceed){
+        if (response.data.isSucceed) {
             const { accessToken, user } = response.data.data;
             setSession(accessToken);
             dispatch({
@@ -118,7 +119,11 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
-        }      
+        }
+        else
+        {
+            throw new Error(JSON.stringify(Object.values(response.data.messages)))
+        }
 /*
 
         if (window.localStorage.getItem('users') !== undefined && window.localStorage.getItem('users') !== null) {

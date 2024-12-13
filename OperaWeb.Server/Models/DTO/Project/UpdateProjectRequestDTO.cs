@@ -1,6 +1,6 @@
 ﻿namespace OperaWeb.Server.Models.DTO.Project
 {
-    public class UpdateProjectRequest
+    public class UpdateProjectRequestDTO
     {
         public int ID { get; set; }
         public string Name { get; set; }

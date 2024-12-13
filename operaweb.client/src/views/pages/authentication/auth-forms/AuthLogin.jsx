@@ -64,7 +64,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
                 try {
                    var res = await login(values.email, values.password);
 
-              
+              console.log(res)
                     openSnackbar({
                         open: true,
                         message: 'Login failed.',

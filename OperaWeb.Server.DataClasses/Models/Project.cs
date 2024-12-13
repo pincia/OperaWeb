@@ -1,30 +1,31 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OperaWeb.Server.DataClasses.Models
 {
-  [Table("Progetti")]
-  public class Progetto
+  [Table("Projects")]
+  public class Project
   {
     public int ID { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-
-    public string Address { get; set; }
+    public string Object { get; set; }
+    public string Province { get; set; }
     public string City { get; set; }
-    public string Country { get; set; }
-    public string ZipCode { get; set; }
+    public string Works { get; set; }
     public decimal TotalAmount { get; set; }
-
-    public bool isDeleted { get; set; }
+    public string? Notes { get; set; }
+    public bool Public { get; set; }
+    public bool Deleted { get; set; }
+    [MaxLength(10)]
+    public string? GIG { get; set; }
+    [MaxLength(15)]
+    public string? CUP { get; set; }
     public DateTime CreationDate { get; set; }
-
     public DateTime LastUpdateDate { get; set; }
-
     public virtual File File { get; set; }
-
     public virtual ApplicationUser User { get; set; }
-
+    public virtual Soa? SoaCategory { get; set; }
+    public virtual SoaClassification? SoaClassification { get; set; }
     public ICollection<VoceComputo> VociComputo { get; set; }
     public ICollection<Categoria> Categorie { get; set; }
     public ICollection<SubCategoria> SubCategorie { get; set; }

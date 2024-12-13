@@ -5,7 +5,7 @@ import { Link, useLoaderData } from 'react-router-dom';
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import AddIcon from '@mui/icons-material/Add';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import FileOpen from '@mui/icons-material/FileOpen';
 // material-ui
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -31,7 +31,7 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { CSVExport } from 'views/forms/tables/TableExports';
-import ProjectAdd from './ProjectAdd';
+import CreateProject from 'views/pages/projects/CreateProject';
 import { deleteProject, loader } from 'api/projects';
 
 
@@ -81,38 +81,17 @@ export default function Projects() {
     const hideDialogConfirmation = () => {
         setOpenConfirmation(false);
     };
-    const renderSummaryDownloadButton = (params) => {
+    const renderOpenButton = (params) => {
         return (
             <strong>
                 <IconButton
                     aria-label="fingerprint"
-                    color="secondary"
+                    color="primary"
                     onClick={() => {
-                        showDialogConfirmation(params.row)
+                       console.log("APRI PROGETTO")
                     }}  >
-                    <DeleteIcon />
+                    <FileOpen />
                 </IconButton>
-                <Dialog
-                    open={openConfirmation}
-                    onClose={hideDialogConfirmation}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">Conferma</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Sei sicuro di voler eliminare il progetto?
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleConfirmation} color="primary">
-                            Sì
-                        </Button>
-                        <Button onClick={hideDialogConfirmation} color="primary">
-                            No
-                        </Button>
-                    </DialogActions>
-                </Dialog>
             </strong>
         )
     }
@@ -120,60 +99,76 @@ export default function Projects() {
     const columns = [
         { field: 'id', headerName: 'ID', width: 120 },
         {
-            field: 'name',
-            headerName: <FormattedMessage id="name" />,
-            description: <FormattedMessage id="projectNameDescription" />,
+            field: 'object',
+            headerName: <FormattedMessage id="objectLabel" />,
+            description: <FormattedMessage id="objectDescription" />,
+            sortable: true,
+            flex: 2,
+            minWidth: 10,
+        },
+        {
+            field: 'city',
+            headerName: <FormattedMessage id="cityLabel" />,
+            description: <FormattedMessage id="cityDescription" />,
+            sortable: true,
+            flex: 2,
+            minWidth: 160,
+        },
+        {
+            field: 'province',
+            headerName: <FormattedMessage id="provinceLabel" />,
+            description: <FormattedMessage id="provincetDescription" />,
             sortable: true,
             flex: 2,
             minWidth: 160,
         },
         {
             field: 'totalAmount',
-            headerName: <FormattedMessage id="totalAmount" />,
+            headerName: <FormattedMessage id="total" />,
             flex: 1,
             minWidth: 164
         },
-        {
-            field: 'localization',
-            headerName: <FormattedMessage id="localization" />,
-            type: 'actions',
-            flex: 0.75,
-            minWidth: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                return [
-                    <GridActionsCellItem
-                        key={id}
-                        component={IconButton}
-                        size="large"
-                        icon={<FmdGoodIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleLocalizationClick(id)}
-                        color="inherit"
-                    />
-                ];
-            },
-            flex: 0.75,
-            minWidth: 164
-        },
+        //{
+        //    field: 'localization',
+        //    headerName: <FormattedMessage id="localization" />,
+        //    type: 'actions',
+        //    flex: 0.75,
+        //    minWidth: 100,
+        //    cellClassName: 'actions',
+        //    getActions: ({ id }) => {
+        //        return [
+        //            <GridActionsCellItem
+        //                key={id}
+        //                component={IconButton}
+        //                size="large"
+        //                icon={<FmdGoodIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
+        //                label="Edit"
+        //                className="textPrimary"
+        //                onClick={handleLocalizationClick(id)}
+        //                color="inherit"
+        //            />
+        //        ];
+        //    },
+        //    flex: 0.75,
+        //    minWidth: 164
+        //},
         {
             field: 'creationDate',
             headerName: <FormattedMessage id="creationDate" />,
             flex: 1,
-            minWidth: 164
+            minWidth: 130
         },
         {
             field: 'lastUpdateDate',
             headerName: <FormattedMessage id="lastUpdateDate" />,
             flex: 1,
-            minWidth: 164
+            minWidth: 130
         },
         {
             field: 'delete',
             headerName: '',
             width: 150,
-            renderCell: renderSummaryDownloadButton,
+            renderCell: renderOpenButton,
             disableClickEventBubbling: true,
         }
     ];
@@ -228,20 +223,11 @@ export default function Projects() {
             <Grid item xs={12}>
                 <MainCard
                     content={false}
-                    title="Project List"
+                    title="Elenco Cantieri"
                     secondary={
                         <Stack direction="row" spacing={2} alignItems="center">
-                            <Tooltip title="Import new Project">
-                                <Fab
-                                    color="primary"
-                                    size="small"
-                                    onClick={handleClickOpenDialog}
-                                    sx={{ boxShadow: 'none', ml: 1, width: 32, height: 32, minHeight: 32 }}
-                                >
-                                    <AddIcon fontSize="small" />
-                                </Fab>
-                            </Tooltip>
-                            <ProjectAdd open={open} handleCloseDialog={handleCloseDialog} />
+                            
+                            <CreateProject open={open} handleCloseDialog={handleCloseDialog} />
                             {/*         <CSVExport data={NewValue} filename={'data-grid-table.csv'} header={headers} /> */}
                         </Stack>
                     }

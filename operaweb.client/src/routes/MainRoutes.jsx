@@ -9,6 +9,7 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 import { loader as productsLoader, productLoader } from 'api/products';
 import Projects from 'views/pages/projects';
 import { loader as projectsLoader } from 'api/projects';
+import ProjectWizard from '../views/forms/forms-wizard/ProjectWizard';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -174,6 +175,9 @@ const UtilsGrid = Loadable(lazy(() => import('views/utilities/Grid')));
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
+//projects
+const FrmProjectWizard = Loadable(lazy(() => import('views/pages/create-project')));
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 
@@ -192,6 +196,18 @@ const MainRoutes = {
         {
             path: '/general/default',
             element: <DashboardDefault />
+        }, {
+            path: '/general/projects',
+            loader: projectsLoader,
+            element: <Projects />
+        },
+        {
+            path: '/general/create-project/',
+            element: <ProjectWizard />
+        },
+        {
+            path: '/general/create-project/:id',
+            element: <ProjectWizard />
         }
     ]
 };
@@ -704,6 +720,10 @@ const MainRoutesTest = {
             element: <Projects />
         },
         {
+            path: '/general/create-project',
+            element: <ProjectWizard />
+        },
+        {
             path: '/general/default',
             element: <DashboardDefault />
         },
@@ -714,4 +734,4 @@ const MainRoutesTest = {
     ]
 };
 
-export default MainRoutesTest;
+export default MainRoutes;

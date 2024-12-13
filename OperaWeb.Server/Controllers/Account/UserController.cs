@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.Models.DTO;
 using Services;
 using Services.UserGroup;
+using System.Security.Claims;
 
 namespace OperaWeb.Server.Controllers.Account
 {
@@ -23,6 +25,17 @@ namespace OperaWeb.Server.Controllers.Account
     public async Task<AppResponse<object>> Register(UserRegisterRequest req)
     {
       return await _userService.UserRegisterAsync(req, Request.Headers["origin"]);
+    }
+
+
+    [HttpGet]
+    public async Task<AppResponse<ApplicationUser>> Me()
+    {
+      var userId = User.FindFirstValue("Id");
+
+      var user =  await _userService.Me(userId);
+
+      return user;
     }
 
     [HttpPost]

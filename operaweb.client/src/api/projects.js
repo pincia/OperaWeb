@@ -10,18 +10,29 @@ export async function loader() {
     }
 }
 
+export async function getProject(id) {
+    try {
+        const response = await axios.get('/api/projects/'+id);
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
 
-export async function saveProject(project) {
+export async function getTemplates() {
+    try {
+        const response = await axios.get('/api/template');
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function importXPWE(project) {
     try {
         console.log('save project called')
         console.log(project)
         const formData = new FormData();
-        formData.append("name", project.name);
-        formData.append("description", project.description);
-        formData.append("address", project.address);
-        formData.append("city", project.city);
-        formData.append("zipCode", project.zipCode);
-        formData.append("country", project.country);
         formData.append("file", project.file);
 
         const response = axios.post('/api/projects/create-project-from-file', formData, {

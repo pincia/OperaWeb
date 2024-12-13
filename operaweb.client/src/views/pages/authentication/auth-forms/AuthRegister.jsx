@@ -90,8 +90,8 @@ const JWTRegister = ({ ...others }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                       await register(values.email, values.password, values.firstName, values.lastName);
-                     //   if (scriptedRef.current) {
+                       var res = await register(values.email, values.password, values.firstName, values.lastName);
+                        //if (scriptedRef.current) {
                             setStatus({ success: true });
                             setSubmitting(false);
                             dispatch(
@@ -109,11 +109,11 @@ const JWTRegister = ({ ...others }) => {
                         //}
                     } catch (err) {
                         console.error(err);
-                        if (scriptedRef.current) {
+                      //if (scriptedRef.current) {
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);
-                        }
+                       //
                     }
                 }}
             >

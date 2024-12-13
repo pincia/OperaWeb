@@ -10,6 +10,9 @@ using System.Globalization;
 using System.Xml;
 using System.Xml.Serialization;
 using Services.UserGroup;
+using System.Diagnostics.Metrics;
+using System.Net;
+using System.Reflection.Emit;
 
 namespace OperaWeb.Server.Services.BLL
 {
@@ -30,11 +33,11 @@ namespace OperaWeb.Server.Services.BLL
     /// </summary>
     /// <param name="xmlString"></param>
     /// <param name="newProject"></param>
-    public void ImportData(string xmlString, Progetto newProject)
+    public int ImportData(string xmlString, Project newProject)
     {
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data for project: {newProject}");
 
-      var importedProject = _context.Progetti.Add(newProject);
+
 
       PweDocumento importedPwe;
 
@@ -46,7 +49,8 @@ namespace OperaWeb.Server.Services.BLL
 
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Dati Generali");
       //dati generali
-      _context.DatiGenerali.Add(new DatiGenerali()
+
+      var datiGenerali = new DatiGenerali()
       {
         PercPrezzi = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.PercPrezzi,
         Comune = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Comune,
@@ -55,8 +59,17 @@ namespace OperaWeb.Server.Services.BLL
         Committente = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Committente,
         Impresa = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Impresa,
         ParteOpera = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.ParteOpera,
-        Progetto = importedProject.Entity
-      });
+      };
+
+      newProject.Object = datiGenerali.Oggetto;
+      newProject.City = datiGenerali.Comune;
+      newProject.Province = datiGenerali.Provincia;
+      newProject.Works = datiGenerali.ParteOpera;
+
+      var importedProject = _context.Projects.Add(newProject);
+      datiGenerali.Project = importedProject.Entity;
+
+      _context.DatiGenerali.Add(datiGenerali);
 
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Categorie");
       //Categorie
@@ -74,7 +87,7 @@ namespace OperaWeb.Server.Services.BLL
           CodFase = importedCategoria.CodFase,
           Percentuale = importedCategoria.Percentuale,
           Codice = importedCategoria.Codice,
-          Progetto = importedProject.Entity
+          Project = importedProject.Entity
         }));
       }
 
@@ -93,7 +106,7 @@ namespace OperaWeb.Server.Services.BLL
           CodFase = importedCategoria.CodFase,
           Percentuale = importedCategoria.Percentuale,
           Codice = importedCategoria.Codice,
-          Progetto = importedProject.Entity
+          Project = importedProject.Entity
         }));
       }
 
@@ -112,7 +125,7 @@ namespace OperaWeb.Server.Services.BLL
           CodFase = importedCategoria.CodFase,
           Percentuale = importedCategoria.Percentuale,
           Codice = importedCategoria.Codice,
-          Progetto = importedProject.Entity
+          Project = importedProject.Entity
         }));
 
       }
@@ -142,7 +155,7 @@ namespace OperaWeb.Server.Services.BLL
           Data = DateTime.ParseExact(importedPrezzo.Data, "dd/MM/yyyy", null),
           AdrInternet = importedPrezzo.AdrInternet,
           PweEPAnalisi = importedPrezzo.PweEPAnalisi,
-          Progetto = importedProject.Entity
+          Project = importedProject.Entity
         });
       }
 
@@ -157,7 +170,7 @@ namespace OperaWeb.Server.Services.BLL
           continue;
         }
         
-        var category = addedCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProgettoID == importedProject.Entity.ID);
+        var category = addedCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
         if (category == null) 
         {
           continue;
@@ -168,7 +181,7 @@ namespace OperaWeb.Server.Services.BLL
           continue;
         }
 
-        var superCategory = addedSuperCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProgettoID == importedProject.Entity.ID);
+        var superCategory = addedSuperCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
         if (superCategory == null)
         {
           continue;
@@ -179,7 +192,7 @@ namespace OperaWeb.Server.Services.BLL
           continue;
         }
 
-        var subCategory = addedSubCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProgettoID == importedProject.Entity.ID);
+        var subCategory = addedSubCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
         if (subCategory == null)
         {
           continue;
@@ -191,7 +204,7 @@ namespace OperaWeb.Server.Services.BLL
           Quantita = voceComputoImported.Quantita,
           DataMis = DateTime.ParseExact(voceComputoImported.DataMis, "dd/MM/yyyy", null),
           Flags = voceComputoImported.Flags,
-          Progetto = importedProject.Entity,
+          Project = importedProject.Entity,
           Categoria = category.Entity,
           SubCategoria = subCategory.Entity,
           SuperCategoria = superCategory.Entity
@@ -225,6 +238,8 @@ namespace OperaWeb.Server.Services.BLL
 
       _logger.Log(LogLevel.Information, $"[ImportData] End Import Data");
       _context.SaveChanges();
+
+      return importedProject.Entity.ID;
     }
 
 

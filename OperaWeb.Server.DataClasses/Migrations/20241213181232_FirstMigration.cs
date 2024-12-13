@@ -56,6 +56,51 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Soa",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Soa", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SoaClassifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SoaClassifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Templates",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Codice = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descrizione = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JsonTemplate = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Templates", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -182,38 +227,52 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Progetti",
+                name: "Projects",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Object = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Works = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    isDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Public = table.Column<bool>(type: "bit", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    GIG = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CUP = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FileID = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SoaCategoryId = table.Column<int>(type: "int", nullable: true),
+                    SoaClassificationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Progetti", x => x.ID);
+                    table.PrimaryKey("PK_Projects", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Progetti_AspNetUsers_UserId",
+                        name: "FK_Projects_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Progetti_Files_FileID",
+                        name: "FK_Projects_Files_FileID",
                         column: x => x.FileID,
                         principalTable: "Files",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Projects_SoaClassifications_SoaClassificationId",
+                        column: x => x.SoaClassificationId,
+                        principalTable: "SoaClassifications",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Projects_Soa_SoaCategoryId",
+                        column: x => x.SoaCategoryId,
+                        principalTable: "Soa",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -227,15 +286,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     UtiliImpresa = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OneriAccessoriSc = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ConfQuantita = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DocumentoID = table.Column<int>(type: "int", nullable: false)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Analisi", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Analisi_Progetti_DocumentoID",
-                        column: x => x.DocumentoID,
-                        principalTable: "Progetti",
+                        name: "FK_Analisi_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -254,21 +313,21 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     CodFase = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Percentuale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Codice = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false),
-                    ProgettoID1 = table.Column<int>(type: "int", nullable: true)
+                    ProjectID = table.Column<int>(type: "int", nullable: false),
+                    ProjectID1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categorie", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Categorie_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
+                        name: "FK_Categorie_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID");
                     table.ForeignKey(
-                        name: "FK_Categorie_Progetti_ProgettoID1",
-                        column: x => x.ProgettoID1,
-                        principalTable: "Progetti",
+                        name: "FK_Categorie_Projects_ProjectID1",
+                        column: x => x.ProjectID1,
+                        principalTable: "Projects",
                         principalColumn: "ID");
                 });
 
@@ -293,15 +352,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     ConvPrezziTotale = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IncidenzaPercentuale = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Aliquote = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ConfigNumeri", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_ConfigNumeri_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
+                        name: "FK_ConfigNumeri_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -319,15 +378,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     Committente = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Impresa = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ParteOpera = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DatiGenerali", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_DatiGenerali_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
+                        name: "FK_DatiGenerali_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -357,15 +416,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     Data = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AdrInternet = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PweEPAnalisi = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ElencoPrezzi", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_ElencoPrezzi_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
+                        name: "FK_ElencoPrezzi_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID");
                 });
 
@@ -383,22 +442,17 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     CodFase = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Percentuale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Codice = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false),
-                    ProgettoID1 = table.Column<int>(type: "int", nullable: true)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubCategorie", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_SubCategorie_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_SubCategorie_Progetti_ProgettoID1",
-                        column: x => x.ProgettoID1,
-                        principalTable: "Progetti",
-                        principalColumn: "ID");
+                        name: "FK_SubCategorie_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -415,22 +469,17 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     CodFase = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Percentuale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Codice = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false),
-                    ProgettoID1 = table.Column<int>(type: "int", nullable: true)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SuperCategorie", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_SuperCategorie_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_SuperCategorie_Progetti_ProgettoID1",
-                        column: x => x.ProgettoID1,
-                        principalTable: "Progetti",
-                        principalColumn: "ID");
+                        name: "FK_SuperCategorie_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -446,7 +495,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     SuperCategoriaID = table.Column<int>(type: "int", nullable: true),
                     CategoriaID1 = table.Column<int>(type: "int", nullable: false),
                     SubCategoriaID = table.Column<int>(type: "int", nullable: true),
-                    ProgettoID = table.Column<int>(type: "int", nullable: false)
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -458,9 +507,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VociComputo_Progetti_ProgettoID",
-                        column: x => x.ProgettoID,
-                        principalTable: "Progetti",
+                        name: "FK_VociComputo_Projects_ProjectID",
+                        column: x => x.ProjectID,
+                        principalTable: "Projects",
                         principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_VociComputo_SubCategorie_SubCategoriaID",
@@ -502,9 +551,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Analisi_DocumentoID",
+                name: "IX_Analisi_ProjectID",
                 table: "Analisi",
-                column: "DocumentoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -546,29 +595,29 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categorie_ProgettoID",
+                name: "IX_Categorie_ProjectID",
                 table: "Categorie",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categorie_ProgettoID1",
+                name: "IX_Categorie_ProjectID1",
                 table: "Categorie",
-                column: "ProgettoID1");
+                column: "ProjectID1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConfigNumeri_ProgettoID",
+                name: "IX_ConfigNumeri_ProjectID",
                 table: "ConfigNumeri",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DatiGenerali_ProgettoID",
+                name: "IX_DatiGenerali_ProjectID",
                 table: "DatiGenerali",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ElencoPrezzi_ProgettoID",
+                name: "IX_ElencoPrezzi_ProjectID",
                 table: "ElencoPrezzi",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Files_UserId",
@@ -581,34 +630,34 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "VoceComputoID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Progetti_FileID",
-                table: "Progetti",
+                name: "IX_Projects_FileID",
+                table: "Projects",
                 column: "FileID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Progetti_UserId",
-                table: "Progetti",
+                name: "IX_Projects_SoaCategoryId",
+                table: "Projects",
+                column: "SoaCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_SoaClassificationId",
+                table: "Projects",
+                column: "SoaClassificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_UserId",
+                table: "Projects",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubCategorie_ProgettoID",
+                name: "IX_SubCategorie_ProjectID",
                 table: "SubCategorie",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubCategorie_ProgettoID1",
-                table: "SubCategorie",
-                column: "ProgettoID1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SuperCategorie_ProgettoID",
+                name: "IX_SuperCategorie_ProjectID",
                 table: "SuperCategorie",
-                column: "ProgettoID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SuperCategorie_ProgettoID1",
-                table: "SuperCategorie",
-                column: "ProgettoID1");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VociComputo_CategoriaID1",
@@ -616,9 +665,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "CategoriaID1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VociComputo_ProgettoID",
+                name: "IX_VociComputo_ProjectID",
                 table: "VociComputo",
-                column: "ProgettoID");
+                column: "ProjectID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VociComputo_SubCategoriaID",
@@ -665,6 +714,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "Misure");
 
             migrationBuilder.DropTable(
+                name: "Templates");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -680,10 +732,16 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "SuperCategorie");
 
             migrationBuilder.DropTable(
-                name: "Progetti");
+                name: "Projects");
 
             migrationBuilder.DropTable(
                 name: "Files");
+
+            migrationBuilder.DropTable(
+                name: "SoaClassifications");
+
+            migrationBuilder.DropTable(
+                name: "Soa");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -34,14 +34,11 @@ namespace OperaWeb.API.Test
     [Fact]
     public void TestXmlImport_is_correct()
     {
-      var newProject = new Progetto()
+      var newProject = new Project()
       {
-        Name = "TEST PROGETTO",
-        Description = "TEST DESCRIPTION",
-        Address = "TEST",
+        Object = "TEST PROGETTO",
+        Province = "TEST",
         City = "TEST",
-        Country = "TEST",
-        ZipCode ="12345",
       };
       
       var lines = File.ReadAllLines(_currentPath + "\\XPVE\\test.xpve");

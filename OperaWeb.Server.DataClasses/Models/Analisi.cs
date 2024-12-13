@@ -16,7 +16,7 @@ namespace OperaWeb.Server.DataClasses.Models
 
         public string ConfQuantita { get; set; }
 
-        public virtual Progetto Documento { get; set; }
-        public int DocumentoID { get; set; }
+        public virtual Project Project { get; set; }
+        public int ProjectID { get; set; }
     }
 }

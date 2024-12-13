@@ -9,7 +9,7 @@ namespace OperaWeb.Server.DataClasses.Context
 {
   public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
-    public virtual DbSet<Progetto> Documenti { get; set; }
+    public virtual DbSet<Project> Documenti { get; set; }
     public virtual DbSet<DatiGenerali> DatiGenerali { get; set; }
     public virtual DbSet<Categoria> Categorie { get; set; }
     public virtual DbSet<SubCategoria> SubCategorie { get; set; }
@@ -20,7 +20,10 @@ namespace OperaWeb.Server.DataClasses.Context
     public virtual DbSet<ElencoPrezzo> ElencoPrezzi { get; set; }
     public virtual DbSet<VoceComputo> VociComputo { get; set; }
     public virtual DbSet<Misura> Misure { get; set; }
-    public virtual DbSet<Progetto> Progetti { get; set; }
+    public virtual DbSet<Project> Projects { get; set; }
+    public virtual DbSet<Template> Templates { get; set; }
+    public virtual DbSet<Soa> Soas { get; set; }
+    public virtual DbSet<SoaClassification> SoaClassifications { get; set; }
 
     public OperaWebDbContext(DbContextOptions<OperaWebDbContext> options) : base(options)
     {
@@ -39,116 +42,108 @@ namespace OperaWeb.Server.DataClasses.Context
               .HasForeignKey(e => e.SuperCategoriaID)
               .OnDelete(DeleteBehavior.NoAction);
 
-          entity
-        .HasOne(e => e.SubCategoria)
-        .WithMany()
-        .HasForeignKey(e => e.SubCategoriaID)
-        .OnDelete(DeleteBehavior.NoAction);
+        entity
+      .HasOne(e => e.SubCategoria)
+      .WithMany()
+      .HasForeignKey(e => e.SubCategoriaID)
+      .OnDelete(DeleteBehavior.NoAction);
 
-          entity
-        .HasOne(e => e.Progetto)
-        .WithMany()
-        .HasForeignKey(e => e.ProgettoID)
-        .OnDelete(DeleteBehavior.NoAction);
+        entity
+      .HasOne(e => e.Project)
+      .WithMany()
+      .HasForeignKey(e => e.ProjectID)
+      .OnDelete(DeleteBehavior.NoAction);
 
-        });
+      });
 
       modelBuilder.Entity<ElencoPrezzo>(entity =>
       {
         entity
-         .HasOne(e => e.Progetto)
+         .HasOne(e => e.Project)
          .WithMany()
-         .HasForeignKey(e => e.ProgettoID)
+         .HasForeignKey(e => e.ProjectID)
          .OnDelete(DeleteBehavior.NoAction);
-
-        //entity
-        //   .HasOne(e => e.SubCategoria)
-        //   .WithMany()
-        //   .HasForeignKey(e => e.SubCategoriaID)
-        //   .OnDelete(DeleteBehavior.NoAction);
-
-
       });
 
-      modelBuilder.Entity<Progetto>()
+      modelBuilder.Entity<Project>()
       .HasMany(e => e.VociComputo)
-      .WithOne(e => e.Progetto)
-      .HasForeignKey(e => e.ProgettoID)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
       .HasPrincipalKey(e => e.ID);
 
-   
-      modelBuilder.Entity<Progetto>()
+
+      modelBuilder.Entity<Project>()
       .HasMany(e => e.SuperCategorie)
-      .WithOne(e => e.Progetto)
-      .HasForeignKey(e => e.ProgettoID)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
       .HasPrincipalKey(e => e.ID);
 
-      modelBuilder.Entity<Progetto>()
+      modelBuilder.Entity<Project>()
       .HasMany(e => e.Categorie)
-      .WithOne(e => e.Progetto)
-      .HasForeignKey(e => e.ProgettoID)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
       .HasPrincipalKey(e => e.ID);
 
-      modelBuilder.Entity<Progetto>()
+      modelBuilder.Entity<Project>()
       .HasMany(e => e.SubCategorie)
-      .WithOne(e => e.Progetto)
-      .HasForeignKey(e => e.ProgettoID)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
       .HasPrincipalKey(e => e.ID);
 
-      modelBuilder.Entity<Progetto>()
-.HasMany(e => e.ConfigNumeri)
-.WithOne(e => e.Progetto)
-.HasForeignKey(e => e.ProgettoID)
-.HasPrincipalKey(e => e.ID);
+      modelBuilder.Entity<Project>()
+      .HasMany(e => e.ConfigNumeri)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
+      .HasPrincipalKey(e => e.ID);
 
-      modelBuilder.Entity<Progetto>()
-.HasMany(e => e.DatiGenerali)
-.WithOne(e => e.Progetto)
-.HasForeignKey(e => e.ProgettoID)
-.HasPrincipalKey(e => e.ID);
+      modelBuilder.Entity<Project>()
+      .HasMany(e => e.DatiGenerali)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
+      .HasPrincipalKey(e => e.ID);
 
-      modelBuilder.Entity<Progetto>()
-.HasMany(e => e.ElencoPrezzi)
-.WithOne(e => e.Progetto)
-.HasForeignKey(e => e.ProgettoID)
-.HasPrincipalKey(e => e.ID);
+      modelBuilder.Entity<Project>()
+      .HasMany(e => e.ElencoPrezzi)
+      .WithOne(e => e.Project)
+      .HasForeignKey(e => e.ProjectID)
+      .HasPrincipalKey(e => e.ID);
 
 
-    modelBuilder.Entity<Categoria>(entity =>
-      {
-        entity
-  .HasOne(e => e.Progetto)
-  .WithMany()
-  .HasForeignKey(e => e.ProgettoID)
-  .OnDelete(DeleteBehavior.NoAction);
+      modelBuilder.Entity<Categoria>(entity =>
+        {
+          entity
+    .HasOne(e => e.Project)
+    .WithMany()
+    .HasForeignKey(e => e.ProjectID)
+    .OnDelete(DeleteBehavior.NoAction);
 
-      });
+        });
 
-  //    modelBuilder.Entity<SuperCategoria>(entity =>
-  //    {
-  //      entity
-  //.HasOne(e => e.Progetto)
-  //.WithMany()
-  //.HasForeignKey(e => e.ProgettoID)
-  //.OnDelete(DeleteBehavior.NoAction);
+      //    modelBuilder.Entity<SuperCategoria>(entity =>
+      //    {
+      //      entity
+      //.HasOne(e => e.Project)
+      //.WithMany()
+      //.HasForeignKey(e => e.ProjectID)
+      //.OnDelete(DeleteBehavior.NoAction);
 
-  //    });
-  //    modelBuilder.Entity<SubCategoria>(entity =>
-  //    {
-  //      entity
-  //.HasOne(e => e.Progetto)
-  //.WithMany()
-  //.HasForeignKey(e => e.ProgettoID)
-  //.OnDelete(DeleteBehavior.NoAction);
+      //    });
+      //    modelBuilder.Entity<SubCategoria>(entity =>
+      //    {
+      //      entity
+      //.HasOne(e => e.Project)
+      //.WithMany()
+      //.HasForeignKey(e => e.ProjectID)
+      //.OnDelete(DeleteBehavior.NoAction);
 
-  //    });
-  //    modelBuilder.Entity<Categoria>(entity =>
-  //    {
-  //      entity
-  //.HasOne(e => e.Progetto)
-  //.WithMany()
-  //.HasForeignKey(e => e.ProgettoID)
-  //.OnDelete(DeleteBehavior.NoAction);
+      //    });
+      //    modelBuilder.Entity<Categoria>(entity =>
+      //    {
+      //      entity
+      //.HasOne(e => e.Project)
+      //.WithMany()
+      //.HasForeignKey(e => e.ProjectID)
+      //.OnDelete(DeleteBehavior.NoAction);
 
       //});
       //modelBuilder.Entity<Documento>(entity =>
@@ -195,7 +190,9 @@ namespace OperaWeb.Server.DataClasses.Context
         //.OnDelete(DeleteBehavior.NoAction);
 
       });
-
+      modelBuilder.Entity<Template>(entity =>
+      {
+      });
     }
   }
 }

@@ -6,10 +6,8 @@ using OperaWeb.Server.DataClasses.Models;
 using System.Text;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.Services.BLL;
-using System.Net.NetworkInformation;
-using System.Reflection.PortableExecutable;
 using Microsoft.EntityFrameworkCore;
-using OperaWeb.Server.Models.DTO;
+using OperaWeb.Server.Models.DTO.Templates;
 
 namespace OperaWeb.Server.Services
 {
@@ -28,15 +26,18 @@ namespace OperaWeb.Server.Services
       _config = config;
       _projectServiceManager = new ProjectServiceManager(_context, _logger);
     }
-    public async Task CreateProjectAsync(CreateProjectRequest request)
+
+    /// <inheritdoc/>
+    public async Task<int> CreateProjectAsync(CreateProjectRequestDTO request)
     {
       try
       {
-        var project = _mapper.Map<Progetto>(request);
+        var project = _mapper.Map<Project>(request);
         project.CreationDate = DateTime.UtcNow;
         project.LastUpdateDate = DateTime.UtcNow;
-        _context.Progetti.Add(project);
-        await _context.SaveChangesAsync();
+        var newProject = _context.Projects.Add(project);
+         await _context.SaveChangesAsync();
+        return newProject.Entity.ID;
       }
       catch (Exception ex)
       {
@@ -45,18 +46,19 @@ namespace OperaWeb.Server.Services
       }
     }
 
+    /// <inheritdoc/>
     public async Task DeleteProjectAsync(int id)
     {
       try
       {
-        var project = _context.Progetti.FirstOrDefault(p => p.ID == id);
+        var project = _context.Projects.FirstOrDefault(p => p.ID == id);
         if (project == null)
         {
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
-        project.isDeleted = true;
-        _context.Progetti.Update(project);
+        project.Deleted = true;
+        _context.Projects.Update(project);
         await _context.SaveChangesAsync();
       }
       catch (Exception ex)
@@ -66,9 +68,10 @@ namespace OperaWeb.Server.Services
       }
     }
 
-    public async Task<IEnumerable<Progetto>> GetAllAsync(string userId)
+    /// <inheritdoc/>
+    public async Task<IEnumerable<Project>> GetAllProjects(string userId)
     {
-      var projects = _context.Progetti.Where(p => p.isDeleted == false && p.User.Id == userId).ToList();
+      var projects = _context.Projects.Where(p => p.Deleted == false && p.User.Id == userId).ToList();
       if (projects == null)
       {
         throw new Exception(" No Projects found");
@@ -76,11 +79,26 @@ namespace OperaWeb.Server.Services
       return projects;
     }
 
-    public async Task<Progetto> GetByIdAsync(int id)
+    /// <inheritdoc/>
+    public IEnumerable<TemplateDTO> GetAllTemplates()
+    {
+      return _context.Templates.Select(t => new TemplateDTO
+      {
+        Codice = t.Codice,
+        Nome = t.Nome,
+        ID = t.ID,
+        Descrizione = t.Descrizione,
+        ImagePath = t.ImagePath,
+        JsonTemplate = t.JsonTemplate,  
+      }).ToList();
+    }
+
+    /// <inheritdoc/>
+    public Project GetProjectById(int id, string userId)
     {
       try
       {
-        var project = _context.Progetti.Include(p => p.User).FirstOrDefault(p => p.ID == id);
+        var project = _context.Projects.Include(p => p.User).FirstOrDefault(p => p.ID == id && p.User.Id == userId);
         if (project == null)
         {
           _logger.LogTrace("Project not found!");
@@ -90,16 +108,17 @@ namespace OperaWeb.Server.Services
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "An error occurred while deleting the Project item.");
-        throw new Exception("An error occurred while deleting the Project item.");
+        _logger.LogError(ex, "An error occurred while retriving the Project item.");
+        throw new Exception("An error occurred while retriving the Project item.");
       }
     }
 
+    /// <inheritdoc/>
     public async Task HardDeleteProjectAsync(int id)
     {
       try
       {
-        var project = _context.Progetti
+        var project = _context.Projects
           .Include(p => p.File)
           .Include(v => v.VociComputo)
           .Include(v => v.Categorie)
@@ -115,7 +134,7 @@ namespace OperaWeb.Server.Services
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
-        _context.Progetti.Remove(project);
+        _context.Projects.Remove(project);
         await _context.SaveChangesAsync();
       }
       catch (Exception ex)
@@ -125,15 +144,11 @@ namespace OperaWeb.Server.Services
       }
     }
 
-    /// <summary>
-    /// Import new project from XPV file.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    public async Task<(bool, string)> ImportNewProject(CreateProjectFromFileRequest request, string userId)
+    /// <inheritdoc/>
+    public async Task<(int, string)> ImportNewProject(CreateProjectFromFileRequestDTO request, string userId)
     {
       string fileName = "";
+      var projectId = -1;
       try
       {
         var uploadedFilePath = _config["OperaWeb:UploadedFilePath"];
@@ -142,31 +157,11 @@ namespace OperaWeb.Server.Services
 
         if (user == null)
         {
-          return (false, "User not found!");
+          return (projectId, "User not found!");
         }
 
         if (request.File.Length > 0)
         {
-          var existingProject = _context.Progetti.Any(x => x.User == user && x.Name == request.Name);
-
-          if (existingProject)
-          {
-            return (false, $"Project with name {request.Name} already exists!");
-          }
-          //var filePath = uploadedFilePath + user.UserName;
-
-          //bool exists = Directory.Exists(filePath);
-
-          //if (!exists)
-          //  Directory.CreateDirectory(filePath);
-
-          //fileName = filePath + $"\\{request.Name}.XPVE";
-
-          //using (var stream = System.IO.File.Create(fileName))
-          //{
-          //  await request.File.CopyToAsync(stream);
-          //}
-
           StringBuilder sb = new StringBuilder();
           using var reader = new StreamReader(request.File.OpenReadStream());
 
@@ -177,14 +172,8 @@ namespace OperaWeb.Server.Services
             sb.Append(await reader.ReadLineAsync());
           }
 
-          _projectServiceManager.ImportData(sb.ToString(), new Progetto()
+          projectId = _projectServiceManager.ImportData(sb.ToString(), new Project()
           {
-            Name = request.Name,
-            Description = request.Description,
-            Address = request.Address,
-            City = request.City,
-            Country = request.Country,
-            ZipCode = request.ZipCode,
             User = user,
             CreationDate = DateTime.Now,
             LastUpdateDate = DateTime.Now,
@@ -199,7 +188,7 @@ namespace OperaWeb.Server.Services
           var res = _context.SaveChanges();
         }
 
-        return (true, "");
+        return (projectId, "");
       }
       catch (Exception ex)
       {
@@ -207,22 +196,23 @@ namespace OperaWeb.Server.Services
         {
           System.IO.File.Delete(fileName);
         }
-        return (false, ex.Message);
+        return (projectId, ex.Message);
       }
     }
 
-    public async Task UpdateProjectAsync(UpdateProjectRequest request)
+    /// <inheritdoc/>
+    public async Task UpdateProjectAsync(UpdateProjectRequestDTO request)
     {
       try
       {
-        var project = _mapper.Map<Progetto>(request);
-        var found = _context.Progetti.Any(p => p.ID == request.ID);
+        var project = _mapper.Map<Project>(request);
+        var found = _context.Projects.Any(p => p.ID == request.ID);
         if (!found)
         {
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
-        _context.Progetti.Update(project);
+        _context.Projects.Update(project);
         await _context.SaveChangesAsync();
       }
       catch (Exception ex)

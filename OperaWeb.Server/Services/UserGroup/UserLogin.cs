@@ -1,5 +1,6 @@
 ﻿using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.DataClasses;
+using Azure.Core;
 
 namespace Services.UserGroup
 {
@@ -41,5 +42,19 @@ namespace Services.UserGroup
             }
         }
 
+    public async Task<AppResponse<ApplicationUser>> Me(string userId)
+    {
+      var user = await _userManager.FindByIdAsync(userId);
+
+      if (user == null)
+      {
+        return new AppResponse<ApplicationUser>().SetErrorResponse("user", "user id not found");
+      }
+      else
+      {
+        return new AppResponse<ApplicationUser>().SetSuccessResponse(user);
+      }
     }
+
+  }
 }

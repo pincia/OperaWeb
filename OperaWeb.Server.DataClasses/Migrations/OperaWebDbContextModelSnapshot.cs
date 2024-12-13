@@ -247,11 +247,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DocumentoID")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("OneriAccessoriSc")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProjectID")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("SpeseGenerali")
                         .HasColumnType("decimal(18,2)");
@@ -264,7 +264,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("DocumentoID");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("Analisi");
                 });
@@ -305,17 +305,17 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal>("Percentuale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProgettoID")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProgettoID1")
+                    b.Property<int?>("ProjectID1")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
+                    b.HasIndex("ProjectID");
 
-                    b.HasIndex("ProgettoID1");
+                    b.HasIndex("ProjectID1");
 
                     b.ToTable("Categorie");
                 });
@@ -383,7 +383,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProgettoID")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.Property<string>("Quantita")
@@ -392,7 +392,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("ConfigNumeri");
                 });
@@ -428,7 +428,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal>("PercPrezzi")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProgettoID")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.Property<string>("Provincia")
@@ -437,7 +437,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("DatiGenerali");
                 });
@@ -494,7 +494,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal>("Prezzo5")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProgettoID")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.Property<string>("PweEPAnalisi")
@@ -520,7 +520,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("ElencoPrezzi");
                 });
@@ -591,7 +591,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("Misure");
                 });
 
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Progetto", b =>
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -599,34 +599,49 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("CUP")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("FileID")
                         .HasColumnType("int");
 
+                    b.Property<string>("GIG")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<DateTime>("LastUpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Object")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Public")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SoaCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SoaClassificationId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -634,20 +649,67 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ZipCode")
+                    b.Property<string>("Works")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("ID");
 
                     b.HasIndex("FileID");
 
+                    b.HasIndex("SoaCategoryId");
+
+                    b.HasIndex("SoaClassificationId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Progetti");
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Soa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Soa");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.SoaClassification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SoaClassifications");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.SubCategoria", b =>
@@ -686,17 +748,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal>("Percentuale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProgettoID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProgettoID1")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
-
-                    b.HasIndex("ProgettoID1");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("SubCategorie");
                 });
@@ -737,19 +794,47 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal>("Percentuale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProgettoID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProgettoID1")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProgettoID");
-
-                    b.HasIndex("ProgettoID1");
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("SuperCategorie");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Template", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Codice")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descrizione")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JsonTemplate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>
@@ -772,7 +857,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("IDEP")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProgettoID")
+                    b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantita")
@@ -788,7 +873,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasIndex("CategoriaID1");
 
-                    b.HasIndex("ProgettoID");
+                    b.HasIndex("ProjectID");
 
                     b.HasIndex("SubCategoriaID");
 
@@ -850,61 +935,61 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Analisi", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Documento")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany()
-                        .HasForeignKey("DocumentoID")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Documento");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Categoria", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany()
-                        .HasForeignKey("ProgettoID")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", null)
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", null)
                         .WithMany("Categorie")
-                        .HasForeignKey("ProgettoID1");
+                        .HasForeignKey("ProjectID1");
 
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ConfigNumeri", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
-                        .WithMany()
-                        .HasForeignKey("ProgettoID")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("ConfigNumeri")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.DatiGenerali", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
-                        .WithMany()
-                        .HasForeignKey("ProgettoID")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("DatiGenerali")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ElencoPrezzo", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
-                        .WithMany()
-                        .HasForeignKey("ProgettoID")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("ElencoPrezzi")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.File", b =>
@@ -929,7 +1014,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("VoceComputo");
                 });
 
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Progetto", b =>
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.File", "File")
                         .WithMany()
@@ -937,43 +1022,47 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Soa", "SoaCategory")
+                        .WithMany()
+                        .HasForeignKey("SoaCategoryId");
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.SoaClassification", "SoaClassification")
+                        .WithMany()
+                        .HasForeignKey("SoaClassificationId");
+
                     b.HasOne("OperaWeb.Server.DataClasses.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("File");
 
+                    b.Navigation("SoaCategory");
+
+                    b.Navigation("SoaClassification");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.SubCategoria", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
-                        .WithMany()
-                        .HasForeignKey("ProgettoID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("SubCategorie")
+                        .HasForeignKey("ProjectID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", null)
-                        .WithMany("SubCategorie")
-                        .HasForeignKey("ProgettoID1");
-
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.SuperCategoria", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
-                        .WithMany()
-                        .HasForeignKey("ProgettoID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("SuperCategorie")
+                        .HasForeignKey("ProjectID")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", null)
-                        .WithMany("SuperCategorie")
-                        .HasForeignKey("ProgettoID1");
-
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>
@@ -984,9 +1073,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Progetto", "Progetto")
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("VociComputo")
-                        .HasForeignKey("ProgettoID")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1002,16 +1091,22 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("Categoria");
 
-                    b.Navigation("Progetto");
+                    b.Navigation("Project");
 
                     b.Navigation("SubCategoria");
 
                     b.Navigation("SuperCategoria");
                 });
 
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Progetto", b =>
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
                 {
                     b.Navigation("Categorie");
+
+                    b.Navigation("ConfigNumeri");
+
+                    b.Navigation("DatiGenerali");
+
+                    b.Navigation("ElencoPrezzi");
 
                     b.Navigation("SubCategorie");
 
