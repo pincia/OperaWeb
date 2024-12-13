@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace OperaWeb.Server.Controllers
 {
-   [Route("api/[controller]")]
+  [Route("api/[controller]")]
   [ApiController]
   public class ProjectsController : ControllerBase
   {
@@ -65,7 +65,7 @@ namespace OperaWeb.Server.Controllers
       try
       {
         var userId = User.FindFirstValue("Id");
-        var projects = await _projectService.GetAllProjects((string) userId ?? "");
+        var projects = await _projectService.GetAllProjects((string)userId ?? "");
         if (projects == null || !projects.Any())
         {
           return Ok(new { message = "No Projects found", data = new List<Project>() });
@@ -86,7 +86,7 @@ namespace OperaWeb.Server.Controllers
       try
       {
         var userId = User.FindFirstValue("Id");
-        var project =  _projectService.GetProjectById(id, userId);
+        var project = _projectService.GetProjectById(id, userId);
 
         if (project == null)
         {
@@ -161,7 +161,7 @@ namespace OperaWeb.Server.Controllers
       {
         var res = await _projectService.ImportNewProject(request, userId);
 
-        if (res.Item1!= -1)
+        if (res.Item1 != -1)
         {
           return Ok(new { id = res.Item1 });
         }
