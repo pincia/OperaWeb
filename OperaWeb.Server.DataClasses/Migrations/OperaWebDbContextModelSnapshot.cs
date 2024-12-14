@@ -840,6 +840,38 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("Templates");
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.SubRole", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("SubRoles");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.UserSubRole", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SubRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "SubRoleId");
+
+                    b.HasIndex("SubRoleId");
+
+                    b.ToTable("UserSubRoles");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>
                 {
                     b.Property<int>("ID")
@@ -1068,6 +1100,25 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.UserSubRole", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.User.SubRole", "SubRole")
+                        .WithMany()
+                        .HasForeignKey("SubRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubRole");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>

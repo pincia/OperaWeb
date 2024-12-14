@@ -2,8 +2,10 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OperaWeb.Server.DataClasses.Context;
+using System;
 using System.Security.Claims;
 namespace OperaWeb.Server.DataClasses.Context
 {
@@ -52,6 +54,17 @@ namespace OperaWeb.Server.DataClasses.Context
 
     public async Task TrySeedAsync()
     {
+      // Crea un elenco di ruoli da aggiungere
+      var roles = new List<string> { "Admin", "Committente", "Professionista", "Impresa"};
+
+      foreach (var role in roles)
+      {
+        if (!await _roleManager.RoleExistsAsync(role))
+        {
+          await _roleManager.CreateAsync(new IdentityRole(role));
+        }
+      }
+
       // Default roles
       var administratorRole = new IdentityRole("Administrator");
 
@@ -64,6 +77,17 @@ namespace OperaWeb.Server.DataClasses.Context
           await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleAdd"));
           await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleEdit"));
           await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleDelete"));
+        }
+      }
+      //SubRoles
+      var subRoles = new List<string> { "Muratore", "Falegname", "Elettricista","Impiantista"};
+      var actualSubRoles = _context.SubRoles.ToList();
+
+      foreach (var role in subRoles)
+      {
+        if (!actualSubRoles.Exists(S=>S.Name == role))
+        {
+          _context.SubRoles.Add(new Models.User.SubRole() { Name = role });
         }
       }
 

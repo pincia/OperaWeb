@@ -1,18 +1,31 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import gantt from 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
-const GanttChart = ({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd }) => {
+const GanttChart = forwardRef(({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd }, ref) => {
     const ganttContainer = useRef();
 
+    useImperativeHandle(ref, () => ({
+        exportToPDF: async () => {
+            const element = ganttContainer.current;
+            const canvas = await html2canvas(element);
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('landscape', 'mm', 'a4');
+            const width = pdf.internal.pageSize.getWidth();
+            const height = (canvas.height * width) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+            pdf.save('gantt-chart.pdf');
+        },
+    }));
+
     useEffect(() => {
-        // Configura il Gantt
         gantt.config.scale_unit = 'day';
         gantt.config.date_scale = '%d %M';
         gantt.config.scale_height = 50;
         gantt.config.row_height = 30;
 
-        // Configura gli eventi
         gantt.attachEvent('onAfterTaskAdd', (id, task) => {
             onTaskAdd(task);
         });
@@ -25,17 +38,15 @@ const GanttChart = ({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd }) => {
             onTaskDelete(id);
         });
 
-        // Inizializza il Gantt
         gantt.init(ganttContainer.current);
         gantt.parse(tasks);
 
-        // Cleanup
         return () => {
             gantt.clearAll();
         };
     }, [tasks, onTaskUpdate, onTaskDelete, onTaskAdd]);
 
     return <div ref={ganttContainer} style={{ width: '100%', height: '500px' }}></div>;
-};
+});
 
 export default GanttChart;

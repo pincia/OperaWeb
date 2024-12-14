@@ -5,10 +5,14 @@ using OperaWeb.Server.DataClasses.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Reflection.Metadata;
+using OperaWeb.Server.DataClasses.Models.User;
 namespace OperaWeb.Server.DataClasses.Context
 {
   public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
+    public virtual DbSet<SubRole> SubRoles { get; set; }
+    public virtual DbSet<UserSubRole> UserSubRoles { get; set; }
+
     public virtual DbSet<Project> Documenti { get; set; }
     public virtual DbSet<DatiGenerali> DatiGenerali { get; set; }
     public virtual DbSet<Categoria> Categorie { get; set; }
@@ -193,6 +197,23 @@ namespace OperaWeb.Server.DataClasses.Context
       modelBuilder.Entity<Template>(entity =>
       {
       });
+
+      // Configura la chiave primaria composita
+      modelBuilder.Entity<UserSubRole>()
+          .HasKey(ur => new { ur.UserId, ur.SubRoleId });
+
+      // Configura la relazione tra UserSubRole e ApplicationUser
+      modelBuilder.Entity<UserSubRole>()
+          .HasOne(ur => ur.User)
+          .WithMany()
+          .HasForeignKey(ur => ur.UserId);
+
+      // Configura la relazione tra UserSubRole e SubRole
+      modelBuilder.Entity<UserSubRole>()
+          .HasOne(ur => ur.SubRole)
+          .WithMany()
+          .HasForeignKey(ur => ur.SubRoleId);
+
     }
   }
 }

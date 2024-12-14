@@ -84,6 +84,19 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubRoles",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubRoles", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Templates",
                 columns: table => new
                 {
@@ -223,6 +236,30 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSubRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubRoles", x => new { x.UserId, x.SubRoleId });
+                    table.ForeignKey(
+                        name: "FK_UserSubRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserSubRoles_SubRoles_SubRoleId",
+                        column: x => x.SubRoleId,
+                        principalTable: "SubRoles",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -667,6 +704,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "ProjectID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserSubRoles_SubRoleId",
+                table: "UserSubRoles",
+                column: "SubRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VociComputo_CategoriaID1",
                 table: "VociComputo",
                 column: "CategoriaID1");
@@ -726,10 +768,16 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "Templates");
 
             migrationBuilder.DropTable(
+                name: "UserSubRoles");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "VociComputo");
+
+            migrationBuilder.DropTable(
+                name: "SubRoles");
 
             migrationBuilder.DropTable(
                 name: "Categorie");

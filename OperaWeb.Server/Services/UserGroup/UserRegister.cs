@@ -14,10 +14,10 @@ namespace Services.UserGroup
   {
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";
+    public string Role { get; set; } = "";
   }
   public partial class UserService
   {
-
     public async Task<AppResponse<object>> UserRegisterAsync(UserRegisterRequest request, string origin)
     {
       var user = new ApplicationUser()
@@ -35,6 +35,7 @@ namespace Services.UserGroup
 
       var newUser = _context.Users.Where(u => u.Email == request.Email).FirstOrDefault();
 
+      var res = await _userManager.AddToRoleAsync(newUser, request.Role);
       newUser.VerificationToken = generateVerificationToken();
 
       if (result.Succeeded)

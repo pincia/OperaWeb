@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.Models.DTO;

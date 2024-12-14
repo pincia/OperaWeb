@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'store';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -15,9 +15,11 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
+import { getRoles } from 'api/roles';
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -46,6 +48,7 @@ const JWTRegister = ({ ...others }) => {
 
     const [strength, setStrength] = React.useState(0);
     const [level, setLevel] = React.useState();
+    const [roles, setRoles] = useState([]);
     const { register } = useAuth();
 
     const handleClickShowPassword = () => {
@@ -62,7 +65,19 @@ const JWTRegister = ({ ...others }) => {
         setLevel(strengthColor(temp));
     };
 
+    // Fetch roles from API
     useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const fetchedRoles = await getRoles();
+                setRoles(fetchedRoles);
+                setRoles(data);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+            }
+        };
+
+        fetchRoles();
         changePassword('123456');
     }, []);
 
@@ -82,38 +97,36 @@ const JWTRegister = ({ ...others }) => {
                     password: '',
                     firstName: '',
                     lastName: '',
+                    role: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    password: Yup.string().max(255).required('Password is required'),
+                    role: Yup.string().required('Role is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                       var res = await register(values.email, values.password, values.firstName, values.lastName);
-                        //if (scriptedRef.current) {
-                            setStatus({ success: true });
-                            setSubmitting(false);
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: 'Your registration has been successfully completed.',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'success'
-                                    },
-                                    close: false
-                                })
-                            );
-                            navigate('/check-mail-confirmation', { replace: true });
-                        //}
+                        var res = await register(values.email, values.password, values.firstName, values.lastName, values.role);
+                        setStatus({ success: true });
+                        setSubmitting(false);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: 'Your registration has been successfully completed.',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                        navigate('/check-mail-confirmation', { replace: true });
                     } catch (err) {
                         console.error(err);
-                      //if (scriptedRef.current) {
-                            setStatus({ success: false });
-                            setErrors({ submit: err.message });
-                            setSubmitting(false);
-                       //
+                        setStatus({ success: false });
+                        setErrors({ submit: err.message });
+                        setSubmitting(false);
                     }
                 }}
             >
@@ -147,6 +160,34 @@ const JWTRegister = ({ ...others }) => {
                                 />
                             </Grid>
                         </Grid>
+
+                        {/* Dropdown for Role */}
+                        <FormControl
+                            fullWidth
+                            margin="normal"
+                            error={Boolean(touched.role && errors.role)}
+                            sx={{ ...theme.typography.customInput }}
+                        >
+                            <InputLabel id="role-select-label">Role</InputLabel>
+                            <Select
+                                labelId="role-select-label"
+                                id="role-select"
+                                name="role"
+                                value={values.role}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                            >
+                                {roles.map((role) => (
+                                    <MenuItem key={role.id} value={role.name}>
+                                        {role.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {touched.role && errors.role && (
+                                <FormHelperText error>{errors.role}</FormHelperText>
+                            )}
+                        </FormControl>
+
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
                             <InputLabel htmlFor="outlined-adornment-email-register">Email Address / Username</InputLabel>
                             <OutlinedInput
