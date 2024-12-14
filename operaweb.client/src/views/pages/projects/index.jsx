@@ -13,6 +13,7 @@ import {
     CardMedia,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
     border: `1px solid ${theme.palette.divider}`,
@@ -49,6 +50,8 @@ const Projects = () => {
     const [activeTab, setActiveTab] = useState(0);
     const projectsPerPage = 10;
 
+    const navigate = useNavigate(); // Hook di React Router
+
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
         setPage(1); // Reset to page 1 when changing tabs
@@ -71,9 +74,12 @@ const Projects = () => {
         page * projectsPerPage
     );
 
+    const handleOpenProject = (id) => {
+        navigate(`/project/${id}`);
+    };
+
     return (
         <Box sx={{ padding: 3, backgroundColor: "background.default" }}>
-          
             <Tabs
                 value={activeTab}
                 onChange={handleTabChange}
@@ -118,7 +124,12 @@ const Projects = () => {
                                 </Typography>
                             </CardContent>
                             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                                <Button size="small" variant="contained" color="secondary">
+                                <Button
+                                    size="small"
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => handleOpenProject(project.id)}
+                                >
                                     Apri
                                 </Button>
                             </Box>

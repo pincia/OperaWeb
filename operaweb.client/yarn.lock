@@ -3775,10 +3775,10 @@ devlop@^1.0.0, devlop@^1.1.0:
   dependencies:
     dequal "^2.0.0"
 
-dhtmlx-gantt@^8.0.9:
-  version "8.0.9"
-  resolved "https://registry.npmjs.org/dhtmlx-gantt/-/dhtmlx-gantt-8.0.9.tgz"
-  integrity sha512-DONbnIjmVv7KiuHPmSEjZA2/XoSVGOviqx2vxRk/Vml+m8/YWMhoW+vP/rfkGEL8N764Gay41hI1ztfiNjWIVQ==
+dhtmlx-gantt@^8.0.11:
+  version "8.0.11"
+  resolved "https://registry.npmjs.org/dhtmlx-gantt/-/dhtmlx-gantt-8.0.11.tgz"
+  integrity sha512-bNC5WBncKCmkyW5y7NNPB7NuEv7GCw7Z3ZdjJPQgPc9nySl/EOhuJCb86vPP6rpqMWeymGR2t3nrKMLtEyBPeg==
 
 diffie-hellman@^5.0.0:
   version "5.0.3"

@@ -206,6 +206,10 @@ const MainRoutes = {
             element: <ProjectWizard />
         },
         {
+            path: '/project/create/:id',
+            element: <ProjectWizard />
+        },
+        {
             path: '/project/:id',
             element: <ProjectDashboard />
         }
