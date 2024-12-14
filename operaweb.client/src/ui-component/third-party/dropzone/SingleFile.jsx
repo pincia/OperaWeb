@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 // material-ui
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 
 // third-party
 import { useDropzone } from 'react-dropzone';
@@ -28,81 +26,69 @@ const DropzoneWrapper = styled('div')(({ theme }) => ({
 
 // ==============================|| UPLOAD - SINGLE FILE ||============================== //
 
-const SingleFileUpload = ({ error, showList = false, file, type, setFieldValue, sx }) => {
+const SingleFileUpload = ({ error, file, setFieldValue, sx }) => {
     const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
-        accept: {
-            '.xpve': []
-        },
-        multiple: false,
+        accept: { '.xpwe': [] }, // Accetta solo file .xpwe
+        multiple: false, // Singolo file
         onDrop: (acceptedFiles) => {
-            setFieldValue(
-                'files',
-                acceptedFiles.map((file) =>
-                    Object.assign(file, {
-                        preview: URL.createObjectURL(file)
+            // Aggiorna il valore di file con Formik
+            if (acceptedFiles.length > 0) {
+                const uploadedFile = acceptedFiles[0];
+                setFieldValue(
+                    'file',
+                    Object.assign(uploadedFile, {
+                        preview: URL.createObjectURL(uploadedFile)
                     })
-                )
-            );
+                );
+            }
         }
     });
 
-    const thumbs =
-        file &&
-        file.map((item, index) => (
-            <Box
-                key={index}
-                sx={{ bgcolor: 'background.paper', top: 8, left: 8, borderRadius: 2, position: 'absolute', width: 1, height: 1 }}
-            >
-                <img
-                    alt={item.name}
-                    src={item.preview}
-                    style={{ width: 'calc(100% - 16px)', height: 'calc(100% - 16px)' }}
-                    onLoad={() => {
-                        URL.revokeObjectURL(item.preview);
-                    }}
-                />
-            </Box>
-        ));
-
+    // Rimuovi il file
     const onRemove = () => {
-        setFieldValue('files', null);
+        setFieldValue('file', null);
     };
 
     return (
         <Box sx={{ width: '100%', ...sx }}>
-            {(!file || file.length == 0) && <DropzoneWrapper
-                {...getRootProps()}
-                sx={{
-                    ...(isDragActive && { opacity: 0.72 }),
-                    ...((isDragReject || error) && { color: 'error.main', borderColor: 'error.light', bgcolor: 'error.lighter' }),
-                    ...(file && { padding: '12% 0' })
-                }}
-            >
-                <input {...getInputProps()} />
-                <PlaceholderContent />
-                {thumbs}
-            </DropzoneWrapper> }
+            {/* Dropzone */}
+            {!file && (
+                <DropzoneWrapper
+                    {...getRootProps()}
+                    sx={{
+                        ...(isDragActive && { opacity: 0.72 }),
+                        ...((isDragReject || error) && {
+                            color: 'error.main',
+                            borderColor: 'error.light',
+                            bgcolor: 'error.lighter'
+                        })
+                    }}
+                >
+                    <input {...getInputProps()} />
+                    <PlaceholderContent />
+                </DropzoneWrapper>
+            )}
 
+            {/* Errore per file non accettati */}
             {fileRejections.length > 0 && <RejectionFiles fileRejections={fileRejections} />}
 
-            {file && file.length > 0 && <FilesPreview files={file} showList={showList} onRemove={onRemove} type={type} />}
-
-            {/*  {file && file.length > 0 && (
-                <Stack direction="row" justifyContent="flex-end" sx={{ mt: 1.5 }}>
-                    <Button variant="contained" color="error" onClick={onRemove}>
-                        Remove
-                    </Button>
-                </Stack>
-            )}*/}
+            {/* Anteprima del File */}
+            {file && (
+                <FilesPreview
+                    files={[file]} // Singolo file come array
+                    showList={false}
+                    onRemove={onRemove}
+                />
+            )}
         </Box>
     );
 };
 
 SingleFileUpload.propTypes = {
-    setFieldValue: PropTypes.func,
-    sx: PropTypes.object,
+    setFieldValue: PropTypes.func.isRequired, // `setFieldValue` è obbligatorio
+    file: PropTypes.object, // Un singolo file (non array)
     error: PropTypes.string,
-    file: PropTypes.array
+    sx: PropTypes.object
 };
 
 export default SingleFileUpload;

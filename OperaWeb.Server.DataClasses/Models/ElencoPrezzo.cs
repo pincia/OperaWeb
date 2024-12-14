@@ -11,6 +11,7 @@ namespace OperaWeb.Server.DataClasses.Models
   public class ElencoPrezzo
   {
     public int ID { get; set; }
+    public int IDEP { get; set; }
     public int TipoEP { get; set; }
 
     public string Tariffa { get; set; }

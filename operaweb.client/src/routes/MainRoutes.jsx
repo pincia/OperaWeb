@@ -7,9 +7,8 @@ import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 
 import { loader as productsLoader, productLoader } from 'api/products';
-import Projects from 'views/pages/projects';
 import { loader as projectsLoader } from 'api/projects';
-import ProjectWizard from '../views/forms/forms-wizard/ProjectWizard';
+
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -176,8 +175,9 @@ const UtilsGrid = Loadable(lazy(() => import('views/utilities/Grid')));
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
 //projects
-const FrmProjectWizard = Loadable(lazy(() => import('views/pages/create-project')));
-
+const Projects = Loadable(lazy(() => import('views/pages/projects')));
+const ProjectWizard = Loadable(lazy(() => import('views/forms/forms-wizard/ProjectWizard')));
+const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/Progetto')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 
@@ -202,12 +202,12 @@ const MainRoutes = {
             element: <Projects />
         },
         {
-            path: '/general/create-project/',
+            path: '/project/create/',
             element: <ProjectWizard />
         },
         {
-            path: '/general/create-project/:id',
-            element: <ProjectWizard />
+            path: '/project/:id',
+            element: <ProjectDashboard />
         }
     ]
 };

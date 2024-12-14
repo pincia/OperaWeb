@@ -19,9 +19,27 @@ export async function getProject(id) {
     }
 }
 
+
 export async function getTemplates() {
     try {
         const response = await axios.get('/api/template');
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+export async function getSoas() {
+    try {
+        const response = await axios.get('/api/soas/');
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function getSoaClassifications() {
+    try {
+        const response = await axios.get('/api/soaclassifications/');
         return response.data;
     } catch (error) {
         return error;

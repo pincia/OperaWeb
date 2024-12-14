@@ -112,7 +112,7 @@ const Dashboard = () => {
     const handleCloseDialog = (success, id) => {
         setOpenImport(false);
         if (success) {
-            navigate(`/general/create-project/`+id) 
+            navigate(`/project/create/`+id) 
         }
     };
 
@@ -294,7 +294,7 @@ const Dashboard = () => {
                 <MainCard title="Crea un nuovo progetto">
                     <Grid container spacing={gridSpacing}>
                         <Grid item xs={12} lg={3}
-                            onClick={() => { navigate(`/general/create-project/`) }}>
+                            onClick={() => { navigate(`/project/create/`) }}>
                             <TemplateCard
                                 imagePath={generico}
                                 name="Template Generico"

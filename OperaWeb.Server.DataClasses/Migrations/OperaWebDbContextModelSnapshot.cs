@@ -479,6 +479,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("Flags")
                         .HasColumnType("int");
 
+                    b.Property<int>("IDEP")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Prezzo1")
                         .HasColumnType("decimal(18,2)");
 
@@ -851,10 +854,10 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<DateTime>("DataMis")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Flags")
+                    b.Property<int>("ElencoPrezzoID")
                         .HasColumnType("int");
 
-                    b.Property<int>("IDEP")
+                    b.Property<int>("Flags")
                         .HasColumnType("int");
 
                     b.Property<int>("ProjectID")
@@ -872,6 +875,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("CategoriaID1");
+
+                    b.HasIndex("ElencoPrezzoID");
 
                     b.HasIndex("ProjectID");
 
@@ -1073,6 +1078,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.ElencoPrezzo", "ElencoPrezzo")
+                        .WithMany()
+                        .HasForeignKey("ElencoPrezzoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("VociComputo")
                         .HasForeignKey("ProjectID")
@@ -1090,6 +1101,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Categoria");
+
+                    b.Navigation("ElencoPrezzo");
 
                     b.Navigation("Project");
 

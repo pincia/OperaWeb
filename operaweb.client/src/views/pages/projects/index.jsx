@@ -1,257 +1,140 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Link, useLoaderData } from 'react-router-dom';
-import FmdGoodIcon from '@mui/icons-material/FmdGood';
-import AddIcon from '@mui/icons-material/Add';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import FileOpen from '@mui/icons-material/FileOpen';
-// material-ui
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import Fab from '@mui/material/Fab';
-import { openSnackbar } from 'store/slices/snackbar';
+import React, { useState } from "react";
 import {
-    DialogTitle,
-    DialogContent,
-    DialogContentText,
-    DialogActions,
+    Grid,
+    Card,
+    CardContent,
+    Typography,
+    Pagination,
+    TextField,
+    Tabs,
+    Tab,
+    Box,
+    Button,
+    CardMedia,
 } from "@mui/material";
+import { styled } from "@mui/system";
 
-import IconButton from '@mui/material/IconButton';
-import { GridRowModes, DataGrid, GridActionsCellItem, GridRowEditStopReasons } from '@mui/x-data-grid';
-import React from 'react';
-import {
-    Dialog,
-} from "@mui/material"
-// project import
-import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
-import { CSVExport } from 'views/forms/tables/TableExports';
-import CreateProject from 'views/pages/projects/CreateProject';
-import { deleteProject, loader } from 'api/projects';
+const StyledCard = styled(Card)(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow: theme.shadows[1],
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(2),
+    transition: "transform 0.2s",
+    "&:hover": {
+        transform: "scale(1.03)",
+    },
+}));
 
+const myProjects = Array.from({ length: 15 }, (_, index) => ({
+    id: index + 1,
+    ente: `Entity ${index + 1}`,
+    comune: `City ${index + 1}`,
+    provincia: `Province ${index % 5 + 1}`,
+    object: `My Project ${String.fromCharCode(65 + (index % 26))}${index + 1}`,
+    logo: "https://via.placeholder.com/150",
+}));
 
-export default function Projects() {
-    let headers = [];
+const involvedProjects = Array.from({ length: 15 }, (_, index) => ({
+    id: index + 1,
+    ente: `Entity ${index + 16}`,
+    comune: `City ${index + 16}`,
+    provincia: `Province ${index % 5 + 1}`,
+    object: `Involved Project ${String.fromCharCode(65 + (index % 26))}${index + 1}`,
+    logo: "https://via.placeholder.com/150",
+}));
 
-    const initialProjects = useLoaderData();
-    const [rows, setRows] = React.useState(initialProjects.data);
-    const [open, setOpen] = React.useState(false);
-    const [selectedRowId, setSelectedRowId] = useState([]);
-    const [openConfirmation, setOpenConfirmation] = useState(false);
+const Projects = () => {
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeTab, setActiveTab] = useState(0);
+    const projectsPerPage = 10;
 
-    const deleteRowFromGrid = (id) => {
-        setRows(rows.filter((el) => el.id != id));
-    }
-
-    const handleClickOpenDialog = () => {
-        setOpen(true);
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+        setPage(1); // Reset to page 1 when changing tabs
     };
 
-    const handleCloseDialog = (success, row) => {
-        setOpen(false);
-        if (success) {
-            loader().then(
-                (response) => {
-                    setRows(response.data);
-                },
-                (error) => {
-                    openSnackbar({
-                        open: true,
-                        message: 'Submit failed!',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                });
-        }
+    const currentProjects = activeTab === 0 ? myProjects : involvedProjects;
+
+    const filteredProjects = currentProjects.filter((project) =>
+        project.object.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
     };
 
-    const showDialogConfirmation = (row) => {
-        setSelectedRowId(row.id)
-        setOpenConfirmation(true);
-    };
-
-    const hideDialogConfirmation = () => {
-        setOpenConfirmation(false);
-    };
-    const renderOpenButton = (params) => {
-        return (
-            <strong>
-                <IconButton
-                    aria-label="fingerprint"
-                    color="primary"
-                    onClick={() => {
-                       console.log("APRI PROGETTO")
-                    }}  >
-                    <FileOpen />
-                </IconButton>
-            </strong>
-        )
-    }
-    // table columns
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 120 },
-        {
-            field: 'object',
-            headerName: <FormattedMessage id="objectLabel" />,
-            description: <FormattedMessage id="objectDescription" />,
-            sortable: true,
-            flex: 2,
-            minWidth: 10,
-        },
-        {
-            field: 'city',
-            headerName: <FormattedMessage id="cityLabel" />,
-            description: <FormattedMessage id="cityDescription" />,
-            sortable: true,
-            flex: 2,
-            minWidth: 160,
-        },
-        {
-            field: 'province',
-            headerName: <FormattedMessage id="provinceLabel" />,
-            description: <FormattedMessage id="provincetDescription" />,
-            sortable: true,
-            flex: 2,
-            minWidth: 160,
-        },
-        {
-            field: 'totalAmount',
-            headerName: <FormattedMessage id="total" />,
-            flex: 1,
-            minWidth: 164
-        },
-        //{
-        //    field: 'localization',
-        //    headerName: <FormattedMessage id="localization" />,
-        //    type: 'actions',
-        //    flex: 0.75,
-        //    minWidth: 100,
-        //    cellClassName: 'actions',
-        //    getActions: ({ id }) => {
-        //        return [
-        //            <GridActionsCellItem
-        //                key={id}
-        //                component={IconButton}
-        //                size="large"
-        //                icon={<FmdGoodIcon color="secondary" sx={{ fontSize: '1.3rem' }} />}
-        //                label="Edit"
-        //                className="textPrimary"
-        //                onClick={handleLocalizationClick(id)}
-        //                color="inherit"
-        //            />
-        //        ];
-        //    },
-        //    flex: 0.75,
-        //    minWidth: 164
-        //},
-        {
-            field: 'creationDate',
-            headerName: <FormattedMessage id="creationDate" />,
-            flex: 1,
-            minWidth: 130
-        },
-        {
-            field: 'lastUpdateDate',
-            headerName: <FormattedMessage id="lastUpdateDate" />,
-            flex: 1,
-            minWidth: 130
-        },
-        {
-            field: 'delete',
-            headerName: '',
-            width: 150,
-            renderCell: renderOpenButton,
-            disableClickEventBubbling: true,
-        }
-    ];
-
-    columns.map((item) => {
-        return headers.push({ label: item.headerName, key: item.field });
-    });
-
-    const handleEditClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-
-    };
-
-    const handleLocalizationClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-    };
-
-  
-
-    const handleConfirmation = () => {
-        deleteProject(selectedRowId).then(
-            (response) => {
-                deleteRowFromGrid(selectedRowId)
-                hideDialogConfirmation()
-                openSnackbar({
-                    open: true,
-                    message: 'Submit Success',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    close: false
-                })
-            },
-            (error) => {
-                hideDialogConfirmation()
-                openSnackbar({
-                    open: true,
-                    message: 'Submit failed!',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    close: false
-                })
-            });
-
-    };
+    const displayedProjects = filteredProjects.slice(
+        (page - 1) * projectsPerPage,
+        page * projectsPerPage
+    );
 
     return (
-        <Grid container spacing={gridSpacing}>
-            <Grid item xs={12}>
-                <MainCard
-                    content={false}
-                    title="Elenco Cantieri"
-                    secondary={
-                        <Stack direction="row" spacing={2} alignItems="center">
-                            
-                            <CreateProject open={open} handleCloseDialog={handleCloseDialog} />
-                            {/*         <CSVExport data={NewValue} filename={'data-grid-table.csv'} header={headers} /> */}
-                        </Stack>
-                    }
-                >
-                    <Box sx={{ width: '100%' }}>
-                        <DataGrid
-                            rows={rows}
-                            columns={columns}
-                            autoHeight
-                            initialState={{
-                                pagination: {
-                                    paginationModel: {
-                                        pageSize: 5
-                                    }
-                                }
-                            }}
-                            pageSizeOptions={[5]}
-                            onRowClick={(rows) => { setSelectedRowId(rows.id) }}
+        <Box sx={{ padding: 3, backgroundColor: "background.default" }}>
+          
+            <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                indicatorColor="secondary"
+                textColor="secondary"
+                sx={{ marginBottom: 2 }}
+            >
+                <Tab label="My Projects" />
+                <Tab label="Involved Projects" />
+            </Tabs>
 
-                        />
-                    </Box>
-                </MainCard>
+            <TextField
+                label="Search Projects"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <Grid container spacing={3}>
+                {displayedProjects.map((project) => (
+                    <Grid item xs={12} sm={6} md={4} key={project.id}>
+                        <StyledCard>
+                            <Box sx={{ display: "flex", justifyContent: "center", paddingTop: 2 }}>
+                                <CardMedia
+                                    component="img"
+                                    sx={{ width: 150, height: 150 }}
+                                    image={project.logo}
+                                    alt="Project Logo"
+                                />
+                            </Box>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    {project.object}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Ente/Comune: {project.ente}, {project.comune}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Provincia: {project.provincia}
+                                </Typography>
+                            </CardContent>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                                <Button size="small" variant="contained" color="secondary">
+                                    Apri
+                                </Button>
+                            </Box>
+                        </StyledCard>
+                    </Grid>
+                ))}
             </Grid>
-        </Grid>
-       
+
+            <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                sx={{ marginTop: 3, display: "flex", justifyContent: "center" }}
+            />
+        </Box>
     );
-}
+};
+
+export default Projects;

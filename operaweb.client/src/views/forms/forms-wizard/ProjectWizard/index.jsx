@@ -9,19 +9,20 @@ import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
 
 // project imports
-import { getProject } from 'api/projects';
+import { getProject, getSoaClassifications, getSoas } from 'api/projects';
 import { useParams } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import GeneralForm from './GeneralForm';
-import PaymentForm from './PaymentForm';
+import SubjectsForm from './SubjectsForm';
 import Review from './Review';
 import { openSnackbar } from 'store/slices/snackbar';
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 // step options
-const steps = ['Generali','Soggetti','Lavorazioni','Quadro economico','Configurazioni'];
+const steps = ['Generali', 'Soggetti', 'Lavorazioni', 'Quadro economico', 'Configurazioni'];
 
-const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData) => {
+const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData, soaOptions, soaClassificationOptions, setSubjectsData) => {
     switch (step) {
         case 0:
             return (
@@ -30,16 +31,18 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                     setErrorIndex={setErrorIndex}
                     projectData={projectData}
                     setProjectData={setProjectData}
+                    soaOptions={soaOptions}
+                    soaClassificationsOptions={soaClassificationOptions}
                 />
             );
         case 1:
             return (
-                <PaymentForm
+                <SubjectsForm
                     handleNext={handleNext}
                     handleBack={handleBack}
                     setErrorIndex={setErrorIndex}
                     paymentData={projectData}
-                    setPaymentData={setProjectData}
+                    setSubjectsData={setSubjectsData}
                 />
             );
         case 2:
@@ -54,29 +57,50 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
 const ProjectWizard = () => {
     const [activeStep, setActiveStep] = React.useState(0);
     const [projectData, setProjectData] = React.useState({});
+    const [subjectsData, setSubjectsData] = React.useState({});
     const [errorIndex, setErrorIndex] = React.useState(null);
-    const { id } = useParams(); 
+    const [soaOptions, setSoaOptions] = useState(null);
+    const [soaClassificationOptions, setSoaClassificationOptions] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+    const { id } = useParams();
+
 
     useEffect(() => {
-        if (id) {
-            getProject(id)
-                .then((response) => {
-                    setProjectData(response.data);
-                })
-                .catch((error) => {
-                    openSnackbar({
-                        open: true,
-                        message: 'Failed to load project!',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error',
-                        },
-                        close: false,
-                    });
-                });
-        }
-    }, [id]); // Esegui solo quando `id` cambia
-   
+
+
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        const fetchProject = async () => {
+            setLoading(true);
+            try {
+                if (id) {
+                    const projectResponse = await getProject(id, { signal });
+                    setProjectData(projectResponse.data);
+
+                }
+                const soasResponse = await getSoas();
+                setSoaOptions(soasResponse);
+
+                const soaClassificationsResponse = await getSoaClassifications();
+                setSoaClassificationOptions(soaClassificationsResponse);
+
+            } catch (error) {
+                console.error('Errore nel caricamento dei dati SOA Classifications:', error);
+
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProject();
+
+        return () => {
+            controller.abort(); // Annulla la richiesta se il componente viene smontato o l'ID cambia
+        };
+    }, [id]);
+
     const handleNext = () => {
         setActiveStep(activeStep + 1);
         setErrorIndex(null);
@@ -86,8 +110,23 @@ const ProjectWizard = () => {
         setActiveStep(activeStep - 1);
     };
 
+    if (loading) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '100vh', // Per centrare lo spinner verticalmente
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
+
     return (
-        <MainCard title={id  ? "Modifica dati progetto" : "Wizard Creazione Progetto"}>
+        <MainCard title={id ? "Modifica dati progetto" : "Wizard Creazione Progetto"}>
             <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
                 {steps.map((label, index) => {
                     const labelProps = {};
@@ -144,7 +183,10 @@ const ProjectWizard = () => {
                             handleBack,
                             setErrorIndex,
                             projectData,
-                            setProjectData,                 
+                            setProjectData,
+                            soaOptions,
+                            soaClassificationOptions,
+                            setSubjectsData
                         )}
                         {activeStep === steps.length - 1 && (
                             <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>

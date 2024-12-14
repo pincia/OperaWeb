@@ -16,6 +16,9 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { FormattedMessage } from 'react-intl';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useEffect, useState } from 'react';
+
 
 const validationSchema = yup.object({
     city: yup.string().required('Ente, Comune campo obbligatorio'),
@@ -26,7 +29,10 @@ const validationSchema = yup.object({
 
 // ==============================|| PROJECT WIZARD - VALIDATION ||============================== //
 
-const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex }) => {
+const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, soaOptions, soaClassificationsOptions }) => {
+    const [selectedSoa, setSelectedSoa] = useState(null);
+    const [selectedSoaClassification, setSelectedSoaClassification] = useState(null);
+
     const formik = useFormik({
         initialValues: {
             city: projectData.city,
@@ -102,6 +108,31 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex })
                             helperText={formik.touched.object && formik.errors.object}
                             fullWidth
                             autoComplete="family-name"
+                        />
+                    </Grid>
+                    {/* Dropdown per SOA */}
+                    <Grid item xs={12} sm={6}>
+                        <Autocomplete
+                            options={soaOptions}
+                            getOptionLabel={(option) => option.description || ''}
+                            value={selectedSoa}
+                            onChange={(event, newValue) => setSelectedSoa(newValue)}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Seleziona SOA" variant="outlined" />
+                            )}
+                        />
+                    </Grid>
+
+                    {/* Dropdown per SOA Classifications */}
+                    <Grid item xs={12} sm={6}>
+                        <Autocomplete
+                            options={soaClassificationsOptions}
+                            getOptionLabel={(option) => option.description || ''} 
+                            value={selectedSoaClassification}
+                            onChange={(event, newValue) => setSelectedSoaClassification(newValue)}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Seleziona Classificazione SOA" variant="outlined" />
+                            )}
                         />
                     </Grid>
                     <Grid item xs={12}>

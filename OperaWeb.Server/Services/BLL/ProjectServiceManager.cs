@@ -131,11 +131,14 @@ namespace OperaWeb.Server.Services.BLL
       }
 
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> ElencoPrezzi");
+
+      List<ElencoPrezzo> importedElencoPrezzi = new List<ElencoPrezzo>();
       //elenco prezzi
       foreach (var importedPrezzo in importedPwe.PweMisurazioni.PweElencoPrezzi)
       {
-        _context.ElencoPrezzi.Add(new ElencoPrezzo()
+        var elencoPrezzo = _context.ElencoPrezzi.Add(new ElencoPrezzo()
         {
+          IDEP = importedPrezzo.ID,
           TipoEP = importedPrezzo.TipoEP,
           Tariffa = importedPrezzo.Tariffa,
           Articolo = importedPrezzo.Articolo,
@@ -157,10 +160,12 @@ namespace OperaWeb.Server.Services.BLL
           PweEPAnalisi = importedPrezzo.PweEPAnalisi,
           Project = importedProject.Entity
         });
+
+        importedElencoPrezzi.Add(elencoPrezzo.Entity);
       }
 
       int count = 0;
-
+      decimal totalAmount = 0;
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Voci Computo Start");
       //voci computo
       foreach (var voceComputoImported in importedPwe.PweMisurazioni.PweVociComputo)
@@ -198,9 +203,11 @@ namespace OperaWeb.Server.Services.BLL
           continue;
         }
 
+
         var newVoceComputo = new VoceComputo()
         {
-          IDEP = voceComputoImported.IDEP,
+          ElencoPrezzo = importedElencoPrezzi.FirstOrDefault(e=>e.IDEP == voceComputoImported.IDEP),
+          ElencoPrezzoID = voceComputoImported.IDEP,
           Quantita = voceComputoImported.Quantita,
           DataMis = DateTime.ParseExact(voceComputoImported.DataMis, "dd/MM/yyyy", null),
           Flags = voceComputoImported.Flags,
@@ -210,10 +217,11 @@ namespace OperaWeb.Server.Services.BLL
           SuperCategoria = superCategory.Entity
         };
 
+        
         //misurazioni
         foreach (var misurazioneImpoerted in voceComputoImported.PweVCMisure)
         {
-          _context.Misure.Add(new Misura()
+          var misurazione = _context.Misure.Add(new Misura()
           {
             IDVV = misurazioneImpoerted.IDVV,
             Descrizione = misurazioneImpoerted.Descrizione,
@@ -225,6 +233,8 @@ namespace OperaWeb.Server.Services.BLL
             Flags = misurazioneImpoerted.Flags,
             VoceComputo = newVoceComputo
           });
+
+          totalAmount += misurazione.Entity.Quantita ?? 0 * newVoceComputo.ElencoPrezzo.Prezzo1;
         }
         
         if(count%10 == 0)
@@ -235,7 +245,7 @@ namespace OperaWeb.Server.Services.BLL
 
         count++;
       }
-
+      importedProject.Entity.TotalAmount = totalAmount;
       _logger.Log(LogLevel.Information, $"[ImportData] End Import Data");
       _context.SaveChanges();
 

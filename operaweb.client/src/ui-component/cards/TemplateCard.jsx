@@ -32,8 +32,9 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const TemplateCard = ({ imagePath, name, description }) => {
     const theme = useTheme();
-    const { loading, error, image } = useImage(imagePath)
+    const { loading, error, image } = useImage(imagePath);
     const [anchorEl, setAnchorEl] = useState(null);
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -41,8 +42,31 @@ const TemplateCard = ({ imagePath, name, description }) => {
         setAnchorEl(null);
     };
 
+    const StyledCard = styled(Card)(({ theme }) => ({
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: theme.shadows[1],
+        borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing(2),
+        transition: "transform 0.2s",
+        "&:hover": {
+            transform: "scale(1.03)",
+        },
+        height: "260px", // Altezza fissa
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+    }));
+
+    const Description = styled(Typography)(({ theme }) => ({
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        display: "-webkit-box",
+        WebkitLineClamp: 2, // Limita a 2 righe
+        WebkitBoxOrient: "vertical",
+    }));
+
     return (
-        <Card
+        <StyledCard
             sx={{
                 p: 2,
                 bgcolor: theme.palette.mode === ThemeMode.DARK ? 'background.default' : 'grey.50',
@@ -54,37 +78,23 @@ const TemplateCard = ({ imagePath, name, description }) => {
             }}
         >
             <Grid container spacing={gridSpacing}>
-                <Grid item xs={12} >
-                    <Grid container spacing={gridSpacing}>
-                        <Grid item xs zeroMinWidth>
-                            <CardMedia component="img" image={new URL(imagePath, import.meta.url).href } sx={{ width: 72, height: 72 }} title="Slider5 image" />
-                        </Grid>
-                        
-                    </Grid>
+                <Grid item xs={12}>
+                    <CardMedia
+                        component="img"
+                        image={new URL(imagePath, import.meta.url).href}
+                        sx={{ width: 72, height: 72 }}
+                        title="Slider5 image"
+                    />
                 </Grid>
-                <Grid item xs={12} alignItems="center">
-                    <Grid container spacing={gridSpacing}>
-                        <Grid item xs zeroMinWidth>
-                            <Typography variant="h4">{name}</Typography>
-                        </Grid>
-                    </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="h4">{name}</Typography>
                 </Grid>
-                <Grid item xs={12} alignItems="center">
-                    <Grid container spacing={gridSpacing}>
-                        <Grid item xs zeroMinWidth>
-                            <Typography >{description}</Typography>
-                        </Grid>
-                    </Grid>
+                <Grid item xs={12}>
+                    <Description>{description}</Description>
                 </Grid>
             </Grid>
-        </Card>
+        </StyledCard>
     );
 };
 
-TemplateCard.propTypes = {
-    imagePath: PropTypes.string,
-    name: PropTypes.string,
-    status: PropTypes.string
-};
-
-export default TemplateCard;
+export default TemplateCard
