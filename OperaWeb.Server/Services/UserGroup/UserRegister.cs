@@ -7,6 +7,9 @@ using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Models.DTO.Account;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
+using Microsoft.EntityFrameworkCore;
+using OperaWeb.Server.DataClasses.Models.User;
+using OperaWeb.Server.DataClasses.Models;
 
 namespace Services.UserGroup
 {
@@ -14,44 +17,71 @@ namespace Services.UserGroup
   {
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";
+    public string FirstName { get; set; } = "";
+    public string LastName { get; set; } = "";
     public string Role { get; set; } = "";
   }
   public partial class UserService
   {
     public async Task<AppResponse<object>> UserRegisterAsync(UserRegisterRequest request, string origin)
     {
-      var user = new ApplicationUser()
+      try
       {
-        UserName = request.Email,
-        Email = request.Email,
+        var user = new ApplicationUser()
+        {
+          UserName = request.Email,
+          Email = request.Email,
 
-      };
-      var result = await _userManager.CreateAsync(user, request.Password);
+        };
+        var result = await _userManager.CreateAsync(user, request.Password);
 
-      if (!result.Succeeded)
-      {
-        return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
-      }
+        if (!result.Succeeded)
+        {
+          return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
+        }
 
-      var newUser = _context.Users.Where(u => u.Email == request.Email).FirstOrDefault();
+        var newUser = _context.Users.Where(u => u.Email == request.Email).FirstOrDefault();
 
-      var res = await _userManager.AddToRoleAsync(newUser, request.Role);
-      newUser.VerificationToken = generateVerificationToken();
+        var res = await _userManager.AddToRoleAsync(newUser, request.Role);
+        newUser.FirstName = request.FirstName;
+        newUser.LastName = request.LastName;
+        newUser.FullName = request.FirstName + " " + request.LastName;
+        newUser.VerificationToken = generateVerificationToken();
 
-      if (result.Succeeded)
-      {
+        if (result.Succeeded)
+        {
 #if DEBUG
-        origin = @"https://localhost:7017";
+          origin = @"https://localhost:7017";
 #endif
-        sendVerificationEmail(user, origin);
-        _context.SaveChanges();
-        return new AppResponse<object>().SetSuccessResponse(new { Name = newUser.UserName, Id = newUser.Id, Email = newUser.Email });
-        // return new AppResponse<object>().SetSuccessResponse(new { Name = "TESTNAME", Id = 12, Email ="email@email.it" });
+          sendVerificationEmail(user, origin);
+          if (request.Role == "Impresa" || request.Role == "Committente" || request.Role == "Professionista")
+          {
+            await CreateNewOrganizationAsync(newUser.Id);
+          }
+          await sendNotifcation(newUser);
+          _context.SaveChanges();
+          return new AppResponse<object>().SetSuccessResponse(new { Name = newUser.UserName, Id = newUser.Id, Email = newUser.Email });
+        }
+        else
+        {
+          return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
+        }
       }
-      else
+      catch (Exception ex)
       {
-        return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
+        return new AppResponse<object>().SetErrorResponse("register", ex.Message);
       }
+
+    }
+
+    private async Task sendNotifcation(ApplicationUser newUser)
+    {
+      // Crea una notifica di benvenuto
+      await _notificationService.CreateNotificationAsync(
+          newUser.Id,
+          "Benvenuto",
+          "Grazie per la registrazione. Benvenuto in OperaWeb!"
+      );
     }
 
     private Dictionary<string, string[]> GetRegisterErrors(IdentityResult result)
@@ -254,6 +284,401 @@ namespace Services.UserGroup
         return generateResetToken();
 
       return token;
+    }
+
+    public async Task<bool> UpdateProfileAsync(string userId, UpdateProfileDto dto)
+    {
+      var user = await _context.Users.FindAsync(userId);
+      if (user == null) return false;
+
+      // Update user fields
+      user.FirstName = dto.FirstName;
+      user.LastName = dto.LastName;
+      user.PhoneNumber = dto.PhoneNumber;
+      user.ComuneId = dto.ComuneId;
+      user.ProvinciaId = dto.ProvinciaId;
+
+      // Update company fields
+      user.RagioneSociale = dto.RagioneSociale;
+      user.PIVA = dto.PIVA;
+      user.CompanyTaxCode = dto.CompanyTaxCode;
+      user.CompanyComuneId = dto.CompanyComuneId;
+      user.CompanyProvinciaId = dto.CompanyProvinciaId;
+      user.SDICode = dto.SDICode;
+      user.PEC = dto.PEC;
+      user.SubRoleId = dto.SubRoleId;
+      _context.Users.Update(user);
+      await _context.SaveChangesAsync();
+      return true;
+    }
+
+
+
+    public async Task<bool> IsProfileCompleteAsync(string userId)
+    {
+      var user = await _context.Users
+          .Include(u => u.Comune)
+          .Include(u => u.Provincia)
+          .FirstOrDefaultAsync(u => u.Id == userId);
+
+      return user != null &&
+             !string.IsNullOrEmpty(user.FirstName) &&
+             !string.IsNullOrEmpty(user.LastName) &&
+             !string.IsNullOrEmpty(user.PhoneNumber) &&
+             user.ComuneId.HasValue &&
+             user.ProvinciaId.HasValue &&
+             !string.IsNullOrEmpty(user.RagioneSociale) &&
+             user.CompanyComuneId.HasValue &&
+             user.CompanyProvinciaId.HasValue;
+    }
+
+
+    /// <summary>
+    /// Retrieves a user by their ID.
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <returns>ApplicationUser</returns>
+    public async Task<ApplicationUser> GetUserByIdAsync(string userId)
+    {
+      var user = await _userManager.FindByIdAsync(userId);
+      if (user == null)
+        throw new KeyNotFoundException("User not found");
+
+      return user;
+    }
+
+    /// <summary>
+    /// Recupera i subroles filtrati in base al ruolo dell'utente.
+    /// </summary>
+    public async Task<List<SubRole>> GetFilteredSubRolesAsync(string userId)
+    {
+      var user = await _userManager.FindByIdAsync(userId);
+      if (user == null)
+      {
+        return new List<SubRole>();
+      }
+
+      var roles = await _userManager.GetRolesAsync(user); // Restituisce una lista di ruoli
+
+      if (roles == null || !roles.Any())
+      {
+        return new List<SubRole>();
+      }
+
+      var userRole = roles.First();
+
+      // Recupera i subroles correlati al ruolo corrente dalla tabella rolesubroles
+      var subRoles = await _context.RoleSubRoles
+          .Where(rsr => rsr.Role.Name == userRole) // Filtro basato sul ruolo
+          .Include(rsr => rsr.SubRole)            // Include la relazione SubRole
+          .Select(rsr => rsr.SubRole)             // Seleziona i subroles
+          .ToListAsync();
+
+      return subRoles;
+    }
+
+    public async Task<AppResponse<bool>> CreateUserAndAddToOrganizationAsync(string organizationId, string fullName, string email, string roleName)
+    {
+      using var transaction = await _context.Database.BeginTransactionAsync();
+      try
+      {
+        // Verifica se l'utente esiste già
+        var existingUser = await _userManager.FindByEmailAsync(email);
+        if (existingUser != null)
+          return new AppResponse<bool>().SetErrorResponse("email", "User already exists.");
+
+        // Genera una password temporanea
+        var temporaryPassword = GenerateCompliantPassword();
+
+        // Crea un nuovo utente
+        var user = new ApplicationUser
+        {
+          UserName = email,
+          Email = email,
+          FullName = fullName,
+          MustChangePassword = true
+        };
+
+        var createUserResult = await _userManager.CreateAsync(user, temporaryPassword);
+        if (!createUserResult.Succeeded)
+          return new AppResponse<bool>().SetErrorResponse("user", "Failed to create user.");
+
+        // Conferma automaticamente l'email
+        user.EmailConfirmed = true;
+        await _userManager.UpdateAsync(user);
+
+        // Verifica e assegna il ruolo
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role == null)
+        {
+          var createRoleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+          if (!createRoleResult.Succeeded)
+            return new AppResponse<bool>().SetErrorResponse("role", "Failed to create role.");
+        }
+        await _userManager.AddToRoleAsync(user, roleName);
+
+        // Aggiungi all'organigramma
+        var organizationRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == roleName);
+        var member = new OrganizationMember
+        {
+          UserId = user.Id,
+          RoleId = organizationRole.Id,
+          OrganizationId = organizationId
+        };
+        _context.OrganizationMembers.Add(member);
+        await _context.SaveChangesAsync();
+
+        // Invia l'email con la password temporanea
+        await _emailService.SendEmailAsync(user.Email, "Welcome to OperaWeb",
+            $"Hello {fullName},\n\nYour account has been created.\nTemporary Password: {temporaryPassword}");
+
+        await transaction.CommitAsync();
+        return new AppResponse<bool>().SetSuccessResponse(true);
+      }
+      catch (Exception ex)
+      {
+        await transaction.RollbackAsync();
+        return new AppResponse<bool>().SetErrorResponse("exception", $"An error occurred: {ex.Message}");
+      }
+    }
+
+    public async Task<AppResponse<bool>> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
+    {
+      // Recupera l'utente in base all'ID
+      var user = await _userManager.FindByIdAsync(userId);
+      if (user == null)
+      {
+        return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
+      }
+
+      // Cambia la password usando UserManager
+      var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+      if (!result.Succeeded)
+      {
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return new AppResponse<bool>().SetErrorResponse("password", errors);
+      }
+
+      // Opzionale: Resetta il flag MustChangePassword se presente
+      if (user.MustChangePassword)
+      {
+        user.MustChangePassword = false;
+        await _userManager.UpdateAsync(user);
+      }
+
+      return new AppResponse<bool>().SetSuccessResponse(true);
+    }
+
+
+    private string GenerateCompliantPassword(int length = 12)
+    {
+      const string upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const string lowerChars = "abcdefghijklmnopqrstuvwxyz";
+      const string digits = "0123456789";
+      const string specialChars = "!@#$%^&*";
+
+      var random = new Random();
+      var passwordChars = new List<char>();
+
+      // Assicurati di includere almeno un carattere di ciascun tipo
+      passwordChars.Add(upperChars[random.Next(upperChars.Length)]);
+      passwordChars.Add(lowerChars[random.Next(lowerChars.Length)]);
+      passwordChars.Add(digits[random.Next(digits.Length)]);
+      passwordChars.Add(specialChars[random.Next(specialChars.Length)]);
+
+      // Completa la lunghezza con caratteri casuali dai set combinati
+      string allChars = upperChars + lowerChars + digits + specialChars;
+      for (int i = passwordChars.Count; i < length; i++)
+      {
+        passwordChars.Add(allChars[random.Next(allChars.Length)]);
+      }
+
+      // Mescola i caratteri per evitare prevedibilità
+      return new string(passwordChars.OrderBy(_ => random.Next()).ToArray());
+    }
+
+    public async Task<AppResponse<bool>> RemoveMemberFromOrganizationAsync(int memberId)
+    {
+      // Trova il membro nell'organigramma
+      var member = await _context.OrganizationMembers
+                                 .Include(m => m.User)
+                                 .FirstOrDefaultAsync(m => m.Id == memberId);
+
+      if (member == null)
+        return new AppResponse<bool>().SetErrorResponse("member", "Member not found.");
+
+      var user = member.User;
+      if (user == null)
+        return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
+
+      // Elimina l'utente dal sistema Identity
+      var result = await _userManager.DeleteAsync(user);
+      if (!result.Succeeded)
+        return new AppResponse<bool>().SetErrorResponse("delete", "Failed to delete user.");
+
+      // Rimuovi il membro dall'organigramma
+      _context.OrganizationMembers.Remove(member);
+      await _context.SaveChangesAsync();
+
+      return new AppResponse<bool>().SetSuccessResponse(true);
+    }
+
+
+    public async Task<AppResponse<bool>> UpdateMemberRoleAsync(int memberId, string newRoleName)
+    {
+      // Trova il membro nell'organigramma
+      var member = await _context.OrganizationMembers
+                                 .Include(m => m.User)
+                                 .FirstOrDefaultAsync(m => m.Id == memberId);
+
+      if (member == null)
+        return new AppResponse<bool>().SetErrorResponse("member", "Member not found.");
+
+      // Controlla se il ruolo esiste, altrimenti lo crea
+      if (!await _roleManager.RoleExistsAsync(newRoleName))
+        await _roleManager.CreateAsync(new IdentityRole(newRoleName));
+
+      var user = member.User;
+      if (user == null)
+        return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
+
+      // Rimuovi i ruoli attuali e assegna il nuovo
+      var currentRoles = await _userManager.GetRolesAsync(user);
+      await _userManager.RemoveFromRolesAsync(user, currentRoles);
+      await _userManager.AddToRoleAsync(user, newRoleName);
+
+      // Aggiorna l'organigramma
+      var newRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == newRoleName);
+      if (newRole == null)
+        return new AppResponse<bool>().SetErrorResponse("role", "Role not found.");
+
+      member.RoleId = newRole.Id;
+      _context.OrganizationMembers.Update(member);
+
+      await _context.SaveChangesAsync();
+
+      return new AppResponse<bool>().SetSuccessResponse(true);
+    }
+
+    public async Task<AppResponse<List<OrganizationRole>>> GetAvailableOrganizationRolesAsync(string userId)
+    {
+      // Ottieni l'utente autenticato
+      var currentUser = await GetUserByIdAsync(userId);
+      if (currentUser == null)
+        return new AppResponse<List<OrganizationRole>>().SetErrorResponse("user", "User not found.");
+
+      // Ottieni i ruoli Identity dell'utente
+      var userRoles = await _userManager.GetRolesAsync(currentUser);
+      if (!userRoles.Any())
+        return new AppResponse<List<OrganizationRole>>().SetErrorResponse("roles", "User has no roles.");
+
+      // Trova i ruoli organizzativi mappati ai ruoli Identity
+      var organizationRoles = await _context.OrganizationRoleMappings
+          .Where(rm => userRoles.Contains(rm.IdentityRole.Name))
+          .Select(rm => rm.OrganizationRole)
+          .Distinct()
+          .ToListAsync();
+
+      return new AppResponse<List<OrganizationRole>>().SetSuccessResponse(organizationRoles);
+    }
+
+    public async Task<AppResponse<bool>> CreateNewOrganizationAsync(string userId)
+    {
+      // Controlla se l'utente esiste
+      var user = await _userManager.FindByIdAsync(userId);
+      if (user == null)
+        return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
+
+      // Verifica se il ruolo "Organization" esiste
+      var organizationRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == "Organization");
+      if (organizationRole == null)
+        return new AppResponse<bool>().SetErrorResponse("role", "Organization role not found.");
+
+      // Controlla se l'utente è già un membro dell'organizzazione
+      var existingMember = await _context.OrganizationMembers
+          .FirstOrDefaultAsync(m => m.UserId == userId && m.RoleId == organizationRole.Id);
+
+      if (existingMember != null)
+        return new AppResponse<bool>().SetErrorResponse("member", "User is already an organization member.");
+
+      // Crea il nuovo OrganizationMember
+      var organizationMember = new OrganizationMember
+      {
+        UserId = user.Id,
+        RoleId = organizationRole.Id,
+        OrganizationId = user.Id // L'organizzazione punta all'utente stesso
+      };
+
+      _context.OrganizationMembers.Add(organizationMember);
+      await _context.SaveChangesAsync();
+
+      return new AppResponse<bool>().SetSuccessResponse(true);
+    }
+
+    public async Task<List<OrganizationStructureDto>> GetOrganizationStructure(string userId)
+    {
+      // Recupera l'organizationMember dell'utente
+      var organizationMember = _context.OrganizationMembers
+          .Where(m => m.UserId == userId)
+          .FirstOrDefault();
+
+      if (organizationMember == null)
+        throw new Exception("Organization member not found.");
+
+      // Recupera l'utente principale dell'organizzazione
+      var organizationUser = await _userManager.FindByIdAsync(organizationMember.OrganizationId);
+      if (organizationUser == null)
+        throw new Exception("Organization not found.");
+
+      // Recupera i ruoli associati all'utente dell'organizzazione
+      var organizationRoles = await _userManager.GetRolesAsync(organizationUser);
+
+      // Recupera i ruoli validi dall'OrganizationRoleMapping
+      var validRoles = await _context.OrganizationRoleMappings
+          .Where(rm => organizationRoles.Contains(rm.IdentityRole.Name))
+          .Select(rm => rm.OrganizationRole)
+          .ToListAsync();
+
+      // Recupera tutti i membri dell'organizzazione con i ruoli validi
+      var organizationMembers = await _context.OrganizationMembers
+          .Include(m => m.User)
+          .Include(m => m.Role)
+          .Where(m => m.OrganizationId == organizationMember.OrganizationId && validRoles.Contains(m.Role))
+          .ToListAsync();
+
+      // Metodo ricorsivo per costruire la struttura ad albero
+      List<OrganizationStructureDto> BuildTree(List<OrganizationRole> roles)
+      {
+        var result = new List<OrganizationStructureDto>();
+
+        foreach (var role in roles)
+        {
+          var node = new OrganizationStructureDto
+          {
+            RoleName = role.Name,
+            Members = organizationMembers
+                  .Where(m => m.RoleId == role.Id)
+                  .Select(m => new MemberDto
+                  {
+                    UserId = m.User.Id,           // Aggiunto UserId
+                    FullName = m.User.FullName,
+                    Email = m.User.Email
+                  }).ToList()
+          };
+
+          // Ruoli figli
+          var childRoles = validRoles.Where(r => r.ParentRoleId == role.Id).ToList();
+          node.Children = BuildTree(childRoles);
+
+          result.Add(node);
+        }
+
+        return result;
+      }
+
+      // Prende solo i ruoli radice per costruire l'albero
+      var rootRoles = validRoles.Where(r => r.ParentRoleId == null).ToList();
+      return BuildTree(rootRoles);
     }
 
   }

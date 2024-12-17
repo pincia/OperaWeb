@@ -2,12 +2,13 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconDashboard, IconDeviceAnalytics, IconSettings } from '@tabler/icons-react';
+import { IconDashboard, IconDeviceAnalytics, IconSettings, IconSitemap } from '@tabler/icons-react';
 
 const icons = {
     IconDashboard: IconDashboard,
     IconDeviceAnalytics: IconDeviceAnalytics,
-    IconSettings: IconSettings
+    IconSettings: IconSettings,
+    IconSitemap: IconSitemap
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -18,6 +19,14 @@ const dashboard = {
     icon: icons.IconDashboard,
     type: 'group',
     children: [
+         {
+            id: 'organization',
+            title: <FormattedMessage id="organization" />,
+            type: 'item',
+            url: '/organization/',
+            icon: icons.IconSitemap,
+            breadcrumbs: false
+        },
         {
             id: 'impostazioni',
             title: <FormattedMessage id="impostazioni" />,

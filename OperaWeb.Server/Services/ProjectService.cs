@@ -8,6 +8,8 @@ using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.Services.BLL;
 using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.Models.DTO.Templates;
+using Microsoft.AspNetCore.SignalR;
+using OperaWeb.Server.Hubs;
 
 namespace OperaWeb.Server.Services
 {
@@ -18,13 +20,14 @@ namespace OperaWeb.Server.Services
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
     private ProjectServiceManager _projectServiceManager;
-    public ProjectService(OperaWebDbContext context, ILogger<ProjectService> logger, IMapper mapper, IConfiguration config)
+
+    public ProjectService(OperaWebDbContext context, ILogger<ProjectService> logger, IMapper mapper, IConfiguration config, IHubContext<ImportHub> hubContext)
     {
       _context = context;
       _logger = logger;
       _mapper = mapper;
       _config = config;
-      _projectServiceManager = new ProjectServiceManager(_context, _logger);
+      _projectServiceManager = new ProjectServiceManager(_context, _logger, hubContext);
     }
 
     /// <inheritdoc/>
@@ -145,7 +148,7 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public async Task<(int, string)> ImportNewProject(CreateProjectFromFileRequestDTO request, string userId)
+    public async Task<(int, string)> ImportNewProject(IFormFile file, string userId, string connectionId)
     {
       string fileName = "";
       var projectId = -1;
@@ -160,10 +163,10 @@ namespace OperaWeb.Server.Services
           return (projectId, "User not found!");
         }
 
-        if (request.File.Length > 0)
+        if (file.Length > 0)
         {
           StringBuilder sb = new StringBuilder();
-          using var reader = new StreamReader(request.File.OpenReadStream());
+          using var reader = new StreamReader(file.OpenReadStream());
 
           await reader.ReadLineAsync();
 
@@ -172,7 +175,7 @@ namespace OperaWeb.Server.Services
             sb.Append(await reader.ReadLineAsync());
           }
 
-          projectId = _projectServiceManager.ImportData(sb.ToString(), new Project()
+          projectId =await  _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
           {
             User = user,
             CreationDate = DateTime.Now,
@@ -182,7 +185,7 @@ namespace OperaWeb.Server.Services
               FileName = fileName,
               User = user
             }
-          });
+          }, connectionId);
 
 
           var res = _context.SaveChanges();

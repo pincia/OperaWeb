@@ -11,6 +11,7 @@ using OperaWeb.Server.Services;
 using Services.UserGroup;
 using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using OperaWeb.Server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,34 +42,35 @@ builder.Services.AddSwaggerGen(config =>
     Scheme = "bearer"
   });
   config.AddSecurityRequirement(new OpenApiSecurityRequirement{
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type=ReferenceType.SecurityScheme,
-                                Id="Bearer"
-                            }
-                        },
-                        new string[]{}
-                    }
-                });
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
 });
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
   options.SignIn.RequireConfirmedEmail = true;
 })
-   .AddRoles<IdentityRole>()
-        .AddSignInManager()
-        .AddEntityFrameworkStores<OperaWebDbContext>()
-        .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("APP");
+    .AddRoles<IdentityRole>()
+    .AddSignInManager()
+    .AddEntityFrameworkStores<OperaWebDbContext>()
+    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("APP");
 
+// Registrazione di SignalR
+builder.Services.AddSignalR();
+
+// Registrazione di servizi
 builder.Services.AddScoped<IProjectService, ProjectService>();
-//Email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-
-
-//Add auto mapper
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
@@ -78,8 +80,9 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 
 builder.Services.AddLogging(logs =>
 {
-  logs.AddConsole();
-  logs.AddAzureWebAppDiagnostics();
+  logs.AddConsole(); // Aggiunge il log sulla console
+  logs.AddDebug();   // Aggiunge il log per debug
+  logs.AddAzureWebAppDiagnostics(); // Se stai usando Azure
 });
 
 builder.Services.AddAuthentication(options =>
@@ -101,19 +104,24 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = appSetttings.Issuer,
         ValidAudience = appSetttings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSetttings.SecretKey)),
-        ClockSkew = TimeSpan.FromSeconds(0)
+        ClockSkew = TimeSpan.Zero,
       };
+
+      // Map Id claim to NameIdentifier
+      options.TokenValidationParameters.NameClaimType = "Id";
     });
-builder.Services.AddScoped<OperaWebDbContextInitialiser>();
+
 builder.Services.AddTransient<UserService>();
+
+// CORS per SignalR e richieste client
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy("webAppRequests", builder =>
+  options.AddPolicy("webAppRequests", policy =>
   {
-    builder.AllowAnyHeader()
-    .AllowAnyMethod()
-    .WithOrigins(appSetttings.Audience)
-    .AllowCredentials();
+    policy.AllowAnyHeader()
+          .AllowAnyMethod()
+          .WithOrigins("http://localhost:3000") // Permetti il frontend React
+          .AllowCredentials(); // Necessario per SignalR e autenticazione
   });
 });
 
@@ -129,20 +137,14 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
   app.UseDeveloperExceptionPage();
   InitializeDb(app);
-
 }
 
-app.UseCors(policy =>
-policy
-.AllowAnyOrigin()
-.AllowAnyHeader()
-.AllowAnyMethod()
-);
+// Middleware per CORS - deve essere prima di UseAuthentication
+app.UseCors("webAppRequests");
 
 app.UseHttpsRedirection();
 
-
-//https://referbruv.com/blog/building-custom-responses-for-unauthorized-requests-in-aspnet-core/
+// Middleware per gestire token non validi
 app.Use(async (context, next) =>
 {
   await next();
@@ -153,14 +155,16 @@ app.Use(async (context, next) =>
   }
 });
 
+// Abilita SignalR
+app.MapHub<ImportHub>("/hubs/import");
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapFallbackToFile("/index.html");
 
+app.MapFallbackToFile("/index.html");
 app.MapControllers();
 
 app.Run();
-
 
 static async void InitializeDb(WebApplication app)
 {
@@ -171,4 +175,3 @@ static async void InitializeDb(WebApplication app)
     await initialiser.SeedAsync();
   }
 }
-

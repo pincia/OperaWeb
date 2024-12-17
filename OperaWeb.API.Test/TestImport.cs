@@ -25,7 +25,7 @@ namespace OperaWeb.API.Test
       builder.UseInMemoryDatabase<OperaWebDbContext>("OperaWeb");
       options = builder.Options;
       _context = new OperaWebDbContext(options);
-      _manager = new ProjectServiceManager(_context, null);
+      _manager = new ProjectServiceManager(_context, null,null);
       var currentSplittedPath = System.IO.Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]).Split('\\');
       _currentPath = String.Join(@"\", currentSplittedPath.Take(currentSplittedPath.Length - 3));
     }
@@ -44,7 +44,7 @@ namespace OperaWeb.API.Test
       var lines = File.ReadAllLines(_currentPath + "\\XPVE\\test.xpve");
       var xmlString =  String.Join("", lines.Skip(1));
 
-      _manager.ImportData(xmlString, newProject);
+      _manager.ImportDataAsync(xmlString, newProject,"");
     }
   }
 }

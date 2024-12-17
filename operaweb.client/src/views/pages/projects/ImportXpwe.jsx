@@ -1,171 +1,153 @@
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { forwardRef, useState } from 'react';
-import { useDispatch } from 'store';
-// material-ui
-import { useTheme } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
-import Slide from '@mui/material/Slide';
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
-// third-party
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-// project imports
-import { gridSpacing } from 'store/constant';
-import AnimateButton from 'ui-component/extended/AnimateButton';
-import { importXPWE } from 'api/projects';
-import { openSnackbar } from 'store/slices/snackbar';
-import { FormattedMessage } from 'react-intl';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    LinearProgress,
+    Typography
+} from '@mui/material';
 import SingleFileUpload from 'ui-component/third-party/dropzone/SingleFile';
-
-// animation
-const Transition = forwardRef((props, ref) => <Slide direction="left" ref={ref} {...props} />);
-
-// ==============================|| PROJECT IMPORT DIALOG ||============================== //
+import { importXPWE } from 'api/projects';
+import { useDispatch } from 'store'; // Importa dispatch dallo store
+import { openSnackbar } from 'store/slices/snackbar'; // Importa l'action per lo Snackbar
 
 const ImportXpwe = ({ open, handleCloseDialog }) => {
-    const theme = useTheme();
-    const dispatch = useDispatch();
+    const [progress, setProgress] = useState(0);
+    const [connection, setConnection] = useState(null);
+    const [file, setFile] = useState(null); // Stato per il file selezionato
+    const [isUploading, setIsUploading] = useState(false); // Stato per mostrare/nascondere la barra di avanzamento
+    const dispatch = useDispatch(); // Hook per usare dispatch
 
-    const [openLoader, setOpen] = useState(false);
+    useEffect(() => {
+        const connectToHub = async () => {
+            const hubUrl = import.meta.env.VITE_SIGNALR_URL || "/hubs/import";
+            const conn = new HubConnectionBuilder()
+                .withUrl(hubUrl)
+                .withAutomaticReconnect()
+                .build();
 
-    const handleClose = (success, id) => {
-        setOpen(false);
-        handleCloseDialog(success, id);
-    };
+            conn.on('UpdateProgress', (progress) => {
+                setProgress(progress); // Aggiorna il progresso ricevuto dal backend
+            });
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
+            try {
+                await conn.start();
+                console.log('SignalR connected.');
+                setConnection(conn);
+            } catch (error) {
+                console.error('SignalR connection error:', error);
+            }
+        };
 
-    const validationSchema = yup.object({
-        file: yup
-            .mixed()
-            .required('File is required')
-            .test(
-                'fileFormat',
-                'Only .xpwe files are supported',
-                (value) => !value || value.name.endsWith('.xpwe')
-            )
-    });
+        connectToHub();
 
-    const formik = useFormik({
-        initialValues: {
-            file: null
-        },
-        validationSchema,
-        onSubmit: (values) => {
-            handleOpen();
+        return () => {
+            if (connection) {
+                connection.stop();
+            }
+        };
+    }, []);
+
+    // Funzione di submit
+    const handleSubmit = async () => {
+        if (!file || !connection) return;
+
+        setProgress(0);
+        setIsUploading(true); // Mostra la barra di avanzamento
+
+        try {
+            var response = await importXPWE(file, connection.connectionId);
+            console.log('File successfully uploaded.');
+
+            // Mostra Snackbar di successo
             dispatch(
-                importXPWE(values).then(
-                    (response) => {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: 'Submit Success',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
-                        handleClose(true, response.data.id);
+                openSnackbar({
+                    open: true,
+                    message: 'File importato con successo!',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
                     },
-                    () => {
-                        handleClose(false, -1);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: 'Submit failed!',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                )
+                    close: false
+                })
             );
+
+            // Chiudi il dialog
+            handleCloseDialog(true, response.id);
+        } catch (error) {
+            console.error('Error submitting file:', error);
+            handleCloseDialog(false)
+            // Mostra Snackbar di errore
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'Errore durante l\'importazione del file.',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+        } finally {
+            setIsUploading(false); // Nasconde la barra di avanzamento
         }
-    });
+    };
+
+    // Funzione per aggiornare il file selezionato
+    const setFieldValue = (field, value) => {
+        if (field === 'file') {
+            setFile(value);
+        }
+    };
 
     return (
-        <Dialog
-            open={open}
-            TransitionComponent={Transition}
-            keepMounted
-            onClose={() => handleCloseDialog(false, -1)}
-            maxWidth="sm" // Dimensione massima della finestra
-            fullWidth
-        >
-            <DialogTitle>
-                <FormattedMessage id="importProject" />
-            </DialogTitle>
-            <form onSubmit={formik.handleSubmit}>
-                <DialogContent
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: theme.spacing(2),
-                        padding: theme.spacing(2),
-                        minHeight: '200px' // Altezza minima fissa per evitare ridimensionamenti
-                    }}
-                >
-                    <Grid container spacing={gridSpacing}>
-                        <Grid item xs={12}>
-                            <SingleFileUpload
-                                file={formik.values.file}
-                                setFieldValue={formik.setFieldValue}
-                                error={formik.errors.file && formik.touched.file}
-                            />
-                        </Grid>
+        <Dialog open={open} maxWidth="sm" fullWidth>
+            <DialogTitle>Import Project</DialogTitle>
+            <DialogContent>
+                <Grid container spacing={2}>
+                    {/* Componente SingleFileUpload */}
+                    <Grid item xs={12}>
+                        <SingleFileUpload
+                            file={file}
+                            setFieldValue={setFieldValue}
+                            error={!file ? 'File is required' : ''}
+                        />
                     </Grid>
-                </DialogContent>
-                <DialogActions
-                    sx={{
-                        justifyContent: 'space-between',
-                        padding: theme.spacing(1, 3)
-                    }}
+
+                    {/* Stato di avanzamento: mostrato solo quando isUploading è true */}
+                    {isUploading && (
+                        <Grid item xs={12}>
+                            <Typography variant="body2">Progress: {progress}%</Typography>
+                            <LinearProgress variant="determinate" value={progress} />
+                        </Grid>
+                    )}
+                </Grid>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => handleCloseDialog(false)} color="error" disabled={isUploading}>
+                    Cancel
+                </Button>
+                <Button
+                    onClick={handleSubmit}
+                    disabled={!file || isUploading} // Disabilita durante il caricamento o se manca il file
+                    variant="contained"
                 >
-                    <Button
-                        variant="text"
-                        color="error"
-                        onClick={() => handleCloseDialog(false, -1)}
-                    >
-                        Close
-                    </Button>
-                    <AnimateButton>
-                        <Button
-                            variant="contained"
-                            type="submit"
-                            disabled={!formik.values.file || openLoader}
-                        >
-                            Create
-                        </Button>
-                    </AnimateButton>
-                </DialogActions>
-                <Backdrop
-                    sx={{ color: '#fff', zIndex: theme.zIndex.drawer + 1 }}
-                    open={openLoader}
-                >
-                    <CircularProgress color="inherit" />
-                </Backdrop>
-            </form>
+                    Submit
+                </Button>
+            </DialogActions>
         </Dialog>
     );
 };
 
 ImportXpwe.propTypes = {
-    open: PropTypes.bool,
-    handleCloseDialog: PropTypes.func
+    open: PropTypes.bool.isRequired,
+    handleCloseDialog: PropTypes.func.isRequired
 };
 
 export default ImportXpwe;

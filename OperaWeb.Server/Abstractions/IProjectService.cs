@@ -53,10 +53,11 @@ namespace OperaWeb.Server.Abstractions
     /// <summary>
     /// Import project from XPWE
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="file"></param>
     /// <param name="userId"></param>
+    /// <param name="connectionId"></param>
     /// <returns></returns>
-    Task<(int, string)> ImportNewProject(CreateProjectFromFileRequestDTO request, string userId);
+    Task<(int, string)> ImportNewProject(IFormFile file, string userId,string connectionId);
 
     /// <summary>
     /// Gets all templates

@@ -27,7 +27,10 @@ const AuthForgotPassword3 = Loadable(lazy(() => import('views/pages/authenticati
 const AuthCheckMail3 = Loadable(lazy(() => import('views/pages/authentication/authentication3/CheckMail3')));
 const AuthResetPassword3 = Loadable(lazy(() => import('views/pages/authentication/authentication3/ResetPassword3')));
 const AuthCodeVerification3 = Loadable(lazy(() => import('views/pages/authentication/authentication3/CodeVerification3')));
-
+const ChangePasswordForm = Loadable(lazy(() => import('views/pages/authentication/authentication3/ChangePasswordForm')));
+const RegistrationConfirmation = Loadable(lazy(() => import('views/pages/authentication/authentication3/RegistrationConfirmation')));
+const ErrorPage = Loadable(lazy(() => import('views/pages/authentication/authentication3/ErrorPage')));
+const TermsAndConditions = Loadable(lazy(() => import('views/pages/authentication/authentication3/TermsAndConditions')));
 // maintenance routing
 const MaintenanceError = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const MaintenanceError500 = Loadable(lazy(() => import('views/pages/maintenance/Error500')));
@@ -105,6 +108,11 @@ const AuthenticationRoutes = {
             element: <AuthRegister3 />
         },
         {
+            path: '/change-password',
+            element: <ChangePasswordForm />
+        },
+        
+        {
             path: '/pages/forgot-password/forgot-password3',
             element: <AuthForgotPassword3 />
         },
@@ -161,6 +169,18 @@ const AuthenticationRoutes = {
         {
             path: '/pages/check-mail-confirmation/check-mail-confirmation3',
             element: <AuthCheckMail3 />
+        },
+        {
+            path: '/confirm-registration',
+            element: <RegistrationConfirmation />
+        },
+        {
+            path: '/error',
+            element: <ErrorPage />
+        },
+        {
+            path: '/terms-and-conditions',
+            element: <TermsAndConditions />
         }
     ]
 };

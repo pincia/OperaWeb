@@ -14,7 +14,7 @@ import LocalizationSection from './LocalizationSection';
 import MegaMenuSection from './MegaMenuSection';
 import FullScreenSection from './FullScreenSection';
 import NotificationSection from './NotificationSection';
-
+import Notifications from './Notifications/Notifications';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 import { MenuOrientation, ThemeMode } from 'config';
 
@@ -67,10 +67,10 @@ const Header = () => {
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />
 
-            {/* mega-menu */}
+            {/* mega-menu
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                 <MegaMenuSection />
-            </Box>
+            </Box> */}
 
             {/* live customization & localization */}
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -78,8 +78,8 @@ const Header = () => {
             </Box>
 
             {/* notification */}
-            <NotificationSection />
-
+            {/*      <NotificationSection />*/}
+            <Notifications />
             {/* full sceen toggler */}
             <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                 <FullScreenSection />

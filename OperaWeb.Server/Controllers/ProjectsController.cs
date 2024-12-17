@@ -4,11 +4,13 @@ using OperaWeb.Server.Abstractions;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.DataClasses.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OperaWeb.Server.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [Authorize]
   public class ProjectsController : ControllerBase
   {
     private readonly IProjectService _projectService;
@@ -146,33 +148,51 @@ namespace OperaWeb.Server.Controllers
 
       }
     }
+    /// <summary>
+    /// Importa un progetto da file con stato di avanzamento tramite SignalR.
+    /// </summary>
     [HttpPost]
     [Route("Create-project-from-file")]
-    public async Task<IActionResult> Post(CreateProjectFromFileRequestDTO request)
+    public async Task<IActionResult> ImportProjectFromFile([FromForm] IFormFile file)
     {
+      // Ottieni l'ID dell'utente dal token
       var userId = User.FindFirstValue("Id");
 
-      if (userId == null)
+      if (string.IsNullOrEmpty(userId))
       {
-        return BadRequest();
+        return Unauthorized(new { message = "User not authorized" });
       }
 
-      if (request.File.Length > 0)
+      if (file.Length <= 0)
       {
-        var res = await _projectService.ImportNewProject(request, userId);
-
-        if (res.Item1 != -1)
-        {
-          return Ok(new { id = res.Item1 });
-        }
-        else
-        {
-          return StatusCode(StatusCodes.Status500InternalServerError, res.Item2);
-        }
+        return BadRequest(new { message = "File length 0" });
       }
 
-      return BadRequest();
+      try
+      {
+        // Ottieni l'ID di connessione SignalR dal client
+        var connectionId = Request.Headers["X-Connection-Id"].ToString();
+        if (string.IsNullOrEmpty(connectionId))
+        {
+          return BadRequest(new { message = "SignalR Connection ID is required" });
+        }
+
+        // Avvia il metodo ImportNewProject
+        var result = await _projectService.ImportNewProject(file, userId, connectionId);
+
+        if (result.Item1 != -1) // Importazione riuscita
+        {
+          return Ok(new { id = result.Item1 });
+        }
+
+        return StatusCode(StatusCodes.Status500InternalServerError, new { message = result.Item2 });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = "An error occurred during import", error = ex.Message });
+      }
     }
+
 
   }
 }

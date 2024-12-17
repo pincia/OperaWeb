@@ -12,7 +12,7 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    [Migration("20241214144611_FirstMigration")]
+    [Migration("20241217134915_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -158,6 +158,69 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.OrganizationMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OrganizationMembers", (string)null);
+                });
+
+            modelBuilder.Entity("Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -166,8 +229,53 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AlternateEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CompanyComuneId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyCountry")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyPhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyPostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CompanyProvinciaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyTaxCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyWebsite")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ComuneId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -177,11 +285,26 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -190,6 +313,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PEC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PIVA")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -203,13 +332,31 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProvinciaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RagioneSociale")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ResetToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResetTokenExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("SDICode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TaxCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -227,6 +374,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyComuneId");
+
+                    b.HasIndex("CompanyProvinciaId");
+
+                    b.HasIndex("ComuneId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -234,6 +387,10 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ProvinciaId");
+
+                    b.HasIndex("SubRoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -321,6 +478,32 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasIndex("ProjectID1");
 
                     b.ToTable("Categorie");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Comune", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProvinciaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SiglaProvincia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvinciaId");
+
+                    b.ToTable("Comuni");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ConfigNumeri", b =>
@@ -454,11 +637,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("AdrInternet")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Articolo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CapID")
@@ -468,15 +649,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DesBreve")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DesEstesa")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DesRidotta")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Flags")
@@ -504,7 +682,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PweEPAnalisi")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SubCapID")
@@ -514,14 +691,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Tariffa")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TipoEP")
                         .HasColumnType("int");
 
                     b.Property<string>("UnMisura")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
@@ -597,6 +772,29 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("Misure");
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.OrganizationRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ParentRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentRoleId");
+
+                    b.ToTable("OrganizationRoles", (string)null);
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
                 {
                     b.Property<int>("ID")
@@ -670,6 +868,27 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sigla")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Province");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Soa", b =>
@@ -922,6 +1141,47 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("VociComputo");
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.Models.IdentityRoleOrganizationRoleMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IdentityRoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OrganizationRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityRoleId");
+
+                    b.HasIndex("OrganizationRoleId");
+
+                    b.ToTable("IdentityRoleOrganizationRoleMapping", (string)null);
+                });
+
+            modelBuilder.Entity("RoleSubRole", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("SubRoleId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("RoleId", "SubRoleId");
+
+                    b.HasIndex("SubRoleId");
+
+                    b.ToTable("RoleSubRoles");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -973,6 +1233,78 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.OrganizationMember", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.ApplicationUser", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.OrganizationRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Notification", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.ApplicationUser", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Comune", "CompanyComune")
+                        .WithMany()
+                        .HasForeignKey("CompanyComuneId");
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Provincia", "CompanyProvincia")
+                        .WithMany()
+                        .HasForeignKey("CompanyProvinciaId");
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Comune", "Comune")
+                        .WithMany()
+                        .HasForeignKey("ComuneId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Provincia", "Provincia")
+                        .WithMany()
+                        .HasForeignKey("ProvinciaId");
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.User.SubRole", "SubRole")
+                        .WithMany()
+                        .HasForeignKey("SubRoleId");
+
+                    b.Navigation("CompanyComune");
+
+                    b.Navigation("CompanyProvincia");
+
+                    b.Navigation("Comune");
+
+                    b.Navigation("Provincia");
+
+                    b.Navigation("SubRole");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Analisi", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
@@ -997,6 +1329,17 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasForeignKey("ProjectID1");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Comune", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Provincia", "Provincia")
+                        .WithMany("Comuni")
+                        .HasForeignKey("ProvinciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Provincia");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ConfigNumeri", b =>
@@ -1052,6 +1395,16 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired();
 
                     b.Navigation("VoceComputo");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.OrganizationRole", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.OrganizationRole", "ParentRole")
+                        .WithMany("SubRoles")
+                        .HasForeignKey("ParentRoleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentRole");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
@@ -1165,6 +1518,49 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("SuperCategoria");
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.Models.IdentityRoleOrganizationRoleMapping", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "IdentityRole")
+                        .WithMany()
+                        .HasForeignKey("IdentityRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.OrganizationRole", "OrganizationRole")
+                        .WithMany()
+                        .HasForeignKey("OrganizationRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IdentityRole");
+
+                    b.Navigation("OrganizationRole");
+                });
+
+            modelBuilder.Entity("RoleSubRole", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.User.SubRole", "SubRole")
+                        .WithMany()
+                        .HasForeignKey("SubRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("SubRole");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.OrganizationRole", b =>
+                {
+                    b.Navigation("SubRoles");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Project", b =>
                 {
                     b.Navigation("Categorie");
@@ -1180,6 +1576,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("SuperCategorie");
 
                     b.Navigation("VociComputo");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>
+                {
+                    b.Navigation("Comuni");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>

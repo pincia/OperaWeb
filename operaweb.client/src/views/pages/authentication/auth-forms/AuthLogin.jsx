@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -36,8 +36,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
     const theme = useTheme();
 
     const { login } = useAuth();
-    const scriptedRef = useScriptRef();
-
+    const navigate = useNavigate();
     const [checked, setChecked] = React.useState(true);
 
     const [showPassword, setShowPassword] = React.useState(false);
@@ -61,31 +60,39 @@ const JWTLogin = ({ loginProp, ...others }) => {
                 password: Yup.string().max(255).required('Password is required')
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-                try {
-                   var res = await login(values.email, values.password);
+        
+                        try {
+                            const response = await login(values.email, values.password); // API di login
 
-              console.log(res)
-                    openSnackbar({
-                        open: true,
-                        message: 'Login failed.',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                
-                 //   if (scriptedRef.current) {
-                        setStatus({ success: true });
-                        setSubmitting(false);
-                  //  }
-                } catch (err) {
-                 //   if (scriptedRef.current) {
-                        setStatus({ success: false });
-                        setErrors({ submit: err.message });
-                        setSubmitting(false);
-                 //   }
-                }
+                            if (!response.data.isSucceed && response.data.messages['change_password']) {
+                                // Reindirizza alla pagina di cambio password
+                                    console.log("Reindirizzamento al cambio password...");
+                                    navigate('/change-password', { state: { email: values.email } });
+                          
+                            } else if (response.data.isSucceed) {
+                                // Login riuscito
+                                // setUser(response.data);
+                                navigate('/dashboard');
+                            } else {
+                                setError(Object.entries(response.data.messages)
+                                    .map(([k, v]) => (`'${v}'`))
+                                    .join(' '));
+                            }
+                            setStatus({ success: true });
+                            setSubmitting(false);
+                        } catch (error) {
+                            openSnackbar({
+                                open: true,
+                                message: 'Login failed.',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                close: false
+                            })
+                            setSubmitting(false);
+                        }
+                    
             }}
         >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (

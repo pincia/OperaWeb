@@ -18,14 +18,17 @@ namespace Services.UserGroup
     private readonly OperaWebDbContext _context;
     private IEmailSender _emailService;
     private readonly ILogger<UserService> _logger;
+    private readonly INotificationService _notificationService;
     public UserService(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             OperaWebDbContext applicationDbContext,
             AppSettings appSettings,
             IEmailSender emailService,
-            ILogger<UserService> logger)
+            ILogger<UserService> logger,
+    INotificationService notificationService)
     {
+      _notificationService = notificationService;
       _userManager = userManager;
       _signInManager = signInManager;
       _appSettings = appSettings;

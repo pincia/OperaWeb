@@ -27,9 +27,6 @@ const verifyToken = (serviceToken) => {
         return false;
     }
     const decoded = jwtDecode(serviceToken);
-    /**
-     * Property 'exp' does not exist on type '<T = unknown>(token, options) => T'.
-     */
     return decoded.exp > Date.now() / 1000;
 };
 
@@ -82,8 +79,7 @@ export const JWTProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const response = await axios.post('/api/user/login', { email, password });
-        console.log(response)
-        if(response.data.isSucceed){
+        if (response.data.isSucceed) {
             const { accessToken, user } = response.data.data;
             setSession(accessToken);
             dispatch({
@@ -93,11 +89,11 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
-        }      
+        }
+        return response;
     };
 
     const register = async (email, password, firstName, lastName, role) => {
-        // todo: this flow need to be recode as it not verified
         const id = chance.bb_pin();
         const response = await axios.post('/api/user/register', {
             id,
@@ -107,8 +103,6 @@ export const JWTProvider = ({ children }) => {
             lastName,
             role
         });
-        
-        let user = response.data;
 
         if (response.data.isSucceed) {
             const { accessToken, user } = response.data.data;
@@ -120,27 +114,9 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
+        } else {
+            throw new Error(JSON.stringify(Object.values(response.data.messages)));
         }
-        else
-        {
-            throw new Error(JSON.stringify(Object.values(response.data.messages)))
-        }
-/*
-
-        if (window.localStorage.getItem('users') !== undefined && window.localStorage.getItem('users') !== null) {
-            const localUsers = window.localStorage.getItem('users');
-            users = [
-                ...JSON.parse(localUsers),
-                {
-                    id,
-                    email,
-                    password,
-                    name: `${firstName} ${lastName}`
-                }
-            ];
-        }
-
-        window.localStorage.setItem('users', JSON.stringify(users.data));*/
     };
 
     const logout = () => {
@@ -149,17 +125,38 @@ export const JWTProvider = ({ children }) => {
     };
 
     const resetPassword = async (email) => {
-        console.log(email);
+        console.log(email); // Implementa questa funzione se necessario
     };
 
-    const updateProfile = () => {};
+    // Aggiunta della nuova API per il cambio password
+    const changePassword = async (oldPassword, newPassword) => {
+        const data = {
+            oldPassword,
+            newPassword
+        };
+
+        try {
+            // Assicurati che l'endpoint corrisponda al controller
+            const response = await axios.post('/api/user/change-password', data);
+            return response.data; // Ritorna i dati di successo
+        } catch (error) {
+            // Stampa l'intero errore per debugging
+            console.error('Change Password Error:', error.response?.data || error.message);
+            throw error; // Può essere rilanciato per essere gestito altrove
+        }
+    };
+
+
+    const updateProfile = () => { };
 
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
     }
 
     return (
-        <JWTContext.Provider value={{ ...state, login, logout, register, resetPassword, updateProfile }}>{children}</JWTContext.Provider>
+        <JWTContext.Provider value={{ ...state, login, logout, register, resetPassword, changePassword, updateProfile }}>
+            {children}
+        </JWTContext.Provider>
     );
 };
 

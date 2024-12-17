@@ -13,44 +13,50 @@ using Services.UserGroup;
 using System.Diagnostics.Metrics;
 using System.Net;
 using System.Reflection.Emit;
+using Microsoft.AspNetCore.SignalR;
+using OperaWeb.Server.Hubs;
 
 namespace OperaWeb.Server.Services.BLL
 {
     public class ProjectServiceManager
   {
     private OperaWebDbContext _context;
-
+    private readonly IHubContext<ImportHub> _hubContext;
     private  ILogger _logger;
 
-    public ProjectServiceManager(OperaWebDbContext context, ILogger logger)
+    public ProjectServiceManager(OperaWebDbContext context, ILogger logger, IHubContext<ImportHub> hubContext)
     {
         _logger = logger;
         _context = context;
+      _hubContext = hubContext;
     }
 
-    /// <summary>
-    /// Imports data from xmlString to a new Project
-    /// </summary>
-    /// <param name="xmlString"></param>
-    /// <param name="newProject"></param>
-    public int ImportData(string xmlString, Project newProject)
+    public async Task<int> ImportDataAsync(string xmlString, Project newProject, string connectionId)
     {
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data for project: {newProject}");
 
-
-
+      // Step 1: Deserializzazione del documento XML
       PweDocumento importedPwe;
-
       using (var stringReader = new StringReader(RemoveInvalidXmlChars(xmlString)))
       {
         var serializer = new XmlSerializer(typeof(PweDocumento));
         importedPwe = (PweDocumento)serializer.Deserialize(stringReader);
       }
 
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Dati Generali");
-      //dati generali
+      // Totale passi per calcolare la percentuale di avanzamento
+      const int totalSteps = 5;
+      int currentStep = 0;
 
-      var datiGenerali = new DatiGenerali()
+      // Metodo per inviare aggiornamenti
+      async Task UpdateProgress()
+      {
+        int progress = ++currentStep * 100 / totalSteps;
+        await _hubContext.Clients.Client(connectionId).SendAsync("UpdateProgress", progress);
+      }
+
+      // Step 2: Importazione Dati Generali
+      _logger.Log(LogLevel.Information, $"[ImportData] Import Dati Generali");
+      var datiGenerali = new DatiGenerali
       {
         PercPrezzi = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.PercPrezzi,
         Comune = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Comune,
@@ -58,7 +64,7 @@ namespace OperaWeb.Server.Services.BLL
         Oggetto = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Oggetto,
         Committente = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Committente,
         Impresa = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.Impresa,
-        ParteOpera = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.ParteOpera,
+        ParteOpera = importedPwe.PweDatiGenerali.PweDGProgetto.PweDGDatiGenerali.ParteOpera
       };
 
       newProject.Object = datiGenerali.Oggetto;
@@ -69,188 +75,125 @@ namespace OperaWeb.Server.Services.BLL
       var importedProject = _context.Projects.Add(newProject);
       datiGenerali.Project = importedProject.Entity;
 
-      _context.DatiGenerali.Add(datiGenerali);
+      await UpdateProgress();
 
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Categorie");
-      //Categorie
-      List<EntityEntry<Categoria>> addedCategories = new List<EntityEntry<Categoria>>();
+      // Step 3: Importazione Categorie, SuperCategorie e SubCategorie
+      _logger.Log(LogLevel.Information, $"[ImportData] Import Categorie e SuperCategorie");
+      var categories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGCategorie
+          .Select(c => new Categoria
+          {
+            ExternalID = c.ID,
+            DesSintetica = c.DesSintetica ?? "",
+            DesEstesa = c.DesEstesa,
+            DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            Durata = c.Durata,
+            CodFase = c.CodFase,
+            Percentuale = c.Percentuale,
+            Codice = c.Codice,
+            Project = importedProject.Entity
+          }).ToList();
 
-      foreach (var importedCategoria in importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGCategorie)
+      var superCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie
+          .Select(c => new SuperCategoria
+          {
+            ExternalID = c.ID,
+            DesSintetica = c.DesSintetica ?? "",
+            DesEstesa = c.DesEstesa ?? "",
+            DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", null),
+            Durata = c.Durata,
+            CodFase = c.CodFase,
+            Percentuale = c.Percentuale,
+            Codice = c.Codice,
+            Project = importedProject.Entity
+          }).ToList();
+
+      _context.Categorie.AddRange(categories);
+      _context.SuperCategorie.AddRange(superCategories);
+
+      await UpdateProgress();
+
+      // Dizionari per lookup rapido
+      var categoryLookup = categories.ToDictionary(c => c.ExternalID);
+      var superCategoryLookup = superCategories.ToDictionary(c => c.ExternalID);
+
+      // Step 4: Importazione Elenco Prezzi
+      _logger.Log(LogLevel.Information, $"[ImportData] Import Elenco Prezzi");
+      var elencoPrezzi = importedPwe.PweMisurazioni.PweElencoPrezzi
+          .Select(e => new ElencoPrezzo
+          {
+            IDEP = e.ID,
+            TipoEP = e.TipoEP,
+            Tariffa = e.Tariffa,
+            Articolo = e.Articolo,
+            DesRidotta = e.DesRidotta ?? "",
+            DesEstesa = e.DesEstesa ?? "",
+            Prezzo1 = e.Prezzo1,
+            Data = DateTime.ParseExact(e.Data, "dd/MM/yyyy", null),
+            Project = importedProject.Entity
+          }).ToList();
+
+      _context.ElencoPrezzi.AddRange(elencoPrezzi);
+      var elencoPrezziLookup = elencoPrezzi.ToDictionary(e => e.IDEP);
+
+      await UpdateProgress();
+
+      // Step 5: Importazione Voci Computo e Misurazioni
+      _logger.Log(LogLevel.Information, $"[ImportData] Import Voci Computo e Misurazioni");
+      var totalAmount = 0M;
+      var vociComputo = new List<VoceComputo>();
+      var misure = new List<Misura>();
+
+      foreach (var voce in importedPwe.PweMisurazioni.PweVociComputo)
       {
-        addedCategories.Add(_context.Categorie.Add(new Categoria()
+        if (!categoryLookup.ContainsKey(voce.IDCat)) continue;
+
+        var voceComputo = new VoceComputo
         {
-          ExternalID = importedCategoria.ID,
-          DesSintetica = importedCategoria.DesSintetica,
-          DesEstesa = importedCategoria.DesEstesa,
-          DataInit = DateTime.ParseExact(importedCategoria.DataInit, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-          Durata = importedCategoria.Durata,
-          CodFase = importedCategoria.CodFase,
-          Percentuale = importedCategoria.Percentuale,
-          Codice = importedCategoria.Codice,
-          Project = importedProject.Entity
-        }));
-      }
-
-      List<EntityEntry<SuperCategoria>> addedSuperCategories = new List<EntityEntry<SuperCategoria>>();
-
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> SuperCategorie");
-      foreach (var importedCategoria in importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie)
-      {
-        addedSuperCategories.Add(_context.SuperCategorie.Add(new SuperCategoria()
-        {
-          ExternalID = importedCategoria.ID,
-          DesSintetica = importedCategoria.DesSintetica,
-          DesEstesa = importedCategoria.DesEstesa,
-          DataInit = DateTime.ParseExact(importedCategoria.DataInit, "dd/MM/yyyy", null),
-          Durata = importedCategoria.Durata,
-          CodFase = importedCategoria.CodFase,
-          Percentuale = importedCategoria.Percentuale,
-          Codice = importedCategoria.Codice,
-          Project = importedProject.Entity
-        }));
-      }
-
-      List<EntityEntry<SubCategoria>> addedSubCategories = new List<EntityEntry<SubCategoria>>();
-
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> SubCategorie");
-      foreach (var importedCategoria in importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie)
-      {
-        addedSubCategories.Add( _context.SubCategorie.Add(new SubCategoria()
-        {
-          ExternalID = importedCategoria.ID,
-          DesSintetica = importedCategoria.DesSintetica,
-          DesEstesa = importedCategoria.DesEstesa,
-          DataInit = DateTime.ParseExact(importedCategoria.DataInit, "dd/MM/yyyy", null),
-          Durata = importedCategoria.Durata,
-          CodFase = importedCategoria.CodFase,
-          Percentuale = importedCategoria.Percentuale,
-          Codice = importedCategoria.Codice,
-          Project = importedProject.Entity
-        }));
-
-      }
-
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> ElencoPrezzi");
-
-      List<ElencoPrezzo> importedElencoPrezzi = new List<ElencoPrezzo>();
-      //elenco prezzi
-      foreach (var importedPrezzo in importedPwe.PweMisurazioni.PweElencoPrezzi)
-      {
-        var elencoPrezzo = _context.ElencoPrezzi.Add(new ElencoPrezzo()
-        {
-          IDEP = importedPrezzo.ID,
-          TipoEP = importedPrezzo.TipoEP,
-          Tariffa = importedPrezzo.Tariffa,
-          Articolo = importedPrezzo.Articolo,
-          DesRidotta = importedPrezzo.DesRidotta,
-          DesEstesa = importedPrezzo.DesEstesa,
-          DesBreve = importedPrezzo.DesBreve,
-          UnMisura = importedPrezzo.UnMisura,
-          Prezzo1 = importedPrezzo.Prezzo1,
-          Prezzo2 = importedPrezzo.Prezzo2,
-          Prezzo3 = importedPrezzo.Prezzo3,
-          Prezzo4 = importedPrezzo.Prezzo4,
-          Prezzo5 = importedPrezzo.Prezzo5,
-          SuperCapID = 0,
-          SubCapID = 0,
-          CapID = 0,
-          Flags = importedPrezzo.Flags,
-          Data = DateTime.ParseExact(importedPrezzo.Data, "dd/MM/yyyy", null),
-          AdrInternet = importedPrezzo.AdrInternet,
-          PweEPAnalisi = importedPrezzo.PweEPAnalisi,
-          Project = importedProject.Entity
-        });
-
-        importedElencoPrezzi.Add(elencoPrezzo.Entity);
-      }
-
-      int count = 0;
-      decimal totalAmount = 0;
-      _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Voci Computo Start");
-      //voci computo
-      foreach (var voceComputoImported in importedPwe.PweMisurazioni.PweVociComputo)
-      {
-        if (voceComputoImported.IDCat <= 0) 
-        {
-          continue;
-        }
-        
-        var category = addedCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
-        if (category == null) 
-        {
-          continue;
-        }
-
-        if (voceComputoImported.IDSpCat <= 0)
-        {
-          continue;
-        }
-
-        var superCategory = addedSuperCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
-        if (superCategory == null)
-        {
-          continue;
-        }
-
-        if (voceComputoImported.IDSbCat <= 0)
-        {
-          continue;
-        }
-
-        var subCategory = addedSubCategories.FirstOrDefault(c => c.Entity.ExternalID == voceComputoImported.IDCat && c.Entity.ProjectID == importedProject.Entity.ID);
-        if (subCategory == null)
-        {
-          continue;
-        }
-
-
-        var newVoceComputo = new VoceComputo()
-        {
-          ElencoPrezzo = importedElencoPrezzi.FirstOrDefault(e=>e.IDEP == voceComputoImported.IDEP),
-          ElencoPrezzoID = voceComputoImported.IDEP,
-          Quantita = voceComputoImported.Quantita,
-          DataMis = DateTime.ParseExact(voceComputoImported.DataMis, "dd/MM/yyyy", null),
-          Flags = voceComputoImported.Flags,
+          ElencoPrezzo = elencoPrezziLookup.GetValueOrDefault(voce.IDEP),
+          ElencoPrezzoID = voce.IDEP,
+          Quantita = voce.Quantita,
+          DataMis = DateTime.ParseExact(voce.DataMis, "dd/MM/yyyy", null),
+          Flags = voce.Flags,
           Project = importedProject.Entity,
-          Categoria = category.Entity,
-          SubCategoria = subCategory.Entity,
-          SuperCategoria = superCategory.Entity
+          Categoria = categoryLookup[voce.IDCat]
         };
 
-        
-        //misurazioni
-        foreach (var misurazioneImpoerted in voceComputoImported.PweVCMisure)
+        foreach (var misura in voce.PweVCMisure)
         {
-          var misurazione = _context.Misure.Add(new Misura()
+          var nuovaMisura = new Misura
           {
-            IDVV = misurazioneImpoerted.IDVV,
-            Descrizione = misurazioneImpoerted.Descrizione,
-            PartiUguali = misurazioneImpoerted.PartiUguali,
-            Lunghezza = SafeConvert.ToDecimal(misurazioneImpoerted.Lunghezza),
-            Larghezza = SafeConvert.ToDecimal(misurazioneImpoerted.Larghezza),
-            HPeso = SafeConvert.ToDecimal(misurazioneImpoerted.HPeso),
-            Quantita = SafeConvert.ToDecimal(misurazioneImpoerted.Quantita),
-            Flags = misurazioneImpoerted.Flags,
-            VoceComputo = newVoceComputo
-          });
+            IDVV = misura.IDVV,
+            Descrizione = misura.Descrizione,
+            PartiUguali = misura.PartiUguali,
+            Lunghezza = SafeConvert.ToDecimal(misura.Lunghezza),
+            Larghezza = SafeConvert.ToDecimal(misura.Larghezza),
+            HPeso = SafeConvert.ToDecimal(misura.HPeso),
+            Quantita = SafeConvert.ToDecimal(misura.Quantita),
+            Flags = misura.Flags,
+            VoceComputo = voceComputo
+          };
 
-          totalAmount += misurazione.Entity.Quantita ?? 0 * newVoceComputo.ElencoPrezzo.Prezzo1;
-        }
-        
-        if(count%10 == 0)
-        {
-          _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data -> Voci Computo Importing -> Count: {count}");
+          misure.Add(nuovaMisura);
+          totalAmount += nuovaMisura.Quantita.GetValueOrDefault() * (voceComputo.ElencoPrezzo?.Prezzo1 ?? 0);
         }
 
-
-        count++;
+        vociComputo.Add(voceComputo);
       }
+
+      _context.VociComputo.AddRange(vociComputo);
+      _context.Misure.AddRange(misure);
+
+      await UpdateProgress();
+
+      // Salvataggio
       importedProject.Entity.TotalAmount = totalAmount;
-      _logger.Log(LogLevel.Information, $"[ImportData] End Import Data");
       _context.SaveChanges();
 
+      _logger.Log(LogLevel.Information, $"[ImportData] End Import Data");
       return importedProject.Entity.ID;
     }
+
+
 
 
 

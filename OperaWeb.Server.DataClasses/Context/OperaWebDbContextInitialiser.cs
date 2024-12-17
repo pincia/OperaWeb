@@ -5,11 +5,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OperaWeb.Server.DataClasses.Context;
+using OperaWeb.Server.DataClasses.Models;
 using System;
+using System.Data;
 using System.Security.Claims;
+using Newtonsoft.Json;
+using File = System.IO.File;
+using OperaWeb.Server.DataClasses.DTO;
+using OperaWeb.Server.Models;
 namespace OperaWeb.Server.DataClasses.Context
 {
-  public class OperaWebDbContextInitialiser
+    public class OperaWebDbContextInitialiser
   {
     private readonly ILogger<OperaWebDbContextInitialiser> _logger;
     private readonly OperaWebDbContext _context;
@@ -23,6 +29,9 @@ namespace OperaWeb.Server.DataClasses.Context
       _userManager = userManager;
       _roleManager = roleManager;
     }
+
+    public object JsonConvert { get; private set; }
+
     public async Task InitialiseAsync()
     {
       try
@@ -55,39 +64,101 @@ namespace OperaWeb.Server.DataClasses.Context
     public async Task TrySeedAsync()
     {
       // Crea un elenco di ruoli da aggiungere
-      var roles = new List<string> { "Admin", "Committente", "Professionista", "Impresa"};
+      var roles = new List<string> { "Admin", "Committente", "Professionista", "Impresa", "OrganizationMember" };
+
+      var addedRoles = new List<IdentityRole>();
 
       foreach (var role in roles)
       {
         if (!await _roleManager.RoleExistsAsync(role))
         {
-          await _roleManager.CreateAsync(new IdentityRole(role));
+          var res = await _roleManager.CreateAsync(new IdentityRole(role));
         }
       }
 
-      // Default roles
-      var administratorRole = new IdentityRole("Administrator");
-
-      if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
-      {
-        var role = await _roleManager.CreateAsync(administratorRole);
-        if (role != null)
-        {
-          await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleView"));
-          await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleAdd"));
-          await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleEdit"));
-          await _roleManager.AddClaimAsync(administratorRole, new Claim("RoleClaim", "HasRoleDelete"));
-        }
-      }
       //SubRoles
-      var subRoles = new List<string> { "Muratore", "Falegname", "Elettricista","Impiantista"};
+      var subRoles = new List<string>
+{
+    "PA",
+    "Privato",
+    "Ingegnere",
+    "Architetto",
+    "Geometra",
+    "Geologo",
+    "Società Per Azioni",
+    "Società a Responsabilità Limitata",
+    "Società in Nome Collettivo",
+    "Società Semplice",
+    "Società in Accomandita Semplice",
+    "Società in Accomandita per Azioni",
+    "Impresa Individuale",
+    "Lavoratore Autonomo o Libero Professionista",
+    "Studio Associato o Società di Professionisti",
+    "Società Cooperativa",
+    "Organizzazione non lucrativa di utilità sociale",
+    "Consorzio",
+    "Società consortile",
+    "Ente Pubblico",
+    "Società di fatto",
+    "Forma giuridica estera",
+    "Altre"
+};
+
       var actualSubRoles = _context.SubRoles.ToList();
 
       foreach (var role in subRoles)
       {
-        if (!actualSubRoles.Exists(S=>S.Name == role))
+        if (!actualSubRoles.Exists(S => S.Name == role))
         {
-          _context.SubRoles.Add(new Models.User.SubRole() { Name = role });
+          var res = _context.SubRoles.Add(new Models.User.SubRole() { Name = role });
+
+          var committenti = new List<string>
+{
+    "PA",
+    "Privato" };
+
+          if (committenti.Contains(role))
+          {
+            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Committente") });
+          }
+          var professionisti = new List<string>
+{
+    "Ingegnere",
+    "Architetto",
+    "Geometra",
+    "Geologo"
+};
+
+          if (professionisti.Contains(role))
+          {
+            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Professionista") });
+          }
+
+          var imprese = new List<string>
+{
+    "Società Per Azioni",
+    "Società a Responsabilità Limitata",
+    "Società in Nome Collettivo",
+    "Società Semplice",
+    "Società in Accomandita Semplice",
+    "Società in Accomandita per Azioni",
+    "Impresa Individuale",
+    "Lavoratore Autonomo o Libero Professionista",
+    "Studio Associato o Società di Professionisti",
+    "Società Cooperativa",
+    "Organizzazione non lucrativa di utilità sociale",
+    "Consorzio",
+    "Società consortile",
+    "Ente Pubblico",
+    "Società di fatto",
+    "Forma giuridica estera",
+    "Altre"
+};
+
+          if (imprese.Contains(role))
+          {
+            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Impresa") });
+          }
         }
       }
 
@@ -149,7 +220,7 @@ namespace OperaWeb.Server.DataClasses.Context
         _context.Soas.Add(new Models.Soa() { Code = "OS33", Description = "Coperture speciali" });
         _context.Soas.Add(new Models.Soa() { Code = "OS34", Description = "Sistemi antirumore per infrastrutture di mobilità" });
         _context.Soas.Add(new Models.Soa() { Code = "OS35", Description = "Interventi a basso impatto ambientale" });
- 
+
       }
 
       //soas classifications
@@ -172,19 +243,123 @@ namespace OperaWeb.Server.DataClasses.Context
 
       // Default users
       var administrator = new ApplicationUser { UserName = "admin@test.it", Email = "admin@test.it" };
-     
+
       if (_userManager.Users.All(u => u.UserName != administrator.UserName))
       {
-        await _userManager.CreateAsync(administrator, "admin");
-        if (!string.IsNullOrWhiteSpace(administratorRole.Name))
-        {
-          var result = await _userManager.CreateAsync(administrator, "Admin2024!");
-          var newUser = _context.Users.Where(u => u.Email == administrator.Email).FirstOrDefault();
-          newUser.EmailConfirmed = true;
-        }
+        var result = await _userManager.CreateAsync(administrator, "Admin2024!");
+        var newUser = _context.Users.Where(u => u.Email == administrator.Email).FirstOrDefault();
+        newUser.EmailConfirmed = true;
+
       }
 
+      //Comuni e province
+
+      if (!_context.Province.Any() && !_context.Comuni.Any()) // Controlla se i dati esistono già
+      {
+        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        // Recupera la directory radice dell'app
+        var seedFilesDirectory = Path.Combine(baseDirectory, "SeedFiles");
+
+        // Percorsi assoluti dei file
+        var provinceFilePath = Path.Combine(seedFilesDirectory, "gi_province.json");
+        var comuniFilePath = Path.Combine(seedFilesDirectory, "gi_comuni.json");
+        // Leggi i file JSON
+        var provinceJson = await File.ReadAllTextAsync(provinceFilePath);
+        var comuniJson = await File.ReadAllTextAsync(comuniFilePath);
+
+        // Deserializza in oggetti
+        var provinceDto = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProvinciaDTO>>(provinceJson);
+        var comuniDto = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ComuneDTO>>(comuniJson);
+
+        // Mappa ProvinceDTO alla tua classe Provincia
+        var province = provinceDto.Select(p => new Provincia
+        {
+          Nome = p.DenominazioneProvincia,
+          Sigla = p.SiglaProvincia
+        }).ToList();
+
+        _context.Province.AddRange(province);
+        await _context.SaveChangesAsync();
+
+        foreach (var comuneDto in comuniDto)
+        {
+          var provincia = _context.Province
+                 .Where(p => p.Sigla == comuneDto.SiglaProvincia)
+                 .FirstOrDefault(); // Associa l'ID della provincia
+          var newComune = new Comune()
+          {
+            Nome = comuneDto.DenominazioneIta,
+            Provincia = provincia,
+            SiglaProvincia = provincia.Sigla
+          };
+          _context.Comuni.AddRange(newComune);
+        }
+
+        await _context.SaveChangesAsync();
+
+      }
+
+      // Seeding degli OrganizationRoles
+      var organizationRoles = new List<(string Name, string RoleType, string ParentRole)>
+    {
+        // Committente
+        ("Dirigente/Responsabile Ufficio Tecnico", "Committente","Organization"),
+        ("Responsabile unico del procedimento (RUP)", "Committente", "Dirigente/Responsabile Ufficio Tecnico"),
+        ("General contractor", "Committente", "Dirigente/Responsabile Ufficio Tecnico"),
+        ("Procuratore", "Committente", "Dirigente/Responsabile Ufficio Tecnico"),
+        ("Rappresentante dell'avente titolo", "Committente", "Dirigente/Responsabile Ufficio Tecnico"),
+
+        // Imprese
+        ("Rappresentante Legale", "Impresa", "Organization"),
+        ("Datore di Lavoro", "Impresa", "Rappresentante Legale"),
+        ("Direttore tecnico di cantiere", "Impresa", "Rappresentante Legale"),
+        ("Medico Competente", "Impresa", "Rappresentante Legale"),
+        ("Responsabile del Servizio di Prevenzione e Protezione", "Impresa", "Rappresentante Legale"),
+        ("Addetto al Servizio di Prevenzione e Protezione", "Impresa", "Rappresentante Legale"),
+        ("Rappresentante dei Lavoratori per la Sicurezza", "Impresa", "Rappresentante Legale"),
+        ("Rappresentante dei Lavoratori per la Sicurezza Territoriale", "Impresa", "Rappresentante Legale"),
+
+        //Organization
+        ("Organization","Impresa,Committente","")
+    };
+
       _context.SaveChanges();
+
+      var existingRoles = _context.OrganizationRoles.ToList();
+
+      foreach (var (name, roleTypes, parentRole) in organizationRoles)
+      {
+        if (!existingRoles.Any(r => r.Name == name))
+        {
+          var parent = string.IsNullOrEmpty(parentRole) ? null : _context.OrganizationRoles.FirstOrDefault(r => r.Name == parentRole);
+
+          var role = new Models.OrganizationRole
+          {
+            Name = name,
+            ParentRole = parent
+          };
+
+          var res = _context.OrganizationRoles.Add(role);
+          _context.SaveChanges();
+
+          var roleTypesArray = roleTypes.Split(',');
+
+          foreach (var roleName in roleTypesArray)
+          {
+            var organizationRole = res.Entity;
+            var roleType = await _roleManager.FindByNameAsync(roleName);
+
+            var mapping = new IdentityRoleOrganizationRoleMapping()
+            {
+              OrganizationRole =  organizationRole,
+              IdentityRole = roleType
+            };
+
+            _context.Add(mapping);
+            _context.SaveChanges();
+          }
+        }
+      }
     }
   }
 }

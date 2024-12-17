@@ -26,33 +26,37 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "OrganizationRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    VerificationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResetTokenExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PasswordReset = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ParentRoleId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.PrimaryKey("PK_OrganizationRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrganizationRoles_OrganizationRoles_ParentRoleId",
+                        column: x => x.ParentRoleId,
+                        principalTable: "OrganizationRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Province",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sigla = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Province", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -132,6 +136,161 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityRoleOrganizationRoleMapping",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdentityRoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrganizationRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityRoleOrganizationRoleMapping", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityRoleOrganizationRoleMapping_AspNetRoles_IdentityRoleId",
+                        column: x => x.IdentityRoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_IdentityRoleOrganizationRoleMapping_OrganizationRoles_OrganizationRoleId",
+                        column: x => x.OrganizationRoleId,
+                        principalTable: "OrganizationRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comuni",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProvinciaId = table.Column<int>(type: "int", nullable: false),
+                    SiglaProvincia = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comuni", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comuni_Province_ProvinciaId",
+                        column: x => x.ProvinciaId,
+                        principalTable: "Province",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleSubRoles",
+                columns: table => new
+                {
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleSubRoles", x => new { x.RoleId, x.SubRoleId });
+                    table.ForeignKey(
+                        name: "FK_RoleSubRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleSubRoles_SubRoles_SubRoleId",
+                        column: x => x.SubRoleId,
+                        principalTable: "SubRoles",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VerificationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PasswordReset = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ComuneId = table.Column<int>(type: "int", nullable: true),
+                    ProvinciaId = table.Column<int>(type: "int", nullable: true),
+                    SubRoleId = table.Column<int>(type: "int", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AlternateEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaxCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RagioneSociale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PIVA = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyTaxCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyComuneId = table.Column<int>(type: "int", nullable: true),
+                    CompanyProvinciaId = table.Column<int>(type: "int", nullable: true),
+                    CompanyPostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyWebsite = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SDICode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PEC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MustChangePassword = table.Column<bool>(type: "bit", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Comuni_CompanyComuneId",
+                        column: x => x.CompanyComuneId,
+                        principalTable: "Comuni",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Comuni_ComuneId",
+                        column: x => x.ComuneId,
+                        principalTable: "Comuni",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Province_CompanyProvinciaId",
+                        column: x => x.CompanyProvinciaId,
+                        principalTable: "Province",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Province_ProvinciaId",
+                        column: x => x.ProvinciaId,
+                        principalTable: "Province",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_SubRoles_SubRoleId",
+                        column: x => x.SubRoleId,
+                        principalTable: "SubRoles",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -237,6 +396,62 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrganizationMembers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    OrganizationId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrganizationMembers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrganizationMembers_AspNetUsers_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrganizationMembers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrganizationMembers_OrganizationRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "OrganizationRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -436,12 +651,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IDEP = table.Column<int>(type: "int", nullable: false),
                     TipoEP = table.Column<int>(type: "int", nullable: false),
-                    Tariffa = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Articolo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DesRidotta = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DesEstesa = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DesBreve = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UnMisura = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tariffa = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Articolo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DesRidotta = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DesEstesa = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DesBreve = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UnMisura = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Prezzo1 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Prezzo2 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Prezzo3 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -452,8 +667,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     SubCapID = table.Column<int>(type: "int", nullable: false),
                     Flags = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AdrInternet = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PweEPAnalisi = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdrInternet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PweEPAnalisi = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -632,6 +847,31 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CompanyComuneId",
+                table: "AspNetUsers",
+                column: "CompanyComuneId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CompanyProvinciaId",
+                table: "AspNetUsers",
+                column: "CompanyProvinciaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ComuneId",
+                table: "AspNetUsers",
+                column: "ComuneId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ProvinciaId",
+                table: "AspNetUsers",
+                column: "ProvinciaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_SubRoleId",
+                table: "AspNetUsers",
+                column: "SubRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -647,6 +887,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "IX_Categorie_ProjectID1",
                 table: "Categorie",
                 column: "ProjectID1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comuni_ProvinciaId",
+                table: "Comuni",
+                column: "ProvinciaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConfigNumeri_ProjectID",
@@ -669,9 +914,44 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IdentityRoleOrganizationRoleMapping_IdentityRoleId",
+                table: "IdentityRoleOrganizationRoleMapping",
+                column: "IdentityRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityRoleOrganizationRoleMapping_OrganizationRoleId",
+                table: "IdentityRoleOrganizationRoleMapping",
+                column: "OrganizationRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Misure_VoceComputoID",
                 table: "Misure",
                 column: "VoceComputoID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_UserId",
+                table: "Notifications",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrganizationMembers_OrganizationId",
+                table: "OrganizationMembers",
+                column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrganizationMembers_RoleId",
+                table: "OrganizationMembers",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrganizationMembers_UserId",
+                table: "OrganizationMembers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrganizationRoles_ParentRoleId",
+                table: "OrganizationRoles",
+                column: "ParentRoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_FileID",
@@ -692,6 +972,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "IX_Projects_UserId",
                 table: "Projects",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleSubRoles_SubRoleId",
+                table: "RoleSubRoles",
+                column: "SubRoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubCategorie_ProjectID",
@@ -762,7 +1047,19 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "DatiGenerali");
 
             migrationBuilder.DropTable(
+                name: "IdentityRoleOrganizationRoleMapping");
+
+            migrationBuilder.DropTable(
                 name: "Misure");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "OrganizationMembers");
+
+            migrationBuilder.DropTable(
+                name: "RoleSubRoles");
 
             migrationBuilder.DropTable(
                 name: "Templates");
@@ -771,13 +1068,13 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "UserSubRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
                 name: "VociComputo");
 
             migrationBuilder.DropTable(
-                name: "SubRoles");
+                name: "OrganizationRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Categorie");
@@ -805,6 +1102,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Comuni");
+
+            migrationBuilder.DropTable(
+                name: "SubRoles");
+
+            migrationBuilder.DropTable(
+                name: "Province");
         }
     }
 }

@@ -14,17 +14,17 @@ namespace OperaWeb.Server.DataClasses.Models
     public int IDEP { get; set; }
     public int TipoEP { get; set; }
 
-    public string Tariffa { get; set; }
+    public string? Tariffa { get; set; }
 
-    public string Articolo { get; set; }
+    public string? Articolo { get; set; }
 
-    public string DesRidotta { get; set; }
+    public string? DesRidotta { get; set; }
 
-    public string DesEstesa { get; set; }
+    public string? DesEstesa { get; set; }
 
-    public string DesBreve { get; set; }
+    public string? DesBreve { get; set; }
 
-    public string UnMisura { get; set; }
+    public string? UnMisura { get; set; }
 
     public decimal Prezzo1 { get; set; }
 
@@ -42,9 +42,9 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public DateTime Data { get; set; }
 
-    public string AdrInternet { get; set; }
+    public string? AdrInternet { get; set; }
 
-    public string PweEPAnalisi { get; set; }
+    public string? PweEPAnalisi { get; set; }
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; }

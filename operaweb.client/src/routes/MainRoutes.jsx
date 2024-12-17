@@ -178,6 +178,10 @@ const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Projects = Loadable(lazy(() => import('views/pages/projects')));
 const ProjectWizard = Loadable(lazy(() => import('views/forms/forms-wizard/ProjectWizard')));
 const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/Progetto')));
+
+//origanization
+
+const OrganizationPage = Loadable(lazy(() => import('views/pages/organigramma')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 
@@ -212,6 +216,10 @@ const MainRoutes = {
         {
             path: '/project/:id',
             element: <ProjectDashboard />
+        },
+        {
+            path: '/organization',
+            element: <OrganizationPage />
         }
     ]
 };

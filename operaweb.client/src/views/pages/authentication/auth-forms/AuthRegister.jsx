@@ -275,9 +275,16 @@ const JWTRegister = ({ ...others }) => {
                                     }
                                     label={
                                         <Typography variant="subtitle1">
-                                            Agree with &nbsp;
-                                            <Typography variant="subtitle1" component={Link} to="#">
-                                                Terms & Condition.
+                                            Accetto i &nbsp;
+                                            <Typography
+                                                variant="subtitle1"
+                                                component="a"
+                                                href="/terms-and-conditions"
+                                                target="_blank" // Apre in una nuova scheda
+                                                rel="noopener noreferrer" // Sicurezza
+                                                sx={{ color: 'primary.main', textDecoration: 'none', fontWeight: 'bold' }}
+                                            >
+                                                Termini e Condizioni
                                             </Typography>
                                         </Typography>
                                     }
