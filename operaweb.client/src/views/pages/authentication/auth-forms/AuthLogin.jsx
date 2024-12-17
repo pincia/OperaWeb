@@ -72,7 +72,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
                             } else if (response.data.isSucceed) {
                                 // Login riuscito
                                 // setUser(response.data);
-                                navigate('/dashboard');
+                                navigate('/general/default');
                             } else {
                                 setError(Object.entries(response.data.messages)
                                     .map(([k, v]) => (`'${v}'`))

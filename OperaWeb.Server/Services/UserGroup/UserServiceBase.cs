@@ -55,5 +55,35 @@ namespace Services.UserGroup
       return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new User() { Username = user.UserName } };
     }
 
+    /// <summary>
+    /// Recupera il profilo dell'utente corrente.
+    /// </summary>
+    public async Task<UpdateProfileDto> GetProfileAsync(string userId)
+    {
+      var user = await _userManager.FindByIdAsync(userId);
+      if (user == null)
+      {
+        throw new KeyNotFoundException("User not found");
+      }
+
+      // Popola il DTO con i dati dell'utente
+      return new UpdateProfileDto
+      {
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        PhoneNumber = user.PhoneNumber,
+        ComuneId = user.ComuneId ?? 0,
+        ProvinciaId = user.ProvinciaId ?? 0,
+        RagioneSociale = user.RagioneSociale,
+        PIVA = user.PIVA,
+        CompanyTaxCode = user.CompanyTaxCode,
+        CompanyComuneId = user.CompanyComuneId ?? 0,
+        CompanyProvinciaId = user.CompanyProvinciaId ?? 0,
+        SDICode = user.SDICode,
+        PEC = user.PEC,
+        SubRoleId = user.SubRoleId ?? 0
+      };
+    }
+
   }
 }

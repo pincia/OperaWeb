@@ -2,6 +2,7 @@
 using OperaWeb.Server.DataClasses.Context;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO;
+using OperaWeb.SharedClasses.Enums;
 
 public class NotificationService : INotificationService
 {
@@ -59,7 +60,7 @@ public class NotificationService : INotificationService
   /// </summary>
   public async Task<Notification> GetNotificationByIdAsync(int notificationId)
   {
-    return await _context.Notifications.FindAsync(notificationId);
+    return  _context.Notifications.Include(u=>u.User).FirstOrDefault(n=>n.Id == notificationId);
   }
 
   /// <summary>
@@ -84,7 +85,7 @@ public class NotificationService : INotificationService
   /// <param name="title">The title of the notification.</param>
   /// <param name="message">The content of the notification message.</param>
   /// <returns>A task representing the asynchronous operation.</returns>
-  public async Task CreateNotificationAsync(string userId, string title, string message)
+  public async Task CreateNotificationAsync(string userId, string title, string message, NotificationType type, string link)
   {
     var user = await _context.Users.FindAsync(userId);
     if (user == null)
@@ -96,7 +97,9 @@ public class NotificationService : INotificationService
     {
       User = user,
       Title = title,
-      Message = message
+      Message = message,
+      Type = type,
+      Link = link
     };
 
     _context.Notifications.Add(notification);

@@ -10,6 +10,7 @@ using static System.Net.WebRequestMethods;
 using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.DataClasses.Models;
+using OperaWeb.SharedClasses.Enums;
 
 namespace Services.UserGroup
 {
@@ -80,7 +81,9 @@ namespace Services.UserGroup
       await _notificationService.CreateNotificationAsync(
           newUser.Id,
           "Benvenuto",
-          "Grazie per la registrazione. Benvenuto in OperaWeb!"
+          "Grazie per la registrazione. Benvenuto in OperaWeb!",
+          NotificationType.Info,
+          ""
       );
     }
 
@@ -408,12 +411,10 @@ namespace Services.UserGroup
         await _userManager.UpdateAsync(user);
 
         // Verifica e assegna il ruolo
-        var role = await _roleManager.FindByNameAsync(roleName);
+        var role = await _roleManager.FindByNameAsync("OrganizationMember");
         if (role == null)
         {
-          var createRoleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-          if (!createRoleResult.Succeeded)
-            return new AppResponse<bool>().SetErrorResponse("role", "Failed to create role.");
+          return new AppResponse<bool>().SetErrorResponse("role", "Failed to create role. OrganizationMember not found");
         }
         await _userManager.AddToRoleAsync(user, roleName);
 

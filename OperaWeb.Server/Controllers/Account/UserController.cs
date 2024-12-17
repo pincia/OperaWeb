@@ -177,6 +177,35 @@ namespace OperaWeb.Server.Controllers.Account
 
       return Ok(new { message = "Password changed successfully." });
     }
+    /// <summary>
+    /// Ottiene il profilo dell'utente corrente.
+    /// </summary>
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetProfile()
+    {
+      // Recupera l'ID dell'utente autenticato dal JWT
+      var userId = User.FindFirstValue("Id");
+
+      if (string.IsNullOrEmpty(userId))
+      {
+        return Unauthorized(new { message = "User ID not found" });
+      }
+
+      try
+      {
+        var profile = await _userService.GetProfileAsync(userId);
+        return Ok(profile);
+      }
+      catch (KeyNotFoundException ex)
+      {
+        return NotFound(new { message = ex.Message });
+      }
+      catch (System.Exception ex)
+      {
+        return StatusCode(500, new { message = "An error occurred while retrieving the profile", details = ex.Message });
+      }
+    }
   }
 
 }

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InfoIcon from '@mui/icons-material/Info';
+import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 import {
     Badge,
     IconButton,
@@ -12,71 +18,65 @@ import {
     ListItemIcon,
     Button,
     MenuItem,
-    Divider,
+    Divider
 } from '@mui/material';
-import EventNoteIcon from '@mui/icons-material/EventNote';
+
 import {
     getNotifications,
     markNotificationAsRead,
     markAllNotificationsAsRead,
-    deleteNotification,
+    deleteNotification
 } from 'api/notifications';
 
 const Notifications = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [viewAll, setViewAll] = useState(false);
-    const [hasLoaded, setHasLoaded] = useState(false); // Stato per indicare se il caricamento è completato
-    const [error, setError] = useState(null); // Stato per gestire eventuali errori
+    const [hasLoaded, setHasLoaded] = useState(false);
+    const [error, setError] = useState(null);
+
+    const navigate = useNavigate(); // Hook di navigazione React Router
 
     useEffect(() => {
         if (!hasLoaded) {
             loadNotifications();
         }
-    }, [hasLoaded]); // Carica le notifiche solo se non sono state ancora caricate
+    }, [hasLoaded]);
 
     const loadNotifications = async () => {
         try {
             const data = await getNotifications();
             setNotifications(data);
-            setError(null); // Resetta eventuali errori precedenti
+            setError(null);
         } catch (err) {
             console.error('Error fetching notifications:', err);
             setError('Impossibile caricare le notifiche.');
         } finally {
-            setHasLoaded(true); // Assicurati che il caricamento venga marcato come completato
+            setHasLoaded(true);
         }
     };
 
-    const handleOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleMarkAsRead = async (id) => {
+    const handleOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+  
+    const handleNotificationClick = async (notification) => {
         try {
-            await markNotificationAsRead(id);
-            setNotifications((prev) =>
-                prev.map((notif) =>
-                    notif.id === id ? { ...notif, isRead: true } : notif
-                )
-            );
-        } catch (error) {
-            console.error('Error marking notification as read:', error);
-        }
-    };
+            // Marca come letta la notifica
+            if (!notification.isRead) {
+                await markNotificationAsRead(notification.id);
+                setNotifications((prev) =>
+                    prev.map((notif) =>
+                        notif.id === notification.id ? { ...notif, isRead: true } : notif
+                    )
+                );
+            }
 
-    const handleMarkAllAsRead = async () => {
-        try {
-            await markAllNotificationsAsRead();
-            setNotifications((prev) =>
-                prev.map((notif) => ({ ...notif, isRead: true }))
-            );
+            // Reindirizza usando navigate se esiste un link
+            if (notification.link) {
+                navigate(notification.link);
+            }
         } catch (error) {
-            console.error('Error marking all notifications as read:', error);
+            console.error('Error handling notification click:', error);
         }
     };
 
@@ -87,6 +87,13 @@ const Notifications = () => {
         } catch (error) {
             console.error('Error deleting notification:', error);
         }
+    };
+
+    const iconMap = {
+        1: <InfoIcon color="info" />,
+        2: <WarningIcon color="warning" />,
+        3: <ErrorIcon color="error" />,
+        4: <CheckCircleIcon color="success" />
     };
 
     const displayedNotifications = viewAll
@@ -123,15 +130,15 @@ const Notifications = () => {
                             <ListItem
                                 key={notif.id}
                                 button
-                                onClick={() => handleMarkAsRead(notif.id)}
+                                onClick={() => handleNotificationClick(notif)}
                                 selected={!notif.isRead}
                             >
                                 <ListItemIcon>
-                                    <EventNoteIcon color={notif.isRead ? 'disabled' : 'primary'} />
+                                    {iconMap[notif.type] || <InfoIcon color="disabled" />}
                                 </ListItemIcon>
                                 <ListItemText
-                                    primary={notif.message}
-                                    secondary={notif.isRead ? 'Letta' : 'Non letta'}
+                                    primary={notif.title}
+                                    secondary={notif.message}
                                 />
                                 <IconButton
                                     edge="end"
@@ -149,10 +156,7 @@ const Notifications = () => {
                 )}
                 {notifications.length > 5 && !error && (
                     <MenuItem>
-                        <Button
-                            fullWidth
-                            onClick={() => setViewAll(!viewAll)}
-                        >
+                        <Button fullWidth onClick={() => setViewAll(!viewAll)}>
                             {viewAll ? 'Mostra meno' : 'Visualizza tutto'}
                         </Button>
                     </MenuItem>
@@ -163,7 +167,7 @@ const Notifications = () => {
                         <Button
                             fullWidth
                             variant="outlined"
-                            onClick={handleMarkAllAsRead}
+                            onClick={markAllNotificationsAsRead}
                             disabled={notifications.every((notif) => notif.isRead)}
                         >
                             Segna tutte come lette

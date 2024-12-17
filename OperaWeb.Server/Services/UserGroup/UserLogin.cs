@@ -1,22 +1,23 @@
 ﻿using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.DataClasses;
 using Azure.Core;
+using OperaWeb.SharedClasses.Enums;
 
 namespace Services.UserGroup
 {
-    public class UserLoginRequest
-    {
-        public string Email { get; set; } = "";
-        public string Password { get; set; } = "";
-    }
-    public class UserLoginResponse
-    {
-        public string AccessToken { get; set; } = "";
-        public string RefreshToken { get; set; } = "";
-        public User User { get; set; }
-    }
-    public partial class UserService
-    {
+  public class UserLoginRequest
+  {
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
+  }
+  public class UserLoginResponse
+  {
+    public string AccessToken { get; set; } = "";
+    public string RefreshToken { get; set; } = "";
+    public User User { get; set; }
+  }
+  public partial class UserService
+  {
     public async Task<AppResponse<UserLoginResponse>> UserLoginAsync(UserLoginRequest request)
     {
       _logger.LogInformation("[UserLoginAsync] START for Email: {Email}", request.Email);
@@ -44,6 +45,35 @@ namespace Services.UserGroup
         // Genera il token di accesso e refresh
         var token = await GenerateUserToken(user);
         _logger.LogInformation("[UserLoginAsync] Login successful for User ID: {UserId}", user.Id);
+
+        var profileComplete = await IsProfileCompleteAsync(user.Id);
+
+        if (!profileComplete)
+        {
+          var notification = _context.Notifications.Where(n => n.IsRead == false && n.User.Id == user.Id && n.Type == NotificationType.ProfileIncomplete).FirstOrDefault();
+
+          //se la notifica esite già ed è passato più di un giorno la ricreo
+          if (notification != null && notification.CreatedAt.AddDays(1) > DateTime.Now)
+          {
+            await _notificationService.CreateNotificationAsync(
+          user.Id,
+          "Profilo da completare",
+          "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
+          NotificationType.Info,
+          "/user/profile/"
+      );
+          }
+          else
+          {
+            await _notificationService.CreateNotificationAsync(
+         user.Id,
+         "Profilo da completare",
+         "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
+         NotificationType.Warning,
+         "/user/profile/"
+     );
+          }
+        }
 
         return new AppResponse<UserLoginResponse>().SetSuccessResponse(token);
       }

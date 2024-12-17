@@ -2,13 +2,14 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconDashboard, IconDeviceAnalytics, IconSettings, IconSitemap } from '@tabler/icons-react';
+import { IconDashboard, IconDeviceAnalytics, IconSettings, IconSitemap, IconUser } from '@tabler/icons-react';
 
 const icons = {
     IconDashboard: IconDashboard,
     IconDeviceAnalytics: IconDeviceAnalytics,
     IconSettings: IconSettings,
-    IconSitemap: IconSitemap
+    IconSitemap: IconSitemap,
+    IconUser: IconUser
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -19,6 +20,14 @@ const dashboard = {
     icon: icons.IconDashboard,
     type: 'group',
     children: [
+        {
+            id: 'profile',
+            title: <FormattedMessage id="profile" />,
+            type: 'item',
+            url: '/user/profile',
+            icon: icons.IconUser,
+            breadcrumbs: false
+        },
          {
             id: 'organization',
             title: <FormattedMessage id="organization" />,

@@ -13,6 +13,12 @@ export const isProfileComplete = async () => {
     }
 };
 
+export const getProfile = async () => {
+    const response = await axios.get('/api/User/GetProfile');
+    return response.data;
+};
+
+
 /**
  * Aggiorna il profilo dell'utente con i dati forniti.
  * @param {object} profileData - I dati di contatto e aziendali dell'utente.

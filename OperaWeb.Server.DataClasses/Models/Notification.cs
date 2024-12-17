@@ -1,4 +1,5 @@
 ﻿using OperaWeb.Server.DataClasses;
+using OperaWeb.SharedClasses.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 [Table("Notifications")]
@@ -12,4 +13,10 @@ public class Notification
 
   // Relazione con ApplicationUser
   public virtual ApplicationUser User { get; set; }
+
+  // Nuovo campo Type
+  public NotificationType Type { get; set; } = NotificationType.Info;
+
+  // Nuovo campo Link
+  public string Link { get; set; } // URL per il reindirizzamento
 }
