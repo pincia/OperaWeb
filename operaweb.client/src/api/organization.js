@@ -4,7 +4,7 @@
 // Carica la struttura dell'organizzazione
 export async function getOrganizationStructure() {
     try {
-        const response = await axios.get('/api/organization/get-structure');
+        const response = await axios.get('/api/Organization/get-structure');
         return response.data;
     } catch (error) {
         console.error('Failed to fetch organization structure:', error);
