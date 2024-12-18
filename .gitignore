@@ -14,11 +14,10 @@ api/wwwroot/**
 node_modules/
 typings/
 npm-debug.log
-.env.dev
 
 # client-react
 operaweb.client/components/*.js
-operaweb.client/.env.dev
+
 #Server
 OperaWeb.Server/Properties
 
@@ -30,5 +29,5 @@ OperaWeb.Server/Properties
 .vs/
 
 .config
-
+.env.dev
 appsettings.json
