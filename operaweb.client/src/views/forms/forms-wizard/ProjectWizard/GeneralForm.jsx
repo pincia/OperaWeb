@@ -8,6 +8,7 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -16,15 +17,15 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { FormattedMessage } from 'react-intl';
-import Autocomplete from '@mui/material/Autocomplete';
-import { useEffect, useState } from 'react';
-
+import { useState } from 'react';
+import usePlacesAutocomplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 
 const validationSchema = yup.object({
     city: yup.string().required('Ente, Comune campo obbligatorio'),
     province: yup.string().required('Provincia campo obbligatorio'),
     works: yup.string().required('Opere campo obbligatorio'),
     object: yup.string().required('Progetto campo obbligatorio'),
+    location: yup.string().required('Localizzazione cantiere campo obbligatorio'),
 });
 
 // ==============================|| PROJECT WIZARD - VALIDATION ||============================== //
@@ -32,27 +33,52 @@ const validationSchema = yup.object({
 const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, soaOptions, soaClassificationsOptions }) => {
     const [selectedSoa, setSelectedSoa] = useState(null);
     const [selectedSoaClassification, setSelectedSoaClassification] = useState(null);
+    const [selectedLocation, setSelectedLocation] = useState('');
+
+    const {
+        suggestions: { status, data },
+        setValue,
+        clearSuggestions,
+    } = usePlacesAutocomplete({ debounce: 300 });
 
     const formik = useFormik({
         initialValues: {
             city: projectData.city,
             province: projectData.province,
             works: projectData.works,
-            object: projectData.object
+            object: projectData.object,
+            location: projectData.location || '',
         },
         enableReinitialize: true,
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
+            let coordinates = null;
+            if (selectedLocation) {
+                try {
+                    const results = await getGeocode({ address: selectedLocation });
+                    coordinates = await getLatLng(results[0]);
+                } catch (error) {
+                    console.error('Errore durante il recupero delle coordinate:', error);
+                }
+            }
+
             setProjectData({
                 city: values.city,
                 province: values.province,
                 works: values.works,
-                object: values.object
+                object: values.object,
+                location: selectedLocation,
+                coordinates, // Salva latitudine e longitudine
             });
+
             handleNext();
-        }
+        },
     });
 
+    const handleLocationChange = (event, newValue) => {
+        setSelectedLocation(newValue);
+        setValue(newValue);
+    };
 
     return (
         <>
@@ -110,6 +136,36 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                             autoComplete="family-name"
                         />
                     </Grid>
+
+                    {/* Campo Localizzazione */}
+                    <Grid item xs={12}>
+                        <Autocomplete
+                            id="location"
+                            freeSolo
+                            options={status === 'OK' ? data.map((suggestion) => suggestion.description) : []}
+                            value={formik.values.location} // Sincronizzato con formik
+                            onChange={(event, newValue) => {
+                                formik.setFieldValue('location', newValue || ''); // Aggiorna formik con il valore selezionato
+                                setValue(newValue || ''); // Aggiorna usePlacesAutocomplete
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Localizzazione Cantiere"
+                                    value={formik.values.location} // Sincronizzato con formik
+                                    onChange={(e) => {
+                                        formik.handleChange(e);
+                                        setValue(e.target.value); // Aggiorna il suggerimento
+                                    }}
+                                    error={formik.touched.location && Boolean(formik.errors.location)}
+                                    helperText={formik.touched.location && formik.errors.location}
+                                    fullWidth
+                                />
+                            )}
+                        />
+
+                    </Grid>
+
                     {/* Dropdown per SOA */}
                     <Grid item xs={12} sm={6}>
                         <Autocomplete
@@ -127,7 +183,7 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                     <Grid item xs={12} sm={6}>
                         <Autocomplete
                             options={soaClassificationsOptions}
-                            getOptionLabel={(option) => option.description || ''} 
+                            getOptionLabel={(option) => option.description || ''}
                             value={selectedSoaClassification}
                             onChange={(event, newValue) => setSelectedSoaClassification(newValue)}
                             renderInput={(params) => (

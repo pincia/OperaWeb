@@ -29,5 +29,5 @@ OperaWeb.Server/Properties
 .vs/
 
 .config
-
+.env.dev
 appsettings.json
