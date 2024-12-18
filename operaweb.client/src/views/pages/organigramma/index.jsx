@@ -11,7 +11,11 @@ import {
     Snackbar,
     Alert,
     MenuItem,
-    CircularProgress
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
 } from '@mui/material';
 
 const OrganizationPage = () => {
@@ -20,6 +24,7 @@ const OrganizationPage = () => {
     const [organizationId, setOrganizationId] = useState('');
     const [loading, setLoading] = useState(true);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -32,7 +37,6 @@ const OrganizationPage = () => {
         fetchAvailableRoles();
     }, []);
 
-    // Carica la struttura dell'organizzazione
     const fetchOrganizationStructure = async () => {
         try {
             setLoading(true);
@@ -61,7 +65,6 @@ const OrganizationPage = () => {
         }
     };
 
-    // Carica i ruoli disponibili
     const fetchAvailableRoles = async () => {
         try {
             const data = await getAvailableRoles();
@@ -71,7 +74,6 @@ const OrganizationPage = () => {
         }
     };
 
-    // Aggiunge un nuovo membro all'organizzazione
     const handleAddMember = async () => {
         if (!formData.fullName || !formData.email || !formData.roleName) {
             setSnackbar({ open: true, message: 'Please fill all fields.', severity: 'error' });
@@ -87,15 +89,15 @@ const OrganizationPage = () => {
 
         try {
             await addMember(payload);
-            setSnackbar({ open: true, message: 'Member added successfully!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Member added successfully! Password sent via email.', severity: 'success' });
             fetchOrganizationStructure(); // Aggiorna l'organigramma
             setFormData({ fullName: '', email: '', roleName: '' }); // Reset del form
+            setDialogOpen(false); // Chiudi il dialog
         } catch (error) {
             setSnackbar({ open: true, message: 'Failed to add member.', severity: 'error' });
         }
     };
 
-    // Rendering dei nodi dell'albero
     const renderCustomNode = ({ nodeDatum }) => {
         const member = nodeDatum.members?.[0]; // Prendi il primo membro del nodo
 
@@ -130,40 +132,10 @@ const OrganizationPage = () => {
     return (
         <Card>
             <CardContent>
-                <Typography variant="h4" gutterBottom>
-                    Organization Structure
-                </Typography>
-
-                {/* Form per aggiungere membri */}
-                <Box display="flex" gap={2} mb={4}>
-                    <TextField
-                        label="Full Name"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        fullWidth
-                    />
-                    <TextField
-                        select
-                        label="Role"
-                        value={formData.roleName}
-                        onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
-                        fullWidth
-                    >
-                        <MenuItem value="">Select Role</MenuItem>
-                        {roles.map((role) => (
-                            <MenuItem key={role.name} value={role.name}>
-                                {role.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <Button variant="contained" color="primary" onClick={handleAddMember}>
-                        Add Member
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h4">Organization Structure</Typography>
+                    <Button variant="contained" color="primary" onClick={() => setDialogOpen(true)}>
+                        Add New Member
                     </Button>
                 </Box>
 
@@ -182,6 +154,48 @@ const OrganizationPage = () => {
                     </Box>
                 )}
             </CardContent>
+
+            {/* Dialog per aggiungere membri */}
+            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+                <DialogTitle>Aggiungi Nuovo Membro</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" mb={2}>
+                        Compila il modulo per aggiungere un nuovo membro all'organizzazione. Il membro riceverà un'email con una password temporanea per accedere al sistema.
+                    </Typography>
+                    <Box display="flex" flexDirection="column" gap={2}>
+                        <TextField
+                            label="Full Name"
+                            value={formData.fullName}
+                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                            fullWidth
+                        />
+                        <TextField
+                            label="Email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            fullWidth
+                        />
+                        <TextField
+                            select
+                            label="Role"
+                            value={formData.roleName}
+                            onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
+                            fullWidth
+                        >
+                            <MenuItem value="">Select Role</MenuItem>
+                            {roles.map((role) => (
+                                <MenuItem key={role.name} value={role.name}>
+                                    {role.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDialogOpen(false)} color="secondary">Cancel</Button>
+                    <Button onClick={handleAddMember} color="primary" variant="contained">Add Member</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Snackbar per feedback */}
             <Snackbar

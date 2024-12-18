@@ -44,9 +44,9 @@ export async function createNotification(notification) {
 // ⬇️ Mark all notifications as read for the logged-in user
 export async function deleteNotification(id) {
     try {
-        const response = await axios.post('/api/notifications/mark-all-as-read');
+        const response = await axios.delete('/api/Notifications/'+id);
         return response.data; // Returns success message or empty response
     } catch (error) {
         return error;
     }
-}
+};

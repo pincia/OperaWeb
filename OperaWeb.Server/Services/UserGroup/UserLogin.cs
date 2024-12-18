@@ -50,26 +50,27 @@ namespace Services.UserGroup
 
         if (!profileComplete)
         {
-          var notification = _context.Notifications.Where(n => n.IsRead == false && n.User.Id == user.Id && n.Type == NotificationType.ProfileIncomplete).FirstOrDefault();
+          var notification = _context.Notifications.Where(n => n.User.Id == user.Id && n.Type == NotificationType.ProfileIncomplete).FirstOrDefault();
 
           //se la notifica esite già ed è passato più di un giorno la ricreo
-          if (notification != null && notification.CreatedAt.AddDays(1) > DateTime.Now)
+          if (notification != null && notification.IsRead && notification.CreatedAt.AddDays(1) < DateTime.Now)
           {
             await _notificationService.CreateNotificationAsync(
           user.Id,
           "Profilo da completare",
           "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
-          NotificationType.Info,
+          NotificationType.ProfileIncomplete,
           "/user/profile/"
       );
           }
-          else
+
+          else if(notification == null)
           {
             await _notificationService.CreateNotificationAsync(
          user.Id,
          "Profilo da completare",
          "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
-         NotificationType.Warning,
+         NotificationType.ProfileIncomplete,
          "/user/profile/"
      );
           }

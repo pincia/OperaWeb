@@ -9,4 +9,6 @@ public interface INotificationService
   Task<List<Notification>> GetUserNotificationsAsync(string userId);
   Task MarkAllAsReadAsync(string userId);
   Task MarkAsReadAsync(int notificationId);
+
+  Task<bool> MarkAsDeletedAsync(int notificationId);
 }

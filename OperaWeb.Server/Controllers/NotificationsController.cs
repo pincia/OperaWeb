@@ -87,5 +87,17 @@ public class NotificationsController : ControllerBase
     return NoContent();
   }
 
+  /// <summary>
+  /// Marks a notification as deleted.
+  /// </summary>
+  [HttpDelete("{id}")]
+  public async Task<IActionResult> DeleteNotification(int id)
+  {
+    var success = await _notificationService.MarkAsDeletedAsync(id);
+    if (!success)
+      return NotFound(new { Message = "Notification not found" });
+
+    return Ok(new { Message = "Notification deleted successfully" });
+  }
 }
 

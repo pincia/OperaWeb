@@ -416,7 +416,7 @@ namespace Services.UserGroup
         {
           return new AppResponse<bool>().SetErrorResponse("role", "Failed to create role. OrganizationMember not found");
         }
-        await _userManager.AddToRoleAsync(user, roleName);
+        await _userManager.AddToRoleAsync(user, role.Name);
 
         // Aggiungi all'organigramma
         var organizationRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == roleName);
@@ -615,7 +615,6 @@ namespace Services.UserGroup
 
       return new AppResponse<bool>().SetSuccessResponse(true);
     }
-
     public async Task<List<OrganizationStructureDto>> GetOrganizationStructure(string userId)
     {
       // Recupera l'organizationMember dell'utente
@@ -647,39 +646,47 @@ namespace Services.UserGroup
           .Where(m => m.OrganizationId == organizationMember.OrganizationId && validRoles.Contains(m.Role))
           .ToListAsync();
 
-      // Metodo ricorsivo per costruire la struttura ad albero
-      List<OrganizationStructureDto> BuildTree(List<OrganizationRole> roles)
+      // Prendi solo i ruoli radice per costruire l'albero
+      var rootRoles = validRoles.Where(r => r.ParentRoleId == null).ToList();
+      return BuildTree(rootRoles, organizationMembers, validRoles);
+    }
+
+    private List<OrganizationStructureDto> BuildTree(
+    List<OrganizationRole> roles,
+    List<OrganizationMember> organizationMembers,
+    List<OrganizationRole> validRoles)
+    {
+      var result = new List<OrganizationStructureDto>();
+
+      foreach (var role in roles)
       {
-        var result = new List<OrganizationStructureDto>();
+        // Recupera i membri per questo ruolo
+        var members = organizationMembers
+            .Where(m => m.RoleId == role.Id)
+            .Select(m => new MemberDto
+            {
+              UserId = m.User.Id,
+              FullName = m.User.FullName,
+              Email = m.User.Email
+            })
+            .ToList();
 
-        foreach (var role in roles)
+        // Escludi i nodi senza membri
+        //if (!members.Any())
+        //  continue;
+
+        // Costruisci il nodo
+        var node = new OrganizationStructureDto
         {
-          var node = new OrganizationStructureDto
-          {
-            RoleName = role.Name,
-            Members = organizationMembers
-                  .Where(m => m.RoleId == role.Id)
-                  .Select(m => new MemberDto
-                  {
-                    UserId = m.User.Id,           // Aggiunto UserId
-                    FullName = m.User.FullName,
-                    Email = m.User.Email
-                  }).ToList()
-          };
+          RoleName = role.Name,
+          Members = members,
+          Children = BuildTree(validRoles.Where(r => r.ParentRoleId == role.Id).ToList(), organizationMembers, validRoles)
+        };
 
-          // Ruoli figli
-          var childRoles = validRoles.Where(r => r.ParentRoleId == role.Id).ToList();
-          node.Children = BuildTree(childRoles);
-
-          result.Add(node);
-        }
-
-        return result;
+        result.Add(node);
       }
 
-      // Prende solo i ruoli radice per costruire l'albero
-      var rootRoles = validRoles.Where(r => r.ParentRoleId == null).ToList();
-      return BuildTree(rootRoles);
+      return result;
     }
 
   }

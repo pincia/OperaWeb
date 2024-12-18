@@ -131,13 +131,13 @@ export const JWTProvider = ({ children }) => {
     // Aggiunta della nuova API per il cambio password
     const changePassword = async (oldPassword, newPassword) => {
         const data = {
-            oldPassword,
-            newPassword
+            oldPassword: oldPassword,
+            newPassword: newPassword
         };
 
         try {
             // Assicurati che l'endpoint corrisponda al controller
-            const response = await axios.post('/api/user/change-password', data);
+            const response = await axios.post('/api/user/ChangePassword/change-password', data);
             return response.data; // Ritorna i dati di successo
         } catch (error) {
             // Stampa l'intero errore per debugging

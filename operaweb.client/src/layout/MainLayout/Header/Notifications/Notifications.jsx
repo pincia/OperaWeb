@@ -5,7 +5,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import {
     Badge,
     IconButton,
@@ -23,7 +23,7 @@ import {
     getNotifications,
     markNotificationAsRead,
     markAllNotificationsAsRead,
-    deleteNotification,
+    deleteNotification, // Metodo aggiornato
 } from 'api/notifications';
 
 const Notifications = () => {
@@ -31,6 +31,7 @@ const Notifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [viewAll, setViewAll] = useState(false);
     const navigate = useNavigate();
+
     useEffect(() => {
         loadNotifications();
     }, []);
@@ -38,7 +39,7 @@ const Notifications = () => {
     const loadNotifications = async () => {
         try {
             const data = await getNotifications();
-            setNotifications(data);
+            setNotifications(data.filter((n) => !n.isDeleted)); // Escludi le notifiche eliminate
         } catch (err) {
             console.error('Error fetching notifications:', err);
         }
@@ -49,7 +50,6 @@ const Notifications = () => {
 
     const handleNotificationClick = async (notification) => {
         try {
-            // Marca come letta la notifica
             if (!notification.isRead) {
                 await markNotificationAsRead(notification.id);
                 setNotifications((prev) =>
@@ -58,8 +58,6 @@ const Notifications = () => {
                     )
                 );
             }
-
-            // Reindirizza usando navigate se esiste un link
             if (notification.link) {
                 navigate(notification.link);
             }
@@ -67,20 +65,40 @@ const Notifications = () => {
             console.error('Error handling notification click:', error);
         }
     };
-    // Mappatura tra iconType e icone Material-UI
+
+    const handleDeleteNotification = async (id) => {
+        try {
+            await deleteNotification(id); // Aggiorna il server
+            setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+        } catch (err) {
+            console.error('Error deleting notification:', err);
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            await markAllNotificationsAsRead();
+            setNotifications((prev) =>
+                prev.map((notif) => ({ ...notif, isRead: true }))
+            );
+        } catch (err) {
+            console.error('Error marking all notifications as read:', err);
+        }
+    };
+
     const getIcon = (iconType, isRead) => {
-        const color = isRead ? 'disabled' : 'primary'; // Grigio se letta, colorata altrimenti
+        const color = isRead ? 'disabled' : 'primary';
         switch (iconType) {
             case 0:
-                return <InfoIcon color={isRead ? 'disabled' : 'primary'} />;
+                return <InfoIcon color={color} />;
             case 1:
-                return <WarningIcon color={isRead ? 'disabled' : 'orange'} />;
+                return <WarningIcon color={color} />;
             case 2:
-                return <ErrorIcon color={isRead ? 'disabled' : 'red'} />;
+                return <ErrorIcon color={color} />;
             case 3:
-                return <CheckCircleIcon color={isRead ? 'disabled' : 'green'} />;
+                return <CheckCircleIcon color={color} />;
             default:
-                return <InfoIcon color={isRead ? 'disabled' : 'primary'} />;
+                return <InfoIcon color={color} />;
         }
     };
 
@@ -122,7 +140,7 @@ const Notifications = () => {
                                 edge="end"
                                 size="small"
                                 onClick={(e) => {
-                                    e.stopPropagation();
+                                    e.stopPropagation(); // Blocca il click del ListItem
                                     handleDeleteNotification(notif.id);
                                 }}
                             >
@@ -138,6 +156,17 @@ const Notifications = () => {
                         </Button>
                     </MenuItem>
                 )}
+                <Divider />
+                <MenuItem>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        onClick={handleMarkAllAsRead}
+                        disabled={notifications.every((n) => n.isRead)}
+                    >
+                        Segna tutte come lette
+                    </Button>
+                </MenuItem>
             </Menu>
         </>
     );

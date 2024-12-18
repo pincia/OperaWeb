@@ -50,7 +50,7 @@ public class NotificationService : INotificationService
     }
 
     return await _context.Notifications
-        .Where(n => n.User.Id == userId)
+        .Where(n => n.User.Id == userId && !n.IsDeleted)
         .OrderByDescending(n => n.CreatedAt)
         .ToListAsync();
   }
@@ -60,7 +60,7 @@ public class NotificationService : INotificationService
   /// </summary>
   public async Task<Notification> GetNotificationByIdAsync(int notificationId)
   {
-    return  _context.Notifications.Include(u=>u.User).FirstOrDefault(n=>n.Id == notificationId);
+    return  _context.Notifications.Include(u=>u.User).FirstOrDefault(n=>n.Id == notificationId && !n.IsDeleted);
   }
 
   /// <summary>
@@ -76,6 +76,22 @@ public class NotificationService : INotificationService
 
     notification.IsRead = true;
     await _context.SaveChangesAsync();
+  }
+
+  /// <summary>
+  /// Marca una specifica notifica come eliminata.
+  /// </summary>
+
+  public async Task<bool> MarkAsDeletedAsync(int notificationId)
+  {
+    var notification = await GetNotificationByIdAsync(notificationId);
+    if (notification == null)
+    {
+      throw new ArgumentException("Notifica non trovata.", nameof(notificationId));
+    }
+
+    notification.IsDeleted = true;
+    return await _context.SaveChangesAsync() >0;
   }
 
   /// <summary>

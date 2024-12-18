@@ -43,3 +43,14 @@ export const getSubRoles = async () => {
         return [];
     }
 };
+
+
+export const changePassowrd = async (data) => {
+    try {
+        const response = await axios.post('/api/user/ChangePassword/change-password', data);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        throw error;
+    }
+};

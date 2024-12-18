@@ -19,4 +19,5 @@ public class Notification
 
   // Nuovo campo Link
   public string Link { get; set; } // URL per il reindirizzamento
+  public bool IsDeleted { get; set; } = false; // New field for soft delete
 }

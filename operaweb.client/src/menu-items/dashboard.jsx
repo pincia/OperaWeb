@@ -15,33 +15,17 @@ const icons = {
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
 
 const dashboard = {
-    id: 'account',
-    title: <FormattedMessage id="account" />,
+    id: 'genral',
+    title: <FormattedMessage id="general" />,
     icon: icons.IconDashboard,
     type: 'group',
     children: [
-        {
-            id: 'profile',
-            title: <FormattedMessage id="profile" />,
-            type: 'item',
-            url: '/user/profile',
-            icon: icons.IconUser,
-            breadcrumbs: false
-        },
          {
             id: 'organization',
             title: <FormattedMessage id="organization" />,
             type: 'item',
             url: '/organization/',
             icon: icons.IconSitemap,
-            breadcrumbs: false
-        },
-        {
-            id: 'impostazioni',
-            title: <FormattedMessage id="impostazioni" />,
-            type: 'item',
-            url: '/dashboard/default',
-            icon: icons.IconSettings,
             breadcrumbs: false
         }
     ]

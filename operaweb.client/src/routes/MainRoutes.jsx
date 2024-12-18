@@ -23,6 +23,7 @@ const OrganizationPage = Loadable(lazy(() => import('views/pages/organigramma'))
 
 //user
 const ProfilePage = Loadable(lazy(() => import('views/pages/profile')));
+const SettingsPage = Loadable(lazy(() => import('views/pages/settings')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 
@@ -61,6 +62,10 @@ const MainRoutes = {
         {
             path: '/user/profile',
             element: <ProfilePage />
+        },
+        {
+            path: '/user/settings',
+            element: <SettingsPage />
         }
     ]
 };
