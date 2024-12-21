@@ -27,7 +27,7 @@ namespace OperaWeb.Server.Services
       _logger = logger;
       _mapper = mapper;
       _config = config;
-      _projectServiceManager = new ProjectServiceManager(_context, _logger, hubContext);
+      _projectServiceManager = new ProjectServiceManager(_context, _logger, hubContext, mapper);
     }
 
     /// <inheritdoc/>
@@ -101,12 +101,26 @@ namespace OperaWeb.Server.Services
     {
       try
       {
-        var project = _context.Projects.Include(p => p.User).FirstOrDefault(p => p.ID == id && p.User.Id == userId);
+        var project = _context.Projects.Include(p => p.Categorie)
+            .Include(p => p.DatiGenerali)
+          .FirstOrDefault(p => p.ID == id && p.User.Id == userId);
+       
         if (project == null)
         {
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
+        
+        var vociComputo = _context.VociComputo.Include(v=>v.Misure).Where(e => e.ProjectID == id);
+        var categorie = _context.Categorie.Where(e => e.ProjectID == id);
+        var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == id);
+        var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
+        var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
+        project.VociComputo = vociComputo.ToList();
+        project.Categorie = categorie.ToList();
+        project.SubCategorie = subCategorie.ToList();
+        project.SuperCategorie = superCategorie.ToList();
+        project.ElencoPrezzi = elencoPrezzi.ToList();
         return project;
       }
       catch (Exception ex)
@@ -148,10 +162,10 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public async Task<(int, string)> ImportNewProject(IFormFile file, string userId, string connectionId)
+    public async Task<ImportResult> ImportNewProject(IFormFile file, string userId, string connectionId)
     {
       string fileName = "";
-      var projectId = -1;
+      ImportResult res = null;
       try
       {
         var uploadedFilePath = _config["OperaWeb:UploadedFilePath"];
@@ -160,7 +174,7 @@ namespace OperaWeb.Server.Services
 
         if (user == null)
         {
-          return (projectId, "User not found!");
+          return new ImportResult() { IsSuccess = false, Messages = { "User not found!" } };
         }
 
         if (file.Length > 0)
@@ -175,7 +189,7 @@ namespace OperaWeb.Server.Services
             sb.Append(await reader.ReadLineAsync());
           }
 
-          projectId =await  _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
+          res = await  _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
           {
             User = user,
             CreationDate = DateTime.Now,
@@ -187,11 +201,9 @@ namespace OperaWeb.Server.Services
             }
           }, connectionId);
 
-
-          var res = _context.SaveChanges();
         }
 
-        return (projectId, "");
+        return res;
       }
       catch (Exception ex)
       {
@@ -199,7 +211,7 @@ namespace OperaWeb.Server.Services
         {
           System.IO.File.Delete(fileName);
         }
-        return (projectId, ex.Message);
+        return new ImportResult() { IsSuccess = false, Messages = {ex.Message} };
       }
     }
 

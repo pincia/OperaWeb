@@ -7,6 +7,7 @@ namespace OperaWeb.Server.DataClasses.Models
     {
         public int ID { get; set; }
         public string FileName { get; set; }
+
         public virtual ApplicationUser User { get; set; }
   }
 }

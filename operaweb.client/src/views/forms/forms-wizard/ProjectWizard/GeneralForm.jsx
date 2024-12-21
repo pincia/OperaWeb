@@ -17,23 +17,19 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { FormattedMessage } from 'react-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import usePlacesAutocomplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 
 const validationSchema = yup.object({
-    city: yup.string().required('Ente, Comune campo obbligatorio'),
-    province: yup.string().required('Provincia campo obbligatorio'),
-    works: yup.string().required('Opere campo obbligatorio'),
-    object: yup.string().required('Progetto campo obbligatorio'),
-    location: yup.string().required('Localizzazione cantiere campo obbligatorio'),
+    // Add any required validation here if needed
 });
 
 // ==============================|| PROJECT WIZARD - VALIDATION ||============================== //
 
 const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, soaOptions, soaClassificationsOptions }) => {
-    const [selectedSoa, setSelectedSoa] = useState(null);
-    const [selectedSoaClassification, setSelectedSoaClassification] = useState(null);
-    const [selectedLocation, setSelectedLocation] = useState('');
+    const [selectedSoa, setSelectedSoa] = useState(projectData.selectedSoa || null);
+    const [selectedSoaClassification, setSelectedSoaClassification] = useState(projectData.selectedSoaClassification || null);
+    const [selectedLocation, setSelectedLocation] = useState(projectData.selectedLocation || '');
 
     const {
         suggestions: { status, data },
@@ -43,41 +39,58 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
 
     const formik = useFormik({
         initialValues: {
-            city: projectData.city,
-            province: projectData.province,
-            works: projectData.works,
-            object: projectData.object,
+            city: projectData.city || '',
+            province: projectData.province || '',
+            works: projectData.works || '',
+            object: projectData.object || '',
             location: projectData.location || '',
         },
         enableReinitialize: true,
         validationSchema,
-        onSubmit: async (values) => {
-            let coordinates = null;
-            if (selectedLocation) {
-                try {
-                    const results = await getGeocode({ address: selectedLocation });
-                    coordinates = await getLatLng(results[0]);
-                } catch (error) {
-                    console.error('Errore durante il recupero delle coordinate:', error);
-                }
-            }
-
-            setProjectData({
+        onSubmit: (values) => {
+            setProjectData((prev) => ({
+                ...prev,
                 city: values.city,
                 province: values.province,
                 works: values.works,
                 object: values.object,
-                location: selectedLocation,
-                coordinates, // Salva latitudine e longitudine
-            });
-
+                location: values.location,
+                selectedSoa,
+                selectedSoaClassification,
+                selectedLocation,
+            }));
             handleNext();
         },
     });
 
+    useEffect(() => {
+        setSelectedSoa(projectData.selectedSoa || null);
+        setSelectedSoaClassification(projectData.selectedSoaClassification || null);
+        setSelectedLocation(projectData.selectedLocation || '');
+    }, [projectData]);
+
+    const handleSoaChange = (event, newValue) => {
+        setSelectedSoa(newValue);
+        setProjectData((prev) => ({
+            ...prev,
+            selectedSoa: newValue,
+        }));
+    };
+
+    const handleSoaClassificationChange = (event, newValue) => {
+        setSelectedSoaClassification(newValue);
+        setProjectData((prev) => ({
+            ...prev,
+            selectedSoaClassification: newValue,
+        }));
+    };
+
     const handleLocationChange = (event, newValue) => {
         setSelectedLocation(newValue);
-        setValue(newValue);
+        setProjectData((prev) => ({
+            ...prev,
+            selectedLocation: newValue,
+        }));
     };
 
     return (
@@ -89,9 +102,9 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            id="city"
-                            name="city"
-                            label={projectData.city ? '' : <FormattedMessage id="cityLabel" />}
+                            id="comune"
+                            name="comune"
+                            label={<FormattedMessage id="cityLabel" />} // Sempre visibile
                             value={formik.values.city}
                             onChange={formik.handleChange}
                             error={formik.touched.city && Boolean(formik.errors.city)}
@@ -101,9 +114,9 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            id="province"
-                            name="province"
-                            label={projectData.province ? '' : <FormattedMessage id="provinceLabel" />}
+                            id="provincia"
+                            name="provincia"
+                            label={<FormattedMessage id="provinceLabel" />} // Sempre visibile
                             value={formik.values.province}
                             onChange={formik.handleChange}
                             error={formik.touched.province && Boolean(formik.errors.province)}
@@ -113,9 +126,9 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            id="works"
-                            name="works"
-                            label={projectData.works ? '' : <FormattedMessage id="worksLabel" />}
+                            id="parteOpera"
+                            name="parteOpera"
+                            label={<FormattedMessage id="worksLabel" />} // Sempre visibile
                             value={formik.values.works}
                             onChange={formik.handleChange}
                             error={formik.touched.works && Boolean(formik.errors.works)}
@@ -125,9 +138,9 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            id="object"
-                            name="object"
-                            label={projectData.object ? '' : <FormattedMessage id="objectLabel" />}
+                            id="oggetto"
+                            name="oggetto"
+                            label={<FormattedMessage id="objectLabel" />} // Sempre visibile
                             value={formik.values.object}
                             onChange={formik.handleChange}
                             error={formik.touched.object && Boolean(formik.errors.object)}
@@ -143,16 +156,12 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                             id="location"
                             freeSolo
                             options={status === 'OK' ? data.map((suggestion) => suggestion.description) : []}
-                            value={formik.values.location} // Sincronizzato con formik
-                            onChange={(event, newValue) => {
-                                formik.setFieldValue('location', newValue || ''); // Aggiorna formik con il valore selezionato
-                                setValue(newValue || ''); // Aggiorna usePlacesAutocomplete
-                            }}
+                            value={selectedLocation}
+                            onChange={handleLocationChange}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label="Localizzazione Cantiere"
-                                    value={formik.values.location} // Sincronizzato con formik
+                                    label={<FormattedMessage id="locationLabel" />} // Sempre visibile
                                     onChange={(e) => {
                                         formik.handleChange(e);
                                         setValue(e.target.value); // Aggiorna il suggerimento
@@ -163,7 +172,6 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                                 />
                             )}
                         />
-
                     </Grid>
 
                     {/* Dropdown per SOA */}
@@ -172,7 +180,7 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                             options={soaOptions}
                             getOptionLabel={(option) => option.description || ''}
                             value={selectedSoa}
-                            onChange={(event, newValue) => setSelectedSoa(newValue)}
+                            onChange={handleSoaChange}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona SOA" variant="outlined" />
                             )}
@@ -185,7 +193,7 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                             options={soaClassificationsOptions}
                             getOptionLabel={(option) => option.description || ''}
                             value={selectedSoaClassification}
-                            onChange={(event, newValue) => setSelectedSoaClassification(newValue)}
+                            onChange={handleSoaClassificationChange}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona Classificazione SOA" variant="outlined" />
                             )}
@@ -213,10 +221,12 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
 };
 
 GeneralForm.propTypes = {
-    generalData: PropTypes.object,
+    projectData: PropTypes.object,
     setProjectData: PropTypes.func,
     handleNext: PropTypes.func,
-    setErrorIndex: PropTypes.func
+    setErrorIndex: PropTypes.func,
+    soaOptions: PropTypes.array,
+    soaClassificationsOptions: PropTypes.array
 };
 
 export default GeneralForm;

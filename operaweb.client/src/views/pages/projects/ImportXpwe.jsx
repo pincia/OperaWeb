@@ -9,30 +9,38 @@ import {
     DialogTitle,
     Grid,
     LinearProgress,
-    Typography
+    Typography,
+    List,
+    ListItem,
+    ListItemText,
+    Divider
 } from '@mui/material';
 import SingleFileUpload from 'ui-component/third-party/dropzone/SingleFile';
 import { importXPWE } from 'api/projects';
-import { useDispatch } from 'store'; // Importa dispatch dallo store
-import { openSnackbar } from 'store/slices/snackbar'; // Importa l'action per lo Snackbar
+import { useDispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { setImportedProject } from 'store/slices/project';
+import { useNavigate } from 'react-router-dom';
+
 
 const ImportXpwe = ({ open, handleCloseDialog }) => {
     const [progress, setProgress] = useState(0);
     const [connection, setConnection] = useState(null);
-    const [file, setFile] = useState(null); // Stato per il file selezionato
-    const [isUploading, setIsUploading] = useState(false); // Stato per mostrare/nascondere la barra di avanzamento
-    const dispatch = useDispatch(); // Hook per usare dispatch
-
+    const [file, setFile] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [importResult, setImportResult] = useState(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     useEffect(() => {
         const connectToHub = async () => {
-            const hubUrl = import.meta.env.VITE_SIGNALR_URL || "/hubs/import";
+            const hubUrl = import.meta.env.VITE_SIGNALR_URL || '/hubs/import';
             const conn = new HubConnectionBuilder()
                 .withUrl(hubUrl)
                 .withAutomaticReconnect()
                 .build();
 
             conn.on('UpdateProgress', (progress) => {
-                setProgress(progress); // Aggiorna il progresso ricevuto dal backend
+                setProgress(progress);
             });
 
             try {
@@ -53,18 +61,20 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
         };
     }, []);
 
-    // Funzione di submit
     const handleSubmit = async () => {
         if (!file || !connection) return;
 
         setProgress(0);
-        setIsUploading(true); // Mostra la barra di avanzamento
+        setIsUploading(true);
+        setImportResult(null);
 
         try {
-            var response = await importXPWE(file, connection.connectionId);
-            console.log('File successfully uploaded.');
+            const response = await importXPWE(file, connection.connectionId);
+            setImportResult(response);
 
-            // Mostra Snackbar di successo
+            // Salva il progetto importato nello stato di Redux
+            dispatch(setImportedProject(response.importedProject));
+
             dispatch(
                 openSnackbar({
                     open: true,
@@ -76,13 +86,10 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
                     close: false
                 })
             );
-
-            // Chiudi il dialog
-            handleCloseDialog(true, response.id);
+            
         } catch (error) {
             console.error('Error submitting file:', error);
-            handleCloseDialog(false)
-            // Mostra Snackbar di errore
+
             dispatch(
                 openSnackbar({
                     open: true,
@@ -95,11 +102,16 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
                 })
             );
         } finally {
-            setIsUploading(false); // Nasconde la barra di avanzamento
+            setIsUploading(false);
         }
     };
 
-    // Funzione per aggiornare il file selezionato
+    const handleCompleteProject = () =>
+    {
+        handleCloseDialog(true)
+        navigate('/project/create'); 
+    }
+
     const setFieldValue = (field, value) => {
         if (field === 'file') {
             setFile(value);
@@ -111,35 +123,67 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
             <DialogTitle>Import Project</DialogTitle>
             <DialogContent>
                 <Grid container spacing={2}>
-                    {/* Componente SingleFileUpload */}
-                    <Grid item xs={12}>
-                        <SingleFileUpload
-                            file={file}
-                            setFieldValue={setFieldValue}
-                            error={!file ? 'File is required' : ''}
-                        />
-                    </Grid>
+                    {!importResult && (
+                        <Grid item xs={12}>
+                            <SingleFileUpload
+                                file={file}
+                                setFieldValue={setFieldValue}
+                                error={!file ? 'File is required' : ''}
+                            />
+                        </Grid>
+                    )}
 
-                    {/* Stato di avanzamento: mostrato solo quando isUploading è true */}
                     {isUploading && (
                         <Grid item xs={12}>
                             <Typography variant="body2">Progress: {progress}%</Typography>
                             <LinearProgress variant="determinate" value={progress} />
                         </Grid>
                     )}
+
+                    {importResult && (
+                        <Grid item xs={12}>
+                            <Typography variant="h6">Import Result</Typography>
+                            <Typography variant="body2">{importResult.message}</Typography>
+                            <List>
+                                {Object.entries(importResult.entitiesImported).map(([entity, count]) => (
+                                    <ListItem key={entity}>
+                                        <ListItemText primary={`${entity}: ${count}`} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                            <Divider sx={{ my: 2 }} />
+                            <Typography variant="h6">Progetto Importato</Typography>
+                            <Typography variant="body2">Comune: {importResult.importedProject?.city}</Typography>
+                            <Typography variant="body2">Provincia: {importResult.importedProject?.province}</Typography>
+                            <Typography variant="body2">Lavori: {importResult.importedProject?.works}</Typography>
+                        </Grid>
+                    )}
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => handleCloseDialog(false)} color="error" disabled={isUploading}>
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleSubmit}
-                    disabled={!file || isUploading} // Disabilita durante il caricamento o se manca il file
-                    variant="contained"
-                >
-                    Submit
-                </Button>
+                {!importResult && (
+                    <>
+                        <Button onClick={() => handleCloseDialog(false)} color="error" disabled={isUploading}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            disabled={!file || isUploading}
+                            variant="contained"
+                        >
+                            Submit
+                        </Button>
+                    </>
+                )}
+                {importResult && (
+                    <Button
+                        onClick={handleCompleteProject}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Completa Configurazione
+                    </Button>
+                )}
             </DialogActions>
         </Dialog>
     );

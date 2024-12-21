@@ -57,7 +57,7 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="userId"></param>
     /// <param name="connectionId"></param>
     /// <returns></returns>
-    Task<(int, string)> ImportNewProject(IFormFile file, string userId,string connectionId);
+    Task<ImportResult> ImportNewProject(IFormFile file, string userId,string connectionId);
 
     /// <summary>
     /// Gets all templates

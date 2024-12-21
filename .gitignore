@@ -17,7 +17,7 @@ npm-debug.log
 
 # client-react
 operaweb.client/components/*.js
-
+operaweb.client/.env.dev
 #Server
 OperaWeb.Server/Properties
 
@@ -29,5 +29,5 @@ OperaWeb.Server/Properties
 .vs/
 
 .config
-.env.dev
+
 appsettings.json

@@ -1,6 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace OperaWeb.Server.DataClasses.Models
 {
@@ -31,8 +32,8 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<SubCategoria> SubCategorie { get; set; }
     public ICollection<SuperCategoria> SuperCategorie { get; set; }
     public ICollection<ConfigNumeri> ConfigNumeri { get; set; }
-    public ICollection<DatiGenerali> DatiGenerali { get; set; }
+    public DatiGenerali DatiGenerali { get; set; } // Cambiato da ICollection a singolo elemento
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
-
   }
+
 }

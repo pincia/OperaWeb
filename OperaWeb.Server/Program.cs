@@ -19,7 +19,11 @@ var connectionString = builder.Configuration.GetConnectionString("OperaWebConnec
 
 // Add context
 builder.Services.AddDbContext<OperaWebDbContext>(options =>
-    options.UseSqlServer(connectionString, x => x.MigrationsAssembly("OperaWeb.Server.DataClasses")));
+{
+  options.LogTo(Console.WriteLine, LogLevel.Information)  // Mostra le query SQL
+               .EnableSensitiveDataLogging();
+  options.UseSqlServer(connectionString, x => x.MigrationsAssembly("OperaWeb.Server.DataClasses"));
+});
 
 // Add services to the container.
 
@@ -84,6 +88,7 @@ builder.Services.AddLogging(logs =>
   logs.AddDebug();   // Aggiunge il log per debug
   logs.AddAzureWebAppDiagnostics(); // Se stai usando Azure
 });
+
 
 builder.Services.AddAuthentication(options =>
 {

@@ -46,25 +46,26 @@ export async function getSoaClassifications() {
     }
 }
 
-export async function importXPWE(file, connectionId) {
+export const importXPWE = async (file, connectionId) => {
     try {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append('file', file);
 
-        console.log("FormData content:", file); // Debug per verificare il contenuto
-
-        const response = await axios.post('/api/projects/create-project-from-file', formData, {
+        const config = {
             headers: {
-                'X-Connection-Id': connectionId // Passa il ConnectionId dinamicamente
+                'Content-Type': 'multipart/form-data',
+                'X-Connection-Id': connectionId
             }
-        });
+        };
 
-        return response.data; // Successo
+        const response = await axios.post('/api/projects/create-project-from-file', formData, config);
+
+        return response.data; // La risposta contiene il risultato dell'import
     } catch (error) {
-        console.error("Error during file upload:", error.response?.data || error.message);
-        throw new Error("Failed to upload file.");
+        console.error('Error importing XPWE:', error);
+        throw error; // Propaga l'errore per gestirlo nel componente chiamante
     }
-}
+};
 
 
 export async function deleteProject(projectId) {

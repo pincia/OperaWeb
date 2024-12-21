@@ -25,6 +25,13 @@ const slice = createSlice({
     name: 'user',
     initialState,
     reducers: {
+        // User data
+        setUserData: (state, action) => {
+            state.userData = action.payload; // Aggiorna i dati dell'utente
+        },
+        clearUserData: (state) => {
+            state.userData = null; // Resetta lo stato
+        },
         // HAS ERROR
         hasError(state, action) {
             state.error = action.payload;
@@ -141,6 +148,7 @@ const slice = createSlice({
         }
     }
 });
+
 
 // Reducer
 export default slice.reducer;

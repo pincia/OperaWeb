@@ -35,7 +35,6 @@
         "@tabler/icons-react": "^2.47.0",
         "@vitejs/plugin-react": "^4.2.1",
         "amazon-cognito-identity-js": "^6.3.7",
-        "apexcharts": "^3.46.0",
         "axios": "1.6.7",
         "buffer": "^6.0.3",
         "chance": "^1.1.11",
@@ -153,6 +152,7 @@
         "immutable": "^4.3.5",
         "prettier": "^3.2.5",
         "react-error-overlay": "6.0.11",
+        "redux-mock-store": "^1.5.5",
         "sass": "^1.71.1"
     },
     "packageManager": "yarn@4.1.0"

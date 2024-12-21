@@ -15,14 +15,16 @@ import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import GeneralForm from './GeneralForm';
 import SubjectsForm from './SubjectsForm';
-import Review from './Review';
+import Tasks from './Tasks';
 import { openSnackbar } from 'store/slices/snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { useSelector } from 'react-redux';
+
 // step options
 const steps = ['Generali', 'Soggetti', 'Lavorazioni', 'Quadro economico', 'Configurazioni'];
 
-const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData, soaOptions, soaClassificationOptions, setSubjectsData) => {
+const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData, soaOptions, soaClassificationOptions, setSubjectsData, tasksData, setTasksData) => {
     switch (step) {
         case 0:
             return (
@@ -46,7 +48,13 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 />
             );
         case 2:
-            return <Review />;
+            return <Tasks
+                handleNext={handleNext}
+                handleBack={handleBack}
+                setErrorIndex={setErrorIndex}
+                projectData={projectData}
+                setProjectData={setProjectData}
+            />;
         default:
             throw new Error('Unknown step');
     }
@@ -58,6 +66,7 @@ const ProjectWizard = () => {
     const [activeStep, setActiveStep] = React.useState(0);
     const [projectData, setProjectData] = React.useState({});
     const [subjectsData, setSubjectsData] = React.useState({});
+    const [tasksData, setTasksData] = React.useState({});
     const [errorIndex, setErrorIndex] = React.useState(null);
     const [soaOptions, setSoaOptions] = useState(null);
     const [soaClassificationOptions, setSoaClassificationOptions] = useState(null);
@@ -65,6 +74,7 @@ const ProjectWizard = () => {
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
 
+    const currentImportedProject = useSelector((state) => state.project.currentImportedProject);
 
     useEffect(() => {
 
@@ -79,7 +89,16 @@ const ProjectWizard = () => {
                     const projectResponse = await getProject(id, { signal });
                     setProjectData(projectResponse.data);
 
+                } else if (currentImportedProject) {
+                    // Copia i Dati nello stato locale
+                    setProjectData((prev) => ({
+                        ...prev,
+                        ...currentImportedProject
+                    }));
+
+                    console.log(projectData)
                 }
+
                 const soasResponse = await getSoas();
                 setSoaOptions(soasResponse);
 
@@ -186,7 +205,9 @@ const ProjectWizard = () => {
                             setProjectData,
                             soaOptions,
                             soaClassificationOptions,
-                            setSubjectsData
+                            setSubjectsData,
+                            tasksData,
+                            setTasksData
                         )}
                         {activeStep === steps.length - 1 && (
                             <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>

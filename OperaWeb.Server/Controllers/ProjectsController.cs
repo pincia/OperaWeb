@@ -5,6 +5,7 @@ using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.DataClasses.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using OperaWeb.Server.Models.Mapper;
 
 namespace OperaWeb.Server.Controllers
 {
@@ -83,7 +84,7 @@ namespace OperaWeb.Server.Controllers
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Project>> GetProject(int id)
+    public async Task<ActionResult<ProjectDTO>> GetProject(int id)
     {
       try
       {
@@ -94,7 +95,7 @@ namespace OperaWeb.Server.Controllers
         {
           return Ok(new { message = $"No Project found for id {id}", data = new List<Project>() });
         }
-        return Ok(new { message = "Successfully retrieved project", data = project });
+        return Ok(new { message = "Successfully retrieved project", data = ProjectMapper.ToProjectDTO(project) });
 
       }
       catch (Exception ex)
@@ -148,9 +149,6 @@ namespace OperaWeb.Server.Controllers
 
       }
     }
-    /// <summary>
-    /// Importa un progetto da file con stato di avanzamento tramite SignalR.
-    /// </summary>
     [HttpPost]
     [Route("Create-project-from-file")]
     public async Task<IActionResult> ImportProjectFromFile([FromForm] IFormFile file)
@@ -177,15 +175,13 @@ namespace OperaWeb.Server.Controllers
           return BadRequest(new { message = "SignalR Connection ID is required" });
         }
 
-        // Avvia il metodo ImportNewProject
-        var result = await _projectService.ImportNewProject(file, userId, connectionId);
+        
+        // Avvia il metodo di importazione
+        var importResult = await _projectService.ImportNewProject(file, userId, connectionId);
 
-        if (result.Item1 != -1) // Importazione riuscita
-        {
-          return Ok(new { id = result.Item1 });
-        }
+   
+        return Ok(importResult);
 
-        return StatusCode(StatusCodes.Status500InternalServerError, new { message = result.Item2 });
       }
       catch (Exception ex)
       {

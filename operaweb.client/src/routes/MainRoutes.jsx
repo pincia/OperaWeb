@@ -25,7 +25,7 @@ const OrganizationPage = Loadable(lazy(() => import('views/pages/organigramma'))
 const ProfilePage = Loadable(lazy(() => import('views/pages/profile')));
 const SettingsPage = Loadable(lazy(() => import('views/pages/settings')));
 // ==============================|| MAIN ROUTING ||============================== //
-
+const AddTaskPage = Loadable(lazy(() => import('views/pages/addtask')));
 
 const MainRoutes = {
     element: (
@@ -66,7 +66,12 @@ const MainRoutes = {
         {
             path: '/user/settings',
             element: <SettingsPage />
+        },
+        {
+            path: '/add-task',
+            element: <AddTaskPage />
         }
+        
     ]
 };
 

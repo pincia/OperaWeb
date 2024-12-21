@@ -475,14 +475,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProjectID1")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
 
                     b.HasIndex("ProjectID");
-
-                    b.HasIndex("ProjectID1");
 
                     b.ToTable("Categorie");
                 });
@@ -630,7 +625,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProjectID");
+                    b.HasIndex("ProjectID")
+                        .IsUnique();
 
                     b.ToTable("DatiGenerali");
                 });
@@ -1109,7 +1105,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("CategoriaID1")
+                    b.Property<int?>("CategoriaID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataMis")
@@ -1135,7 +1131,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CategoriaID1");
+                    b.HasIndex("CategoriaID");
 
                     b.HasIndex("ElencoPrezzoID");
 
@@ -1326,14 +1322,10 @@ namespace OperaWeb.Server.DataClasses.Migrations
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Categoria", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", null)
                         .WithMany("Categorie")
-                        .HasForeignKey("ProjectID1");
+                        .HasForeignKey("ProjectID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
@@ -1363,8 +1355,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.DatiGenerali", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithMany("DatiGenerali")
-                        .HasForeignKey("ProjectID")
+                        .WithOne("DatiGenerali")
+                        .HasForeignKey("OperaWeb.Server.DataClasses.Models.DatiGenerali", "ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1488,9 +1480,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Categoria", "Categoria")
                         .WithMany()
-                        .HasForeignKey("CategoriaID1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoriaID")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("OperaWeb.Server.DataClasses.Models.ElencoPrezzo", "ElencoPrezzo")
                         .WithMany()
@@ -1501,7 +1492,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("VociComputo")
                         .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OperaWeb.Server.DataClasses.Models.SubCategoria", "SubCategoria")
@@ -1574,7 +1565,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("ConfigNumeri");
 
-                    b.Navigation("DatiGenerali");
+                    b.Navigation("DatiGenerali")
+                        .IsRequired();
 
                     b.Navigation("ElencoPrezzi");
 
