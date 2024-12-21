@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { Button, Box, Typography, Snackbar, Alert } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import TaskTreeView from './TaskTreeView';
 import TaskDetailsDialog from './TaskDetailsDialog';
 import EntryDetailsDialog from './EntryDetailsDialog';
@@ -108,62 +108,36 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
    
 
     return (
-        <><Box sx={{ padding: 4, display: 'flex', flexDirection: 'row', gap: 4 }}>
-            <TaskTreeView
-                tasks={tasks}
-                setTasks={setTasks}
-                expanded={expanded}
-                setExpanded={setExpanded}
-                handleOpen={handleOpen}
-                handleEntryOpen={handleEntryOpen}
-                setSnackbar={setSnackbar}
-                setTask={setTask}
-                setSelectedTaskEntries={setSelectedTaskEntries}
-                defaultTaskIds={defaultTaskIds}
-            />
+        <>
+            <Box sx={{ padding: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
+                <Box sx={{ flex: 4 }}> {/* TaskTreeView prende il 40% */}
+                    <TaskTreeView
+                        tasks={tasks}
+                        setTasks={setTasks}
+                        expanded={expanded}
+                        setExpanded={setExpanded}
+                        handleOpen={handleOpen}
+                        handleEntryOpen={handleEntryOpen}
+                        setSnackbar={setSnackbar}
+                        setTask={setTask}
+                        setSelectedTaskEntries={setSelectedTaskEntries}
+                        defaultTaskIds={defaultTaskIds}
+                    />
+                </Box>
 
-            <Box sx={{ flex: 1 }}>
-                <Typography variant="h5" gutterBottom>Voci della Lavorazione Selezionata</Typography>
-                <EntryList
-                    selectedTaskEntries={selectedTaskEntries}
-                    setTasks={setTasks}
-                    tasks={tasks}
-                    setSnackbar={setSnackbar}
-                    taskId={task.id}
-                    setSelectedTaskEntries={setSelectedTaskEntries}
-                    snackbar={snackbar}
-                />
-
+                <Box sx={{ flex: 6 }}> {/* EntryList prende il 60% */}
+                    <EntryList
+                        selectedTaskEntries={selectedTaskEntries}
+                        setTasks={setTasks}
+                        tasks={tasks}
+                        setSnackbar={setSnackbar}
+                        taskId={task.id}
+                        setSelectedTaskEntries={setSelectedTaskEntries}
+                        snackbar={snackbar}
+                    />
+                </Box>
             </Box>
 
-            <TaskDetailsDialog
-                open={open}
-                setOpen={setOpen}
-                task={task}
-                setTask={setTask}
-                setTasks={setTasks}
-                setSnackbar={setSnackbar}
-                generateId={generateId}
-                setSelectedTaskEntries={setSelectedTaskEntries}
-            />
-
-            <EntryDetailsDialog
-                open={entryDialogOpen}
-                setOpen={setEntryDialogOpen}
-                entry={entry}
-                setEntry={setEntry}
-                setTasks={setTasks}
-                taskId={task.id}
-                setSnackbar={setSnackbar}
-                setSelectedTaskEntries={setSelectedTaskEntries}
-            />
-
-            <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
-        </Box>
             <form onSubmit={formik.handleSubmit}>
                 <Grid item xs={12}>
                     <Stack direction="row" justifyContent="space-between">
@@ -171,12 +145,19 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                             Back
                         </Button>
                         <AnimateButton>
-                            <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }} onClick={() => setErrorIndex(1)}>
+                            <Button
+                                variant="contained"
+                                type="submit"
+                                sx={{ my: 3, ml: 1 }}
+                                onClick={() => setErrorIndex(1)}
+                            >
                                 Next
                             </Button>
                         </AnimateButton>
                     </Stack>
                 </Grid>
-            </form></>
+            </form>
+        </>
     );
+
 }

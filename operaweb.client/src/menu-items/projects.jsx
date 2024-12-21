@@ -21,7 +21,7 @@ const projects = {
             id: 'projects',
             title: <FormattedMessage id="projects" />,
             type: 'item',
-            url: 'general/projects',
+            url: 'projects',
             icon: icons.IconArchive,
             breadcrumbs: false
         }

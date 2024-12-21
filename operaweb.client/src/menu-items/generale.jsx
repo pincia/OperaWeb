@@ -38,7 +38,7 @@ const generale = {
             id: 'apri',
             title: <FormattedMessage id="Apri" />,
             type: 'item',
-            url: 'general/projects',
+            url: 'projects',
             icon: icons.IconFolder,
             breadcrumbs: false
         }

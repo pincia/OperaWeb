@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.Models.DTO.Templates;
 using Microsoft.AspNetCore.SignalR;
 using OperaWeb.Server.Hubs;
+using Azure.Identity;
 
 namespace OperaWeb.Server.Services
 {
@@ -72,14 +73,18 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<Project>> GetAllProjects(string userId)
+    public async Task<ProjectsListDTO> GetAllProjects(string userId)
     {
-      var projects = _context.Projects.Where(p => p.Deleted == false && p.User.Id == userId).ToList();
-      if (projects == null)
+      var myProjects = _context.Projects.Include(p=>p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
+      //TODO: INVOLVED PROJECTS
+     // var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
+
+    
+      return new ProjectsListDTO()
       {
-        throw new Exception(" No Projects found");
-      }
-      return projects;
+        MyProjects = myProjects.Select( project =>_mapper.Map<ProjectHeaderDTO>(project)).ToList(),
+        InvolvedProjects = new List<ProjectHeaderDTO>()
+      };
     }
 
     /// <inheritdoc/>

@@ -40,11 +40,14 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
         case 1:
             return (
                 <SubjectsForm
+                    subjectsData={projectData.subjects}
+                    setSubjectsData={(data) =>
+                        setProjectData((prev) => ({ ...prev, subjects: data }))
+                    }
                     handleNext={handleNext}
                     handleBack={handleBack}
-                    setErrorIndex={setErrorIndex}
-                    paymentData={projectData}
-                    setSubjectsData={setSubjectsData}
+                    projectData={projectData}
+                    setProjectData={setProjectData}
                 />
             );
         case 2:
@@ -87,6 +90,7 @@ const ProjectWizard = () => {
             try {
                 if (id) {
                     const projectResponse = await getProject(id, { signal });
+                    projectResponse.data.subjects = [];
                     setProjectData(projectResponse.data);
 
                 } else if (currentImportedProject) {

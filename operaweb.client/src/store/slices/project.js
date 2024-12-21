@@ -56,8 +56,8 @@ const initialState = {
                                                 "id": 1131,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6.80,
+                                                "code": "E.002.042",
                                                 "measurements": [
                                                     {
                                                         "id": 22379,
@@ -97,8 +97,8 @@ const initialState = {
                                                 "id": 1132,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.10,
+                                                "code": "E.002.029.b",
                                                 "measurements": [
                                                     {
                                                         "id": 22383,
@@ -130,8 +130,8 @@ const initialState = {
                                                 "id": 1133,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.10,
+                                                "code": "E.002.041.a",
                                                 "measurements": [
                                                     {
                                                         "id": 22386,
@@ -403,8 +403,8 @@ const initialState = {
                                                 "id": 1134,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.10,
+                                                "code": "E.002.041.a",
                                                 "measurements": [
                                                     {
                                                         "id": 22419,
@@ -540,8 +540,8 @@ const initialState = {
                                                 "id": 1135,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.40,
+                                                "code": "E.002.049.a",
                                                 "measurements": [
                                                     {
                                                         "id": 22435,
@@ -573,8 +573,8 @@ const initialState = {
                                                 "id": 1136,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5.13,
+                                                "code": "BAS_B.02.012.01",
                                                 "measurements": [
                                                     {
                                                         "id": 22438,
@@ -3838,8 +3838,8 @@ const initialState = {
                                                 "id": 1137,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.15,
+                                                "code": "E.002.043.a",
                                                 "measurements": [
                                                     {
                                                         "id": 22845,
@@ -3903,8 +3903,8 @@ const initialState = {
                                                 "id": 1138,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 26.20,
+                                                "code": "E.002.057.b",
                                                 "measurements": [
                                                     {
                                                         "id": 22852,
@@ -4576,8 +4576,8 @@ const initialState = {
                                                 "id": 1139,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 26.20,
+                                                "code": "E.002.057.b",
                                                 "measurements": [
                                                     {
                                                         "id": 22935,
@@ -4625,8 +4625,8 @@ const initialState = {
                                                 "id": 1140,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.00,
+                                                "code": "E.002.059",
                                                 "measurements": [
                                                     {
                                                         "id": 22940,
@@ -5250,8 +5250,8 @@ const initialState = {
                                                 "id": 1141,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 63.00,
+                                                "code": "E.002.040.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23017,
@@ -6579,8 +6579,8 @@ const initialState = {
                                                 "id": 1142,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.75,
+                                                "code": "E.002.008.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23182,
@@ -7212,8 +7212,8 @@ const initialState = {
                                                 "id": 1143,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.60,
+                                                "code": "E.002.062.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23260,
@@ -7229,8 +7229,8 @@ const initialState = {
                                                 "id": 1144,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.60,
+                                                "code": "E.002.063.b",
                                                 "measurements": [
                                                     {
                                                         "id": 23261,
@@ -7254,8 +7254,8 @@ const initialState = {
                                                 "id": 1145,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 23.10,
+                                                "code": "E.002.066",
                                                 "measurements": [
                                                     {
                                                         "id": 23263,
@@ -7271,8 +7271,8 @@ const initialState = {
                                                 "id": 1146,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 170.00,
+                                                "code": "E.002.065.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23264,
@@ -7288,8 +7288,8 @@ const initialState = {
                                                 "id": 1147,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 92.51,
+                                                "code": "DEI.A11.5.06.027.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23265,
@@ -7321,8 +7321,8 @@ const initialState = {
                                                 "id": 1148,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1898.27,
+                                                "code": "A.P. 01",
                                                 "measurements": [
                                                     {
                                                         "id": 23268,
@@ -7338,8 +7338,8 @@ const initialState = {
                                                 "id": 1149,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.03,
+                                                "code": "E.002.069",
                                                 "measurements": [
                                                     {
                                                         "id": 23269,
@@ -7355,8 +7355,8 @@ const initialState = {
                                                 "id": 1150,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.00,
+                                                "code": "E.002.064",
                                                 "measurements": [
                                                     {
                                                         "id": 23270,
@@ -7452,8 +7452,8 @@ const initialState = {
                                                 "id": 1151,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.75,
+                                                "code": "E.002.061",
                                                 "measurements": [
                                                     {
                                                         "id": 23281,
@@ -7469,8 +7469,8 @@ const initialState = {
                                                 "id": 1231,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 18.90,
+                                                "code": "E.002.033.d",
                                                 "measurements": [
                                                     {
                                                         "id": 24868,
@@ -7486,8 +7486,8 @@ const initialState = {
                                                 "id": 1232,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16.30,
+                                                "code": "E.002.029.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24869,
@@ -7511,8 +7511,8 @@ const initialState = {
                                                 "id": 1233,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 13.10,
+                                                "code": "E.002.032",
                                                 "measurements": [
                                                     {
                                                         "id": 24871,
@@ -7526,7 +7526,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 173,
@@ -7539,8 +7539,8 @@ const initialState = {
                                                 "id": 1152,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.50,
+                                                "code": "E.001.031",
                                                 "measurements": [
                                                     {
                                                         "id": 23282,
@@ -7756,8 +7756,8 @@ const initialState = {
                                                 "id": 1153,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.50,
+                                                "code": "E.001.032",
                                                 "measurements": [
                                                     {
                                                         "id": 23308,
@@ -7781,8 +7781,8 @@ const initialState = {
                                                 "id": 1154,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.95,
+                                                "code": "E.001.033.b",
                                                 "measurements": [
                                                     {
                                                         "id": 23310,
@@ -7806,8 +7806,8 @@ const initialState = {
                                                 "id": 1234,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.50,
+                                                "code": "E.001.031",
                                                 "measurements": [
                                                     {
                                                         "id": 24872,
@@ -7847,8 +7847,8 @@ const initialState = {
                                                 "id": 1235,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.50,
+                                                "code": "E.001.032",
                                                 "measurements": [
                                                     {
                                                         "id": 24876,
@@ -7872,8 +7872,8 @@ const initialState = {
                                                 "id": 1236,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.95,
+                                                "code": "E.001.033.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24878,
@@ -7895,7 +7895,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 174,
@@ -7908,8 +7908,8 @@ const initialState = {
                                                 "id": 1155,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 137.64,
+                                                "code": "E.022.002.b",
                                                 "measurements": [
                                                     {
                                                         "id": 23312,
@@ -7949,8 +7949,8 @@ const initialState = {
                                                 "id": 1156,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.70,
+                                                "code": "E.016.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23316,
@@ -7974,8 +7974,8 @@ const initialState = {
                                                 "id": 1160,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 51.41,
+                                                "code": "DEI.A75006",
                                                 "measurements": [
                                                     {
                                                         "id": 23887,
@@ -7997,7 +7997,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 176,
@@ -8010,8 +8010,8 @@ const initialState = {
                                                 "id": 1157,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 98.24,
+                                                "code": "BAS_B.11.032.03",
                                                 "measurements": [
                                                     {
                                                         "id": 23318,
@@ -11907,8 +11907,8 @@ const initialState = {
                                                 "id": 1158,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 24.64,
+                                                "code": "DEI.B15204a",
                                                 "measurements": [
                                                     {
                                                         "id": 23804,
@@ -12572,8 +12572,8 @@ const initialState = {
                                                 "id": 1159,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 28.26,
+                                                "code": "DEI.B15111",
                                                 "measurements": [
                                                     {
                                                         "id": 23886,
@@ -12587,7 +12587,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 179,
@@ -12600,8 +12600,8 @@ const initialState = {
                                                 "id": 1161,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 23889,
@@ -12657,8 +12657,8 @@ const initialState = {
                                                 "id": 1162,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 10.70,
+                                                "code": "E.016.047",
                                                 "measurements": [
                                                     {
                                                         "id": 23895,
@@ -12698,8 +12698,8 @@ const initialState = {
                                                 "id": 1172,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.03,
+                                                "code": "DEI.B65017b",
                                                 "measurements": [
                                                     {
                                                         "id": 23943,
@@ -15091,8 +15091,8 @@ const initialState = {
                                                 "id": 1173,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.03,
+                                                "code": "DEI.B65017b",
                                                 "measurements": [
                                                     {
                                                         "id": 24241,
@@ -15748,8 +15748,8 @@ const initialState = {
                                                 "id": 1174,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 24322,
@@ -15771,7 +15771,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 181,
@@ -15784,8 +15784,8 @@ const initialState = {
                                                 "id": 1163,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 23899,
@@ -15809,8 +15809,8 @@ const initialState = {
                                                 "id": 1165,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 163.80,
+                                                "code": "E.021.001.a07",
                                                 "measurements": [
                                                     {
                                                         "id": 23921,
@@ -15826,8 +15826,8 @@ const initialState = {
                                                 "id": 1195,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 24684,
@@ -16499,8 +16499,8 @@ const initialState = {
                                                 "id": 1200,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 24775,
@@ -16540,8 +16540,8 @@ const initialState = {
                                                 "id": 1230,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 24855,
@@ -16651,7 +16651,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 182,
@@ -16664,8 +16664,8 @@ const initialState = {
                                                 "id": 1164,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 162.18,
+                                                "code": "BAS_B.18.075.01",
                                                 "measurements": [
                                                     {
                                                         "id": 23901,
@@ -16831,7 +16831,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 177,
@@ -16844,8 +16844,8 @@ const initialState = {
                                                 "id": 1166,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 19.37,
+                                                "code": "BAS_B.11.020.01",
                                                 "measurements": [
                                                     {
                                                         "id": 23922,
@@ -16941,8 +16941,8 @@ const initialState = {
                                                 "id": 1167,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.91,
+                                                "code": "BAS_B.11.020.02",
                                                 "measurements": [
                                                     {
                                                         "id": 23933,
@@ -16966,8 +16966,8 @@ const initialState = {
                                                 "id": 1168,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.51,
+                                                "code": "BAS_B.11.020.03",
                                                 "measurements": [
                                                     {
                                                         "id": 23935,
@@ -16991,8 +16991,8 @@ const initialState = {
                                                 "id": 1169,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.10,
+                                                "code": "E.016.028.b",
                                                 "measurements": [
                                                     {
                                                         "id": 23937,
@@ -17016,8 +17016,8 @@ const initialState = {
                                                 "id": 1170,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 14.37,
+                                                "code": "BAS_B.14.131.01",
                                                 "measurements": [
                                                     {
                                                         "id": 23939,
@@ -17039,7 +17039,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 175,
@@ -17052,8 +17052,8 @@ const initialState = {
                                                 "id": 1175,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.77,
+                                                "code": "E.008.08.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24324,
@@ -17085,8 +17085,8 @@ const initialState = {
                                                 "id": 1176,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 22.95,
+                                                "code": "E.011.004",
                                                 "measurements": [
                                                     {
                                                         "id": 24327,
@@ -17118,8 +17118,8 @@ const initialState = {
                                                 "id": 1177,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 55.96,
+                                                "code": "DEI.B15022d",
                                                 "measurements": [
                                                     {
                                                         "id": 24330,
@@ -17151,8 +17151,8 @@ const initialState = {
                                                 "id": 1178,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 18.35,
+                                                "code": "BAS_B.06.012.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24333,
@@ -17184,8 +17184,8 @@ const initialState = {
                                                 "id": 1179,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.48,
+                                                "code": "E.004.037.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24336,
@@ -17217,8 +17217,8 @@ const initialState = {
                                                 "id": 1180,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16.81,
+                                                "code": "E.011.027.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24339,
@@ -17282,8 +17282,8 @@ const initialState = {
                                                 "id": 1181,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 40.95,
+                                                "code": "E.008.004",
                                                 "measurements": [
                                                     {
                                                         "id": 24346,
@@ -17315,8 +17315,8 @@ const initialState = {
                                                 "id": 1182,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 42.36,
+                                                "code": "E.009.001.g",
                                                 "measurements": [
                                                     {
                                                         "id": 24349,
@@ -17340,8 +17340,8 @@ const initialState = {
                                                 "id": 1183,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.71,
+                                                "code": "E.010.007",
                                                 "measurements": [
                                                     {
                                                         "id": 24351,
@@ -17365,8 +17365,8 @@ const initialState = {
                                                 "id": 1184,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 61.91,
+                                                "code": "E.010.07c",
                                                 "measurements": [
                                                     {
                                                         "id": 24353,
@@ -17382,8 +17382,8 @@ const initialState = {
                                                 "id": 1185,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.42,
+                                                "code": "E.009.003.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24354,
@@ -17407,8 +17407,8 @@ const initialState = {
                                                 "id": 1186,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 30.51,
+                                                "code": "BAS_B.17.020.04",
                                                 "measurements": [
                                                     {
                                                         "id": 24356,
@@ -17424,8 +17424,8 @@ const initialState = {
                                                 "id": 1187,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.03,
+                                                "code": "BAS_B.17.021.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24357,
@@ -17439,7 +17439,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 180,
@@ -17452,8 +17452,8 @@ const initialState = {
                                                 "id": 1188,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.20,
+                                                "code": "E.017.044.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24358,
@@ -18125,8 +18125,8 @@ const initialState = {
                                                 "id": 1189,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 360.40,
+                                                "code": "E.017.04c",
                                                 "measurements": [
                                                     {
                                                         "id": 24441,
@@ -18798,8 +18798,8 @@ const initialState = {
                                                 "id": 1190,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 14.00,
+                                                "code": "A.P. 04",
                                                 "measurements": [
                                                     {
                                                         "id": 24524,
@@ -18815,8 +18815,8 @@ const initialState = {
                                                 "id": 1191,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 426.83,
+                                                "code": "BAS_B.18.074C.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24525,
@@ -19448,8 +19448,8 @@ const initialState = {
                                                 "id": 1192,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 85.15,
+                                                "code": "E.017.011.e",
                                                 "measurements": [
                                                     {
                                                         "id": 24603,
@@ -20081,8 +20081,8 @@ const initialState = {
                                                 "id": 1193,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 252.00,
+                                                "code": "E.017.012",
                                                 "measurements": [
                                                     {
                                                         "id": 24681,
@@ -20098,8 +20098,8 @@ const initialState = {
                                                 "id": 1196,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.20,
+                                                "code": "E.017.044.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24767,
@@ -20131,8 +20131,8 @@ const initialState = {
                                                 "id": 1197,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 708.05,
+                                                "code": "BAS_B.18.074A.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24770,
@@ -20148,8 +20148,8 @@ const initialState = {
                                                 "id": 1198,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 174.87,
+                                                "code": "A.002.015.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24771,
@@ -20165,8 +20165,8 @@ const initialState = {
                                                 "id": 1199,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 205.59,
+                                                "code": "BAS_B.18.051.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24772,
@@ -20196,7 +20196,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 190,
@@ -20209,8 +20209,8 @@ const initialState = {
                                                 "id": 1224,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 398.36,
+                                                "code": "E.019.011.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24823,
@@ -20226,8 +20226,8 @@ const initialState = {
                                                 "id": 1225,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 95.57,
+                                                "code": "E.019.010.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24824,
@@ -20243,8 +20243,8 @@ const initialState = {
                                                 "id": 1226,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 33.86,
+                                                "code": "E.010.13",
                                                 "measurements": [
                                                     {
                                                         "id": 24825,
@@ -20436,8 +20436,8 @@ const initialState = {
                                                 "id": 1227,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 48.80,
+                                                "code": "E.016.004",
                                                 "measurements": [
                                                     {
                                                         "id": 24848,
@@ -20469,8 +20469,8 @@ const initialState = {
                                                 "id": 1228,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 24851,
@@ -20494,8 +20494,8 @@ const initialState = {
                                                 "id": 1229,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 10.70,
+                                                "code": "E.016.047",
                                                 "measurements": [
                                                     {
                                                         "id": 24853,
@@ -20519,8 +20519,8 @@ const initialState = {
                                                 "id": 1237,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 138.59,
+                                                "code": "E.004.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24880,
@@ -20544,8 +20544,8 @@ const initialState = {
                                                 "id": 1238,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.66,
+                                                "code": "E.004.041",
                                                 "measurements": [
                                                     {
                                                         "id": 24882,
@@ -20569,8 +20569,8 @@ const initialState = {
                                                 "id": 1239,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 55.60,
+                                                "code": "Inf.001.039.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24884,
@@ -20586,8 +20586,8 @@ const initialState = {
                                                 "id": 1246,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 69.20,
+                                                "code": "Inf.001.041.a02",
                                                 "measurements": [
                                                     {
                                                         "id": 24893,
@@ -20611,8 +20611,8 @@ const initialState = {
                                                 "id": 1247,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 902.24,
+                                                "code": "Inf.003.009.b02",
                                                 "measurements": [
                                                     {
                                                         "id": 24895,
@@ -20628,8 +20628,8 @@ const initialState = {
                                                 "id": 1248,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 256.40,
+                                                "code": "Inf.003.012.c02",
                                                 "measurements": [
                                                     {
                                                         "id": 24896,
@@ -20645,8 +20645,8 @@ const initialState = {
                                                 "id": 1249,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 765.62,
+                                                "code": "Inf.003.024",
                                                 "measurements": [
                                                     {
                                                         "id": 24897,
@@ -20662,8 +20662,8 @@ const initialState = {
                                                 "id": 1250,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 986.00,
+                                                "code": "F.002.032.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24898,
@@ -20687,8 +20687,8 @@ const initialState = {
                                                 "id": 1251,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.10,
+                                                "code": "E.001.001.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24900,
@@ -20704,8 +20704,8 @@ const initialState = {
                                                 "id": 1252,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 13.20,
+                                                "code": "E.001.011",
                                                 "measurements": [
                                                     {
                                                         "id": 24901,
@@ -20729,8 +20729,8 @@ const initialState = {
                                                 "id": 1253,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 40.71,
+                                                "code": "Inf.002.106",
                                                 "measurements": [
                                                     {
                                                         "id": 24903,
@@ -20754,8 +20754,8 @@ const initialState = {
                                                 "id": 1254,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.54,
+                                                "code": "BAS_F.01.013.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24905,
@@ -20771,8 +20771,8 @@ const initialState = {
                                                 "id": 1255,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6.48,
+                                                "code": "T.009.001.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24906,
@@ -20788,8 +20788,8 @@ const initialState = {
                                                 "id": 1256,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 79.50,
+                                                "code": "Inf.002.008.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24907,
@@ -20805,8 +20805,8 @@ const initialState = {
                                                 "id": 1257,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.95,
+                                                "code": "Inf.002.012.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24908,
@@ -20822,8 +20822,8 @@ const initialState = {
                                                 "id": 1258,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 334.37,
+                                                "code": "Inf.003.028.a02",
                                                 "measurements": [
                                                     {
                                                         "id": 24909,
@@ -20839,8 +20839,8 @@ const initialState = {
                                                 "id": 1259,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 0.53,
+                                                "code": "Inf.001.096.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24910,
@@ -20856,8 +20856,8 @@ const initialState = {
                                                 "id": 1260,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11000.00,
+                                                "code": "EA.002.036.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24911,
@@ -20871,7 +20871,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -20895,8 +20895,8 @@ const initialState = {
                                                 "id": 1171,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 37.87,
+                                                "code": "EL.006.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 23941,
@@ -20920,8 +20920,8 @@ const initialState = {
                                                 "id": 1194,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 36.73,
+                                                "code": "EL.006.022.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24682,
@@ -20945,8 +20945,8 @@ const initialState = {
                                                 "id": 1261,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 139.62,
+                                                "code": "EL.006.024.e",
                                                 "measurements": [
                                                     {
                                                         "id": 24912,
@@ -20962,8 +20962,8 @@ const initialState = {
                                                 "id": 1262,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.99,
+                                                "code": "EL.003.002.z03",
                                                 "measurements": [
                                                     {
                                                         "id": 24913,
@@ -20979,8 +20979,8 @@ const initialState = {
                                                 "id": 1263,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 85.02,
+                                                "code": "BAS_D3.10.021.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24914,
@@ -20996,8 +20996,8 @@ const initialState = {
                                                 "id": 1265,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 340.04,
+                                                "code": "EL.002.003.e",
                                                 "measurements": [
                                                     {
                                                         "id": 24916,
@@ -21013,8 +21013,8 @@ const initialState = {
                                                 "id": 1266,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 138.54,
+                                                "code": "EL.002.016.e",
                                                 "measurements": [
                                                     {
                                                         "id": 24917,
@@ -21030,8 +21030,8 @@ const initialState = {
                                                 "id": 1267,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 168.42,
+                                                "code": "EL.002.016.g",
                                                 "measurements": [
                                                     {
                                                         "id": 24918,
@@ -21047,8 +21047,8 @@ const initialState = {
                                                 "id": 1268,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 152.70,
+                                                "code": "EL.002.012.z05",
                                                 "measurements": [
                                                     {
                                                         "id": 24919,
@@ -21064,8 +21064,8 @@ const initialState = {
                                                 "id": 1269,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 106.07,
+                                                "code": "EL.002.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24920,
@@ -21113,8 +21113,8 @@ const initialState = {
                                                 "id": 1270,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 201.85,
+                                                "code": "EL.002.013.z01",
                                                 "measurements": [
                                                     {
                                                         "id": 24925,
@@ -21146,8 +21146,8 @@ const initialState = {
                                                 "id": 1271,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 207.18,
+                                                "code": "EL.002.013.z02",
                                                 "measurements": [
                                                     {
                                                         "id": 24928,
@@ -21161,7 +21161,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 190,
@@ -21174,8 +21174,8 @@ const initialState = {
                                                 "id": 1240,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 90.16,
+                                                "code": "BAS_D3.09.034.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24885,
@@ -21191,8 +21191,8 @@ const initialState = {
                                                 "id": 1241,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5.48,
+                                                "code": "BAS_D3.06.008.02",
                                                 "measurements": [
                                                     {
                                                         "id": 24886,
@@ -21208,8 +21208,8 @@ const initialState = {
                                                 "id": 1242,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.62,
+                                                "code": "EL.003.002.z02",
                                                 "measurements": [
                                                     {
                                                         "id": 24887,
@@ -21241,8 +21241,8 @@ const initialState = {
                                                 "id": 1243,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6.34,
+                                                "code": "EL.003.002.o",
                                                 "measurements": [
                                                     {
                                                         "id": 24890,
@@ -21258,8 +21258,8 @@ const initialState = {
                                                 "id": 1244,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 0.00,
+                                                "code": "EL.004.007.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24891,
@@ -21275,8 +21275,8 @@ const initialState = {
                                                 "id": 1245,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 71.65,
+                                                "code": "L.04.040.020.a.CAM",
                                                 "measurements": [
                                                     {
                                                         "id": 24892,
@@ -21292,8 +21292,8 @@ const initialState = {
                                                 "id": 1264,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 13.02,
+                                                "code": "EL.003.002.m",
                                                 "measurements": [
                                                     {
                                                         "id": 24915,
@@ -21307,7 +21307,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -21331,8 +21331,8 @@ const initialState = {
                                                 "id": 1201,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.92,
+                                                "code": "T.009.005.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24779,
@@ -21428,8 +21428,8 @@ const initialState = {
                                                 "id": 1202,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 87.83,
+                                                "code": "T.012.034.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24790,
@@ -21445,8 +21445,8 @@ const initialState = {
                                                 "id": 1203,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5704.86,
+                                                "code": "A.P. 02",
                                                 "measurements": [
                                                     {
                                                         "id": 24791,
@@ -21462,8 +21462,8 @@ const initialState = {
                                                 "id": 1204,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 37.87,
+                                                "code": "EL.006.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24792,
@@ -21479,8 +21479,8 @@ const initialState = {
                                                 "id": 1205,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 115.19,
+                                                "code": "T.011.023.e",
                                                 "measurements": [
                                                     {
                                                         "id": 24793,
@@ -21576,8 +21576,8 @@ const initialState = {
                                                 "id": 1206,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 427.67,
+                                                "code": "E.020.004.g",
                                                 "measurements": [
                                                     {
                                                         "id": 24804,
@@ -21601,8 +21601,8 @@ const initialState = {
                                                 "id": 1207,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 208.62,
+                                                "code": "E.020.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24806,
@@ -21618,8 +21618,8 @@ const initialState = {
                                                 "id": 1208,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 195.63,
+                                                "code": "E.020.009.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24807,
@@ -21635,8 +21635,8 @@ const initialState = {
                                                 "id": 1209,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 244.04,
+                                                "code": "DEI.B85008f",
                                                 "measurements": [
                                                     {
                                                         "id": 24808,
@@ -21650,7 +21650,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -21674,8 +21674,8 @@ const initialState = {
                                                 "id": 1210,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 25938.17,
+                                                "code": "EL.008.005",
                                                 "measurements": [
                                                     {
                                                         "id": 24809,
@@ -21691,8 +21691,8 @@ const initialState = {
                                                 "id": 1211,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2538.31,
+                                                "code": "EL.008.028",
                                                 "measurements": [
                                                     {
                                                         "id": 24810,
@@ -21708,8 +21708,8 @@ const initialState = {
                                                 "id": 1212,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 165.02,
+                                                "code": "EL.008.023",
                                                 "measurements": [
                                                     {
                                                         "id": 24811,
@@ -21725,8 +21725,8 @@ const initialState = {
                                                 "id": 1213,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 112.02,
+                                                "code": "EL.008.022",
                                                 "measurements": [
                                                     {
                                                         "id": 24812,
@@ -21740,7 +21740,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -21764,8 +21764,8 @@ const initialState = {
                                                 "id": 1214,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 618.54,
+                                                "code": "EL.002.003.j",
                                                 "measurements": [
                                                     {
                                                         "id": 24813,
@@ -21781,8 +21781,8 @@ const initialState = {
                                                 "id": 1215,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 150.00,
+                                                "code": "EA.002.030",
                                                 "measurements": [
                                                     {
                                                         "id": 24814,
@@ -21798,8 +21798,8 @@ const initialState = {
                                                 "id": 1216,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6219.60,
+                                                "code": "EA.002.020.c",
                                                 "measurements": [
                                                     {
                                                         "id": 24815,
@@ -21815,8 +21815,8 @@ const initialState = {
                                                 "id": 1217,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.02,
+                                                "code": "EL.003.002.n",
                                                 "measurements": [
                                                     {
                                                         "id": 24816,
@@ -21832,8 +21832,8 @@ const initialState = {
                                                 "id": 1218,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.69,
+                                                "code": "EL.003.004.g",
                                                 "measurements": [
                                                     {
                                                         "id": 24817,
@@ -21849,8 +21849,8 @@ const initialState = {
                                                 "id": 1219,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 45.47,
+                                                "code": "EL.007.004.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24818,
@@ -21866,8 +21866,8 @@ const initialState = {
                                                 "id": 1220,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 283.20,
+                                                "code": "EL.007.012",
                                                 "measurements": [
                                                     {
                                                         "id": 24819,
@@ -21883,8 +21883,8 @@ const initialState = {
                                                 "id": 1221,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 284.23,
+                                                "code": "EL.007.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24820,
@@ -21900,8 +21900,8 @@ const initialState = {
                                                 "id": 1222,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.23,
+                                                "code": "EL.004.007.f",
                                                 "measurements": [
                                                     {
                                                         "id": 24821,
@@ -21917,8 +21917,8 @@ const initialState = {
                                                 "id": 1223,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16583.19,
+                                                "code": "A.P. 03",
                                                 "measurements": [
                                                     {
                                                         "id": 24822,
@@ -21932,7 +21932,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -21967,8 +21967,8 @@ const initialState = {
                                                 "id": 1272,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6.80,
+                                                "code": "E.002.042",
                                                 "measurements": [
                                                     {
                                                         "id": 24929,
@@ -22008,8 +22008,8 @@ const initialState = {
                                                 "id": 1273,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.10,
+                                                "code": "E.002.029.b",
                                                 "measurements": [
                                                     {
                                                         "id": 24933,
@@ -22041,8 +22041,8 @@ const initialState = {
                                                 "id": 1274,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.10,
+                                                "code": "E.002.041.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24936,
@@ -22306,8 +22306,8 @@ const initialState = {
                                                 "id": 1275,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.10,
+                                                "code": "E.002.041.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24968,
@@ -22443,8 +22443,8 @@ const initialState = {
                                                 "id": 1276,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.40,
+                                                "code": "E.002.049.a",
                                                 "measurements": [
                                                     {
                                                         "id": 24984,
@@ -22476,8 +22476,8 @@ const initialState = {
                                                 "id": 1277,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5.13,
+                                                "code": "BAS_B.02.012.01",
                                                 "measurements": [
                                                     {
                                                         "id": 24987,
@@ -26821,8 +26821,8 @@ const initialState = {
                                                 "id": 1278,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.15,
+                                                "code": "E.002.043.a",
                                                 "measurements": [
                                                     {
                                                         "id": 25529,
@@ -26886,8 +26886,8 @@ const initialState = {
                                                 "id": 1279,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 26.20,
+                                                "code": "E.002.057.b",
                                                 "measurements": [
                                                     {
                                                         "id": 25536,
@@ -27695,8 +27695,8 @@ const initialState = {
                                                 "id": 1280,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 26.20,
+                                                "code": "E.002.057.b",
                                                 "measurements": [
                                                     {
                                                         "id": 25636,
@@ -27744,8 +27744,8 @@ const initialState = {
                                                 "id": 1281,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.00,
+                                                "code": "E.002.059",
                                                 "measurements": [
                                                     {
                                                         "id": 25641,
@@ -28505,8 +28505,8 @@ const initialState = {
                                                 "id": 1282,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 63.00,
+                                                "code": "E.002.040.a",
                                                 "measurements": [
                                                     {
                                                         "id": 25735,
@@ -30106,8 +30106,8 @@ const initialState = {
                                                 "id": 1283,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.75,
+                                                "code": "E.002.008.a",
                                                 "measurements": [
                                                     {
                                                         "id": 25934,
@@ -30867,8 +30867,8 @@ const initialState = {
                                                 "id": 1284,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.60,
+                                                "code": "E.002.062.a",
                                                 "measurements": [
                                                     {
                                                         "id": 26028,
@@ -30884,8 +30884,8 @@ const initialState = {
                                                 "id": 1285,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.60,
+                                                "code": "E.002.063.b",
                                                 "measurements": [
                                                     {
                                                         "id": 26029,
@@ -30909,8 +30909,8 @@ const initialState = {
                                                 "id": 1286,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 23.10,
+                                                "code": "E.002.066",
                                                 "measurements": [
                                                     {
                                                         "id": 26031,
@@ -30926,8 +30926,8 @@ const initialState = {
                                                 "id": 1287,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 170.00,
+                                                "code": "E.002.065.a",
                                                 "measurements": [
                                                     {
                                                         "id": 26032,
@@ -30943,8 +30943,8 @@ const initialState = {
                                                 "id": 1288,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 92.51,
+                                                "code": "DEI.A11.5.06.027.a",
                                                 "measurements": [
                                                     {
                                                         "id": 26033,
@@ -30976,8 +30976,8 @@ const initialState = {
                                                 "id": 1289,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1898.27,
+                                                "code": "A.P. 01",
                                                 "measurements": [
                                                     {
                                                         "id": 26036,
@@ -30993,8 +30993,8 @@ const initialState = {
                                                 "id": 1290,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.03,
+                                                "code": "E.002.069",
                                                 "measurements": [
                                                     {
                                                         "id": 26037,
@@ -31010,8 +31010,8 @@ const initialState = {
                                                 "id": 1291,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.00,
+                                                "code": "E.002.064",
                                                 "measurements": [
                                                     {
                                                         "id": 26038,
@@ -31123,8 +31123,8 @@ const initialState = {
                                                 "id": 1292,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 15.75,
+                                                "code": "E.002.061",
                                                 "measurements": [
                                                     {
                                                         "id": 26051,
@@ -31140,8 +31140,8 @@ const initialState = {
                                                 "id": 1381,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 18.90,
+                                                "code": "E.002.033.d",
                                                 "measurements": [
                                                     {
                                                         "id": 27893,
@@ -31157,8 +31157,8 @@ const initialState = {
                                                 "id": 1382,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16.30,
+                                                "code": "E.002.029.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27894,
@@ -31182,8 +31182,8 @@ const initialState = {
                                                 "id": 1383,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 13.10,
+                                                "code": "E.002.032",
                                                 "measurements": [
                                                     {
                                                         "id": 27896,
@@ -31197,7 +31197,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 173,
@@ -31210,8 +31210,8 @@ const initialState = {
                                                 "id": 1293,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.50,
+                                                "code": "E.001.031",
                                                 "measurements": [
                                                     {
                                                         "id": 26052,
@@ -31427,8 +31427,8 @@ const initialState = {
                                                 "id": 1294,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.50,
+                                                "code": "E.001.032",
                                                 "measurements": [
                                                     {
                                                         "id": 26078,
@@ -31452,8 +31452,8 @@ const initialState = {
                                                 "id": 1295,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.95,
+                                                "code": "E.001.033.b",
                                                 "measurements": [
                                                     {
                                                         "id": 26080,
@@ -31477,8 +31477,8 @@ const initialState = {
                                                 "id": 1384,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.50,
+                                                "code": "E.001.031",
                                                 "measurements": [
                                                     {
                                                         "id": 27897,
@@ -31518,8 +31518,8 @@ const initialState = {
                                                 "id": 1385,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.50,
+                                                "code": "E.001.032",
                                                 "measurements": [
                                                     {
                                                         "id": 27901,
@@ -31543,8 +31543,8 @@ const initialState = {
                                                 "id": 1386,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.95,
+                                                "code": "E.001.033.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27903,
@@ -31566,7 +31566,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 174,
@@ -31579,8 +31579,8 @@ const initialState = {
                                                 "id": 1296,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 137.64,
+                                                "code": "E.022.002.b",
                                                 "measurements": [
                                                     {
                                                         "id": 26082,
@@ -31620,8 +31620,8 @@ const initialState = {
                                                 "id": 1297,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.70,
+                                                "code": "E.016.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 26086,
@@ -31645,8 +31645,8 @@ const initialState = {
                                                 "id": 1301,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 51.41,
+                                                "code": "DEI.A75006",
                                                 "measurements": [
                                                     {
                                                         "id": 26721,
@@ -31668,7 +31668,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 176,
@@ -31681,8 +31681,8 @@ const initialState = {
                                                 "id": 1298,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 98.24,
+                                                "code": "BAS_B.11.032.03",
                                                 "measurements": [
                                                     {
                                                         "id": 26088,
@@ -35954,8 +35954,8 @@ const initialState = {
                                                 "id": 1299,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 24.64,
+                                                "code": "DEI.B15204a",
                                                 "measurements": [
                                                     {
                                                         "id": 26621,
@@ -36755,8 +36755,8 @@ const initialState = {
                                                 "id": 1300,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 28.26,
+                                                "code": "DEI.B15111",
                                                 "measurements": [
                                                     {
                                                         "id": 26720,
@@ -36770,7 +36770,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 179,
@@ -36783,8 +36783,8 @@ const initialState = {
                                                 "id": 1302,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 26723,
@@ -36840,8 +36840,8 @@ const initialState = {
                                                 "id": 1303,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 10.70,
+                                                "code": "E.016.047",
                                                 "measurements": [
                                                     {
                                                         "id": 26729,
@@ -36881,8 +36881,8 @@ const initialState = {
                                                 "id": 1313,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.03,
+                                                "code": "DEI.B65017b",
                                                 "measurements": [
                                                     {
                                                         "id": 26783,
@@ -39762,8 +39762,8 @@ const initialState = {
                                                 "id": 1314,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.03,
+                                                "code": "DEI.B65017b",
                                                 "measurements": [
                                                     {
                                                         "id": 27142,
@@ -40571,8 +40571,8 @@ const initialState = {
                                                 "id": 1315,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 27242,
@@ -40594,7 +40594,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 181,
@@ -40607,8 +40607,8 @@ const initialState = {
                                                 "id": 1304,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 26733,
@@ -40632,8 +40632,8 @@ const initialState = {
                                                 "id": 1306,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 163.80,
+                                                "code": "E.021.001.a07",
                                                 "measurements": [
                                                     {
                                                         "id": 26759,
@@ -40649,8 +40649,8 @@ const initialState = {
                                                 "id": 1346,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 27686,
@@ -41458,8 +41458,8 @@ const initialState = {
                                                 "id": 1351,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 27794,
@@ -41499,8 +41499,8 @@ const initialState = {
                                                 "id": 1380,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 189.00,
+                                                "code": "E.021.001.b07",
                                                 "measurements": [
                                                     {
                                                         "id": 27880,
@@ -41610,7 +41610,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 182,
@@ -41623,8 +41623,8 @@ const initialState = {
                                                 "id": 1305,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 162.18,
+                                                "code": "BAS_B.18.075.01",
                                                 "measurements": [
                                                     {
                                                         "id": 26735,
@@ -41822,7 +41822,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 177,
@@ -41835,8 +41835,8 @@ const initialState = {
                                                 "id": 1307,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 19.37,
+                                                "code": "BAS_B.11.020.01",
                                                 "measurements": [
                                                     {
                                                         "id": 26760,
@@ -41948,8 +41948,8 @@ const initialState = {
                                                 "id": 1308,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.91,
+                                                "code": "BAS_B.11.020.02",
                                                 "measurements": [
                                                     {
                                                         "id": 26773,
@@ -41973,8 +41973,8 @@ const initialState = {
                                                 "id": 1309,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1.51,
+                                                "code": "BAS_B.11.020.03",
                                                 "measurements": [
                                                     {
                                                         "id": 26775,
@@ -41998,8 +41998,8 @@ const initialState = {
                                                 "id": 1310,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.10,
+                                                "code": "E.016.028.b",
                                                 "measurements": [
                                                     {
                                                         "id": 26777,
@@ -42023,8 +42023,8 @@ const initialState = {
                                                 "id": 1311,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 14.37,
+                                                "code": "BAS_B.14.131.01",
                                                 "measurements": [
                                                     {
                                                         "id": 26779,
@@ -42046,7 +42046,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 175,
@@ -42059,8 +42059,8 @@ const initialState = {
                                                 "id": 1316,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.77,
+                                                "code": "E.008.08.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27244,
@@ -42092,8 +42092,8 @@ const initialState = {
                                                 "id": 1317,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 22.95,
+                                                "code": "E.011.004",
                                                 "measurements": [
                                                     {
                                                         "id": 27247,
@@ -42125,8 +42125,8 @@ const initialState = {
                                                 "id": 1318,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 55.96,
+                                                "code": "DEI.B15022d",
                                                 "measurements": [
                                                     {
                                                         "id": 27250,
@@ -42158,8 +42158,8 @@ const initialState = {
                                                 "id": 1319,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 18.35,
+                                                "code": "BAS_B.06.012.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27253,
@@ -42191,8 +42191,8 @@ const initialState = {
                                                 "id": 1320,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.48,
+                                                "code": "E.004.037.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27256,
@@ -42224,8 +42224,8 @@ const initialState = {
                                                 "id": 1321,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16.81,
+                                                "code": "E.011.027.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27259,
@@ -42281,8 +42281,8 @@ const initialState = {
                                                 "id": 1322,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 40.95,
+                                                "code": "E.008.004",
                                                 "measurements": [
                                                     {
                                                         "id": 27265,
@@ -42314,8 +42314,8 @@ const initialState = {
                                                 "id": 1323,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 42.36,
+                                                "code": "E.009.001.g",
                                                 "measurements": [
                                                     {
                                                         "id": 27268,
@@ -42339,8 +42339,8 @@ const initialState = {
                                                 "id": 1324,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 61.91,
+                                                "code": "E.010.07c",
                                                 "measurements": [
                                                     {
                                                         "id": 27270,
@@ -42356,8 +42356,8 @@ const initialState = {
                                                 "id": 1325,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.71,
+                                                "code": "E.010.007",
                                                 "measurements": [
                                                     {
                                                         "id": 27271,
@@ -42381,8 +42381,8 @@ const initialState = {
                                                 "id": 1326,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 12.42,
+                                                "code": "E.009.003.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27273,
@@ -42406,8 +42406,8 @@ const initialState = {
                                                 "id": 1327,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 30.51,
+                                                "code": "BAS_B.17.020.04",
                                                 "measurements": [
                                                     {
                                                         "id": 27275,
@@ -42423,8 +42423,8 @@ const initialState = {
                                                 "id": 1328,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 4.03,
+                                                "code": "BAS_B.17.021.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27276,
@@ -42438,7 +42438,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 180,
@@ -42451,8 +42451,8 @@ const initialState = {
                                                 "id": 1329,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.20,
+                                                "code": "E.017.044.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27277,
@@ -43260,8 +43260,8 @@ const initialState = {
                                                 "id": 1330,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 360.40,
+                                                "code": "E.017.04c",
                                                 "measurements": [
                                                     {
                                                         "id": 27377,
@@ -44069,8 +44069,8 @@ const initialState = {
                                                 "id": 1331,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 14.00,
+                                                "code": "A.P. 04",
                                                 "measurements": [
                                                     {
                                                         "id": 27477,
@@ -44086,8 +44086,8 @@ const initialState = {
                                                 "id": 1332,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 426.83,
+                                                "code": "BAS_B.18.074C.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27478,
@@ -44847,8 +44847,8 @@ const initialState = {
                                                 "id": 1333,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 85.15,
+                                                "code": "E.017.011.e",
                                                 "measurements": [
                                                     {
                                                         "id": 27572,
@@ -45608,8 +45608,8 @@ const initialState = {
                                                 "id": 1334,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 252.00,
+                                                "code": "E.017.012",
                                                 "measurements": [
                                                     {
                                                         "id": 27666,
@@ -45625,8 +45625,8 @@ const initialState = {
                                                 "id": 1347,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.20,
+                                                "code": "E.017.044.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27786,
@@ -45658,8 +45658,8 @@ const initialState = {
                                                 "id": 1348,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 708.05,
+                                                "code": "BAS_B.18.074A.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27789,
@@ -45675,8 +45675,8 @@ const initialState = {
                                                 "id": 1349,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 174.87,
+                                                "code": "A.002.015.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27790,
@@ -45692,8 +45692,8 @@ const initialState = {
                                                 "id": 1350,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 205.59,
+                                                "code": "BAS_B.18.051.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27791,
@@ -45723,7 +45723,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 190,
@@ -45736,8 +45736,8 @@ const initialState = {
                                                 "id": 1376,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 33.86,
+                                                "code": "E.010.13",
                                                 "measurements": [
                                                     {
                                                         "id": 27847,
@@ -45953,8 +45953,8 @@ const initialState = {
                                                 "id": 1377,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 48.80,
+                                                "code": "E.016.004",
                                                 "measurements": [
                                                     {
                                                         "id": 27873,
@@ -45986,8 +45986,8 @@ const initialState = {
                                                 "id": 1378,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.45,
+                                                "code": "E.016.042",
                                                 "measurements": [
                                                     {
                                                         "id": 27876,
@@ -46011,8 +46011,8 @@ const initialState = {
                                                 "id": 1379,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 10.70,
+                                                "code": "E.016.047",
                                                 "measurements": [
                                                     {
                                                         "id": 27878,
@@ -46036,8 +46036,8 @@ const initialState = {
                                                 "id": 1387,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.77,
+                                                "code": "E.008.08.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27905,
@@ -46061,8 +46061,8 @@ const initialState = {
                                                 "id": 1388,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.66,
+                                                "code": "E.004.041",
                                                 "measurements": [
                                                     {
                                                         "id": 27907,
@@ -46086,8 +46086,8 @@ const initialState = {
                                                 "id": 1389,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 55.60,
+                                                "code": "Inf.001.039.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27909,
@@ -46103,8 +46103,8 @@ const initialState = {
                                                 "id": 1394,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 69.20,
+                                                "code": "Inf.001.041.a02",
                                                 "measurements": [
                                                     {
                                                         "id": 27915,
@@ -46128,8 +46128,8 @@ const initialState = {
                                                 "id": 1395,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 902.24,
+                                                "code": "Inf.003.009.b02",
                                                 "measurements": [
                                                     {
                                                         "id": 27917,
@@ -46145,8 +46145,8 @@ const initialState = {
                                                 "id": 1396,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 256.40,
+                                                "code": "Inf.003.012.c02",
                                                 "measurements": [
                                                     {
                                                         "id": 27918,
@@ -46162,8 +46162,8 @@ const initialState = {
                                                 "id": 1397,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 765.62,
+                                                "code": "Inf.003.024",
                                                 "measurements": [
                                                     {
                                                         "id": 27919,
@@ -46179,8 +46179,8 @@ const initialState = {
                                                 "id": 1398,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 986.00,
+                                                "code": "F.002.032.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27920,
@@ -46204,8 +46204,8 @@ const initialState = {
                                                 "id": 1399,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 8.10,
+                                                "code": "E.001.001.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27922,
@@ -46221,8 +46221,8 @@ const initialState = {
                                                 "id": 1400,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 13.20,
+                                                "code": "E.001.011",
                                                 "measurements": [
                                                     {
                                                         "id": 27923,
@@ -46246,8 +46246,8 @@ const initialState = {
                                                 "id": 1401,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 17.77,
+                                                "code": "E.008.08.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27925,
@@ -46271,8 +46271,8 @@ const initialState = {
                                                 "id": 1402,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.30,
+                                                "code": "E.008.08.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27927,
@@ -46296,8 +46296,8 @@ const initialState = {
                                                 "id": 1403,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.54,
+                                                "code": "BAS_F.01.013.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27929,
@@ -46313,8 +46313,8 @@ const initialState = {
                                                 "id": 1404,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6.48,
+                                                "code": "T.009.001.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27930,
@@ -46330,8 +46330,8 @@ const initialState = {
                                                 "id": 1405,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 79.50,
+                                                "code": "Inf.002.008.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27931,
@@ -46347,8 +46347,8 @@ const initialState = {
                                                 "id": 1406,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.95,
+                                                "code": "Inf.002.012.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27932,
@@ -46364,8 +46364,8 @@ const initialState = {
                                                 "id": 1407,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 334.37,
+                                                "code": "Inf.003.028.a02",
                                                 "measurements": [
                                                     {
                                                         "id": 27933,
@@ -46381,8 +46381,8 @@ const initialState = {
                                                 "id": 1408,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 0.53,
+                                                "code": "Inf.001.096.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27934,
@@ -46398,8 +46398,8 @@ const initialState = {
                                                 "id": 1409,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11000.00,
+                                                "code": "EA.002.036.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27935,
@@ -46413,7 +46413,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -46437,8 +46437,8 @@ const initialState = {
                                                 "id": 1312,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 37.87,
+                                                "code": "EL.006.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 26781,
@@ -46462,8 +46462,8 @@ const initialState = {
                                                 "id": 1335,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 36.73,
+                                                "code": "EL.006.022.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27667,
@@ -46495,8 +46495,8 @@ const initialState = {
                                                 "id": 1336,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 139.62,
+                                                "code": "EL.006.024.e",
                                                 "measurements": [
                                                     {
                                                         "id": 27670,
@@ -46512,8 +46512,8 @@ const initialState = {
                                                 "id": 1337,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.99,
+                                                "code": "EL.003.002.z03",
                                                 "measurements": [
                                                     {
                                                         "id": 27671,
@@ -46529,8 +46529,8 @@ const initialState = {
                                                 "id": 1338,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 85.02,
+                                                "code": "BAS_D3.10.021.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27672,
@@ -46546,8 +46546,8 @@ const initialState = {
                                                 "id": 1339,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 340.04,
+                                                "code": "EL.002.003.e",
                                                 "measurements": [
                                                     {
                                                         "id": 27673,
@@ -46563,8 +46563,8 @@ const initialState = {
                                                 "id": 1340,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 138.54,
+                                                "code": "EL.002.016.e",
                                                 "measurements": [
                                                     {
                                                         "id": 27674,
@@ -46580,8 +46580,8 @@ const initialState = {
                                                 "id": 1341,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 168.42,
+                                                "code": "EL.002.016.g",
                                                 "measurements": [
                                                     {
                                                         "id": 27675,
@@ -46597,8 +46597,8 @@ const initialState = {
                                                 "id": 1342,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 152.70,
+                                                "code": "EL.002.012.z05",
                                                 "measurements": [
                                                     {
                                                         "id": 27676,
@@ -46614,8 +46614,8 @@ const initialState = {
                                                 "id": 1343,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 106.07,
+                                                "code": "EL.002.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27677,
@@ -46663,8 +46663,8 @@ const initialState = {
                                                 "id": 1344,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 201.85,
+                                                "code": "EL.002.013.z01",
                                                 "measurements": [
                                                     {
                                                         "id": 27682,
@@ -46696,8 +46696,8 @@ const initialState = {
                                                 "id": 1345,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 207.18,
+                                                "code": "EL.002.013.z02",
                                                 "measurements": [
                                                     {
                                                         "id": 27685,
@@ -46711,7 +46711,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     },
                                     {
                                         "id": 190,
@@ -46724,8 +46724,8 @@ const initialState = {
                                                 "id": 1390,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 90.16,
+                                                "code": "BAS_D3.09.034.01",
                                                 "measurements": [
                                                     {
                                                         "id": 27910,
@@ -46741,8 +46741,8 @@ const initialState = {
                                                 "id": 1391,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5.48,
+                                                "code": "BAS_D3.06.008.02",
                                                 "measurements": [
                                                     {
                                                         "id": 27911,
@@ -46758,8 +46758,8 @@ const initialState = {
                                                 "id": 1392,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 3.94,
+                                                "code": "BAS_D3.05.008.03",
                                                 "measurements": [
                                                     {
                                                         "id": 27912,
@@ -46783,8 +46783,8 @@ const initialState = {
                                                 "id": 1393,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 71.65,
+                                                "code": "L.04.040.020.a.CAM",
                                                 "measurements": [
                                                     {
                                                         "id": 27914,
@@ -46798,7 +46798,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -46822,8 +46822,8 @@ const initialState = {
                                                 "id": 1352,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 11.92,
+                                                "code": "T.009.005.c",
                                                 "measurements": [
                                                     {
                                                         "id": 27798,
@@ -46935,8 +46935,8 @@ const initialState = {
                                                 "id": 1353,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 87.83,
+                                                "code": "T.012.034.c",
                                                 "measurements": [
                                                     {
                                                         "id": 27811,
@@ -46952,8 +46952,8 @@ const initialState = {
                                                 "id": 1354,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 5704.86,
+                                                "code": "A.P. 02",
                                                 "measurements": [
                                                     {
                                                         "id": 27812,
@@ -46969,8 +46969,8 @@ const initialState = {
                                                 "id": 1355,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 37.87,
+                                                "code": "EL.006.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27813,
@@ -46986,8 +46986,8 @@ const initialState = {
                                                 "id": 1356,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 115.19,
+                                                "code": "T.011.023.e",
                                                 "measurements": [
                                                     {
                                                         "id": 27814,
@@ -47099,8 +47099,8 @@ const initialState = {
                                                 "id": 1357,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 427.67,
+                                                "code": "E.020.004.g",
                                                 "measurements": [
                                                     {
                                                         "id": 27827,
@@ -47124,8 +47124,8 @@ const initialState = {
                                                 "id": 1358,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 208.62,
+                                                "code": "E.020.004.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27829,
@@ -47141,8 +47141,8 @@ const initialState = {
                                                 "id": 1359,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 195.63,
+                                                "code": "E.020.009.c",
                                                 "measurements": [
                                                     {
                                                         "id": 27830,
@@ -47158,8 +47158,8 @@ const initialState = {
                                                 "id": 1360,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 244.04,
+                                                "code": "DEI.B85008f",
                                                 "measurements": [
                                                     {
                                                         "id": 27831,
@@ -47173,7 +47173,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -47197,8 +47197,8 @@ const initialState = {
                                                 "id": 1361,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 25938.17,
+                                                "code": "EL.008.005",
                                                 "measurements": [
                                                     {
                                                         "id": 27832,
@@ -47214,8 +47214,8 @@ const initialState = {
                                                 "id": 1362,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 1570.57,
+                                                "code": "EL.008.006",
                                                 "measurements": [
                                                     {
                                                         "id": 27833,
@@ -47231,8 +47231,8 @@ const initialState = {
                                                 "id": 1363,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2538.31,
+                                                "code": "EL.008.028",
                                                 "measurements": [
                                                     {
                                                         "id": 27834,
@@ -47248,8 +47248,8 @@ const initialState = {
                                                 "id": 1364,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 165.02,
+                                                "code": "EL.008.023",
                                                 "measurements": [
                                                     {
                                                         "id": 27835,
@@ -47265,8 +47265,8 @@ const initialState = {
                                                 "id": 1365,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 112.02,
+                                                "code": "EL.008.022",
                                                 "measurements": [
                                                     {
                                                         "id": 27836,
@@ -47280,7 +47280,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false
@@ -47304,8 +47304,8 @@ const initialState = {
                                                 "id": 1366,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 618.54,
+                                                "code": "EL.002.003.j",
                                                 "measurements": [
                                                     {
                                                         "id": 27837,
@@ -47321,8 +47321,8 @@ const initialState = {
                                                 "id": 1367,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 150.00,
+                                                "code": "EA.002.030",
                                                 "measurements": [
                                                     {
                                                         "id": 27838,
@@ -47338,8 +47338,8 @@ const initialState = {
                                                 "id": 1368,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 6219.60,
+                                                "code": "EA.002.020.c",
                                                 "measurements": [
                                                     {
                                                         "id": 27839,
@@ -47355,8 +47355,8 @@ const initialState = {
                                                 "id": 1369,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 9.02,
+                                                "code": "EL.003.002.n",
                                                 "measurements": [
                                                     {
                                                         "id": 27840,
@@ -47372,8 +47372,8 @@ const initialState = {
                                                 "id": 1370,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 2.69,
+                                                "code": "EL.003.004.g",
                                                 "measurements": [
                                                     {
                                                         "id": 27841,
@@ -47389,8 +47389,8 @@ const initialState = {
                                                 "id": 1371,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 45.47,
+                                                "code": "EL.007.004.b",
                                                 "measurements": [
                                                     {
                                                         "id": 27842,
@@ -47406,8 +47406,8 @@ const initialState = {
                                                 "id": 1372,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 283.20,
+                                                "code": "EL.007.012",
                                                 "measurements": [
                                                     {
                                                         "id": 27843,
@@ -47423,8 +47423,8 @@ const initialState = {
                                                 "id": 1373,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 284.23,
+                                                "code": "EL.007.013.a",
                                                 "measurements": [
                                                     {
                                                         "id": 27844,
@@ -47440,8 +47440,8 @@ const initialState = {
                                                 "id": 1374,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 7.23,
+                                                "code": "EL.004.007.f",
                                                 "measurements": [
                                                     {
                                                         "id": 27845,
@@ -47457,8 +47457,8 @@ const initialState = {
                                                 "id": 1375,
                                                 "description": null,
                                                 "unit": null,
-                                                "price": 0,
-                                                "code": "",
+                                                "price": 16583.19,
+                                                "code": "A.P. 03",
                                                 "measurements": [
                                                     {
                                                         "id": 27846,
@@ -47472,7 +47472,7 @@ const initialState = {
                                             }
                                         ],
                                         "children": [],
-                                        "hasEntry": false
+                                        "hasEntry": true
                                     }
                                 ],
                                 "hasEntry": false

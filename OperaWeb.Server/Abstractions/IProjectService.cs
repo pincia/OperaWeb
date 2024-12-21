@@ -11,7 +11,7 @@ namespace OperaWeb.Server.Abstractions
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<IEnumerable<Project>> GetAllProjects(string userId);
+    Task<ProjectsListDTO> GetAllProjects(string userId);
 
     /// <summary>
     /// Get project by id

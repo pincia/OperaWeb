@@ -35,7 +35,7 @@ const MainRoutes = {
     ),
     children: [
         {
-            path: '/general/projects',
+            path: 'projects',
             loader: projectsLoader,
             element: <Projects />
         },

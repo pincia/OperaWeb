@@ -9,6 +9,14 @@ export async function loader() {
         return error;
     }
 }
+export async function getProjects() {
+    try {
+        const response = await axios.get('/api/projects');
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
 
 export async function getProject(id) {
     try {

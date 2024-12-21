@@ -57,14 +57,44 @@ export default function EntryList({
         }));
     };
 
+    const handleDeleteEntry = (entryId) => {
+        const removeEntryFromHierarchy = (tasks, taskId, entryId) => {
+            return tasks.map((task) => {
+                if (task.id === taskId) {
+                    return {
+                        ...task,
+                        entries: task.entries.filter((entry) => entry.id !== entryId), // Rimuove la voce
+                    };
+                }
+                if (task.children) {
+                    return {
+                        ...task,
+                        children: removeEntryFromHierarchy(task.children, taskId, entryId),
+                    };
+                }
+                return task;
+            });
+        };
+
+        setTasks((prevTasks) => {
+            const updatedTasks = removeEntryFromHierarchy(prevTasks, taskId, entryId);
+            const updatedTask = findTask(updatedTasks, taskId);
+            if (updatedTask) setSelectedTaskEntries(updatedTask.entries || []);
+            return updatedTasks;
+        });
+
+        setSnackbar({ open: true, message: 'Voce eliminata con successo.', severity: 'success' });
+    };
+
+
     const handleDuplicateMeasurement = (entryId, measurement) => {
         const duplicate = {
             ...measurement,
             id: Date.now(), // Genera un nuovo ID unico
         };
 
-        setTasks((prevTasks) => {
-            const updatedTasks = prevTasks.map((task) => {
+        const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurement) => {
+            return tasks.map((task) => {
                 if (task.id === taskId) {
                     return {
                         ...task,
@@ -72,19 +102,37 @@ export default function EntryList({
                             if (entry.id === entryId) {
                                 return {
                                     ...entry,
-                                    measurements: [...(entry.measurements || []), duplicate],
+                                    measurements: [...(entry.measurements || []), measurement],
                                 };
                             }
                             return entry;
                         }),
                     };
                 }
+                if (task.children) {
+                    return {
+                        ...task,
+                        children: updateMeasurementsInHierarchy(
+                            task.children,
+                            taskId,
+                            entryId,
+                            measurement
+                        ),
+                    };
+                }
                 return task;
             });
+        };
 
+        setTasks((prevTasks) => {
+            const updatedTasks = updateMeasurementsInHierarchy(
+                prevTasks,
+                taskId,
+                entryId,
+                duplicate
+            );
             const updatedTask = findTask(updatedTasks, taskId);
             if (updatedTask) setSelectedTaskEntries(updatedTask.entries || []);
-
             return updatedTasks;
         });
 
@@ -94,6 +142,7 @@ export default function EntryList({
             severity: 'success',
         });
     };
+
 
     const handleMeasurementEdit = (entryId, measurementId, field, value) => {
         setTasks((prevTasks) => {
@@ -193,8 +242,8 @@ export default function EntryList({
 
 
     const handleDeleteMeasurement = (entryId, measurementId) => {
-        setTasks((prevTasks) => {
-            const updatedTasks = prevTasks.map((task) => {
+        const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurementId) => {
+            return tasks.map((task) => {
                 if (task.id === taskId) {
                     return {
                         ...task,
@@ -209,14 +258,36 @@ export default function EntryList({
                         }),
                     };
                 }
+                if (task.children) {
+                    return {
+                        ...task,
+                        children: updateMeasurementsInHierarchy(
+                            task.children,
+                            taskId,
+                            entryId,
+                            measurementId
+                        ),
+                    };
+                }
                 return task;
             });
+        };
+
+        setTasks((prevTasks) => {
+            const updatedTasks = updateMeasurementsInHierarchy(
+                prevTasks,
+                taskId,
+                entryId,
+                measurementId
+            );
             const updatedTask = findTask(updatedTasks, taskId);
             if (updatedTask) setSelectedTaskEntries(updatedTask.entries || []);
             return updatedTasks;
         });
+
         setSnackbar({ open: true, message: 'Misurazione eliminata con successo.', severity: 'success' });
     };
+
 
     const findTask = (tasks, id) => {
         for (const task of tasks) {
@@ -229,8 +300,20 @@ export default function EntryList({
         return null;
     };
 
+    const getEntryPrice = (entry) => entry.measurements.reduce((sum, item) => sum + item.quantita, 0).toFixed(2)
+
+
     return (
-        <Box>
+        <Box
+            sx={{
+                minHeight: '400px',
+                maxHeight: '550px', // Limita l'altezza
+                overflowY: 'auto', // Scroll interno
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                padding: 2,
+            }}
+        >
             {selectedTaskEntries.length > 0 ? (
                 <TableContainer component={Paper} sx={{ height: 400, overflow: 'auto' }}>
                     <Table>
@@ -238,6 +321,7 @@ export default function EntryList({
                             <TableRow>
                                 <TableCell>Voce</TableCell>
                                 <TableCell>Codice</TableCell>
+                                <TableCell>U.Misura</TableCell>
                                 <TableCell>Prezzo</TableCell>
                                 <TableCell>Azione</TableCell>
                             </TableRow>
@@ -255,7 +339,8 @@ export default function EntryList({
                                             {entry.description}
                                         </TableCell>
                                         <TableCell>{entry.code}</TableCell>
-                                        <TableCell>€{entry.price}</TableCell>
+                                        <TableCell>{entry.unit}</TableCell>
+                                        <TableCell>{getEntryPrice(entry)}</TableCell>
                                         <TableCell>
                                             <Tooltip title="Aggiungi Misurazione">
                                                 <IconButton
@@ -272,13 +357,14 @@ export default function EntryList({
                                                 <IconButton
                                                     color="secondary"
                                                     onClick={() => {
-                                                        setEntryToDelete(entry);
+                                                        setEntryToDelete(entry); 
                                                         setConfirmDialogOpen(true);
                                                     }}
                                                 >
                                                     <DeleteIcon />
                                                 </IconButton>
                                             </Tooltip>
+
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -354,13 +440,12 @@ export default function EntryList({
                                                                         <Tooltip title="Elimina Misurazione">
                                                                             <IconButton
                                                                                 color="secondary"
-                                                                                onClick={() =>
-                                                                                    handleDeleteMeasurement(entry.id, m.id)
-                                                                                }
+                                                                                onClick={() => handleDeleteMeasurement(entry.id, m.id)}
                                                                             >
                                                                                 <DeleteIcon />
                                                                             </IconButton>
                                                                         </Tooltip>
+
                                                                     </TableCell>
                                                                 </TableRow>
                                                             ))}
@@ -432,7 +517,6 @@ export default function EntryList({
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog
                 open={confirmDialogOpen}
                 onClose={() => setConfirmDialogOpen(false)}
@@ -449,7 +533,8 @@ export default function EntryList({
                     </Button>
                     <Button
                         onClick={() => {
-                            handleDeleteMeasurement(entryToDelete.id);
+                            handleDeleteEntry(entryToDelete.id); // Esegui l'eliminazione
+                            setConfirmDialogOpen(false); // Chiudi il dialog
                         }}
                         color="primary"
                         variant="contained"

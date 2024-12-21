@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Typography } from '@mui/material';
+import MainCard from 'ui-component/cards/MainCard';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { deleteProject, loader } from 'api/projects';
 import { openSnackbar } from 'store/slices/snackbar';
 
-const ProjectTable = () => {
-    const [rows, setRows] = useState([]);
+const ProjectTable = ({ rows, setRows, title }) => {
     const [selectedRowId, setSelectedRowId] = useState(null);
     const [openConfirmation, setOpenConfirmation] = useState(false);
-
-    useEffect(() => {
-        loader().then(
-            (response) => setRows(response.data),
-            () => openSnackbar({ open: true, message: 'Failed to load projects!', variant: 'alert', alert: { color: 'error' } })
-        );
-    }, []);
 
     const handleDelete = async () => {
         try {
@@ -51,7 +44,7 @@ const ProjectTable = () => {
     ];
 
     return (
-        <Box sx={{ width: '100%', marginTop: 2 }}>
+        <MainCard title={title} sx={{ marginTop: 2 }}>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -71,8 +64,42 @@ const ProjectTable = () => {
                     <Button onClick={() => setOpenConfirmation(false)} color="primary">No</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </MainCard>
     );
 };
 
-export default ProjectTable;
+const ProjectTables = () => {
+    const [projectsData, setProjectsData] = useState({ myProjects: [], involvedProjects: [] });
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        loader().then(
+            (response) => {
+                setProjectsData(response.data);
+                setIsLoading(false);
+            },
+            () => {
+                setError('Failed to load projects!');
+                setIsLoading(false);
+            }
+        );
+    }, []);
+
+    if (isLoading) {
+        return <Typography variant="h6">Loading...</Typography>;
+    }
+
+    if (error) {
+        return <Typography variant="h6" color="error">{error}</Typography>;
+    }
+
+    return (
+        <>
+            <ProjectTable rows={projectsData.myProjects} setRows={(updatedRows) => setProjectsData((prev) => ({ ...prev, myProjects: updatedRows }))} title="I miei progetti" />
+            <ProjectTable rows={projectsData.involvedProjects} setRows={(updatedRows) => setProjectsData((prev) => ({ ...prev, involvedProjects: updatedRows }))} title="Progetti in cui sei coinvolto" />
+        </>
+    );
+};
+
+export default ProjectTables;

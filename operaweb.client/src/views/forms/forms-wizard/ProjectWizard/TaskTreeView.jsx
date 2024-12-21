@@ -154,7 +154,16 @@ export default function TaskTreeView({
 
     return (
         <>
-            <Box sx={{ flex: 1 }}>
+            <Box
+                sx={{
+                    minHeight: '400px',
+                    maxHeight: '500px', // Limita l'altezza
+                    overflowY: 'auto', // Scroll interno
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    padding: 2,
+                }}
+            >
                 <Typography variant="h4" gutterBottom>Lavorazioni Principali</Typography>
 
                 <TreeView

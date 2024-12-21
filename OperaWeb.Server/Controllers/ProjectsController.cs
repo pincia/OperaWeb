@@ -68,11 +68,8 @@ namespace OperaWeb.Server.Controllers
       try
       {
         var userId = User.FindFirstValue("Id");
-        var projects = await _projectService.GetAllProjects((string)userId ?? "");
-        if (projects == null || !projects.Any())
-        {
-          return Ok(new { message = "No Projects found", data = new List<Project>() });
-        }
+        var projects = await _projectService.GetAllProjects(userId ?? "");
+        
         return Ok(new { message = "Successfully retrieved all projects", data = projects });
 
       }

@@ -1,13 +1,13 @@
 import React from 'react';
 import ProjectTemplates from './ProjectTemplates';
-import ProjectTable from './ProjectTable';
+import ProjectTables from './ProjectTable';
 
 const Dashboard = () => {
     return (
         <>
             {/* Tabella Progetti e Template */}
             <ProjectTemplates />
-            <ProjectTable />
+            <ProjectTables />
         </>
     );
 };
