@@ -2,22 +2,58 @@ import React, { useEffect, useState, useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import GanttChart from 'ui-component/GanttChart';
 import { gridSpacing } from 'store/constant';
+import { getProject } from 'api/projects';
+import { useSelector, useDispatch } from 'react-redux';
+import { setCurrentProject } from 'store/slices/project';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const ProjectDashboard = () => {
     const [isLoading, setLoading] = useState(true);
-    const ganttRef = useRef(null); // Referenza per il componente GanttChart
-
-    useEffect(() => {
-        setLoading(false);
-    }, []);
-
+    const ganttRef = useRef(null);
+   
+    const currentProjectId = useSelector((state) => state.project.currentProjectId);
+    const currentProject = useSelector((state) => state.project.currentProject);
+    const dispatch = useDispatch();
+    const [projectData, setProjectData] = useState(currentProject)
     const [tasks, setTasks] = useState({
-        data: [
-            { id: 1, text: 'Task #1', start_date: '2024-12-01', duration: 5, progress: 0.8 },
-            { id: 2, text: 'Task #2', start_date: '2024-12-06', duration: 3, progress: 0.5 },
-        ],
+        data: [],
         links: []
     });
+
+    useEffect(() => {
+        const fetchProjectData = async () => {
+            if (!currentProject || currentProject.id !== currentProjectId) {
+                try {
+                    setLoading(true);
+                    const response = await getProject(currentProjectId);
+                    console.log(response)
+                    // Aggiorna lo stato di Redux con il progetto corrente
+                    dispatch(setCurrentProject(response.data));
+                    setProjectData(response.data)
+                    // Popola i tasks se il progetto include informazioni relative al Gantt
+                    if (response.data.tasks) {
+                        setTasks({
+                            data: response.data.tasks,
+                            links: response.data.links || []
+                        });
+                    }
+                } catch (error) {
+                    console.error('Errore durante il recupero del progetto:', error);
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setTasks({
+                    data: currentProject.tasks,
+                    links: currentProject.links || []
+                });
+                setLoading(false);
+            }
+        };
+
+        fetchProjectData();
+    }, [currentProjectId, currentProject, dispatch]);
 
     const handleTaskUpdate = (updatedTask) => {
         setTasks((prevState) => {
@@ -42,18 +78,31 @@ const ProjectDashboard = () => {
         }));
     };
 
-    // Funzione per salvare i dati localmente
     const handleSave = () => {
         localStorage.setItem('ganttData', JSON.stringify(tasks));
         alert('Modifiche salvate con successo!');
     };
 
-    // Funzione per stampare il Gantt
     const handlePrint = () => {
         if (ganttRef.current) {
             ganttRef.current.exportToPDF();
         }
     };
+
+    if (isLoading) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <Grid container spacing={gridSpacing}>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241222185808_addTasks")]
+    partial class addTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -708,9 +711,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -729,9 +729,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Priority")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("Progress")
                         .HasColumnType("decimal(18,2)");
 
@@ -741,16 +738,13 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectTasks");
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>
@@ -1525,7 +1519,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithMany("ProjectTasks")
+                        .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1731,11 +1725,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("ProjectSubjects");
 
-                    b.Navigation("ProjectTasks");
-
                     b.Navigation("SubCategorie");
 
                     b.Navigation("SuperCategorie");
+
+                    b.Navigation("Tasks");
 
                     b.Navigation("VociComputo");
                 });

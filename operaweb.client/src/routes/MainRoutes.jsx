@@ -52,7 +52,7 @@ const MainRoutes = {
             element: <ProjectWizard />
         },
         {
-            path: '/project/:id',
+            path: '/project',
             element: <ProjectDashboard />
         },
         {

@@ -12,7 +12,10 @@ public class ProjectSubjectConfiguration : IEntityTypeConfiguration<ProjectSubje
           .WithMany(p => p.ProjectSubjects)
           .HasForeignKey(ps => ps.ProjectId)
           .OnDelete(DeleteBehavior.NoAction); // Nessuna azione
-
+    builder.HasOne(ps => ps.ProjectSubjectRole)
+          .WithMany()
+          .HasForeignKey(ps => ps.ProjectSubjectRoleId)
+          .OnDelete(DeleteBehavior.NoAction);
     builder.HasOne(ps => ps.User)
            .WithMany()
            .HasForeignKey(ps => ps.UserId)

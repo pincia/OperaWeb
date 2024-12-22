@@ -9,8 +9,8 @@
     public int OriginalId {  get; set; }
     public int ParentId { get; set; }
     public int Level { get; set; }
-    public List<EntryDTO> Entries { get; set; }
-    public List<JobDTO> Children { get; set; }
+    public List<EntryDTO>? Entries { get; set; }
+    public List<JobDTO>? Children { get; set; }
     public bool HasEntry { get; set; }
   }
 }

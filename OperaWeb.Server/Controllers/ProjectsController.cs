@@ -21,44 +21,28 @@ namespace OperaWeb.Server.Controllers
       _projectService = projectService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateProjectAsync(CreateProjectRequestDTO request)
+    // PUT: api/projects/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectDTO projectDto)
     {
-      if (!ModelState.IsValid)
+      if (id != projectDto.Id)
       {
-        return BadRequest(ModelState);
-      }
-      try
-      {
-        var projectId = await _projectService.CreateProjectAsync(request);
-        return Ok(new { message = "Project successfully created", id = projectId });
-
-      }
-      catch (Exception ex)
-      {
-        return StatusCode(500, new { message = "An error occurred while creating Project", error = ex.Message });
-
-      }
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateProjectAsync(UpdateProjectRequestDTO request)
-    {
-      if (!ModelState.IsValid)
-      {
-        return BadRequest(ModelState);
+        return BadRequest("ID del progetto nella URL e nel body non corrispondono.");
       }
 
       try
       {
-        await _projectService.UpdateProjectAsync(request);
-        return Ok(new { message = "Project successfully updated" });
+        var result = await _projectService.UpdateProjectAsync(projectDto);
+        if (result == null)
+        {
+          return NotFound($"Progetto con ID {id} non trovato.");
+        }
 
+        return Ok(result); // Restituisce il progetto aggiornato
       }
       catch (Exception ex)
       {
-        return StatusCode(500, new { message = "An error occurred while updating Project", error = ex.Message });
-
+        return StatusCode(500, $"Errore interno del server: {ex.Message}");
       }
     }
 

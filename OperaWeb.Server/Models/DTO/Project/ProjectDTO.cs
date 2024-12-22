@@ -1,6 +1,7 @@
 ﻿using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.DataClasses;
 using System.ComponentModel.DataAnnotations;
+using OperaWeb.Server.Models.DTO.Project.ProjectManagement.Models.DTO;
 
 namespace OperaWeb.Server.Models.DTO.Project
 {
@@ -18,9 +19,16 @@ namespace OperaWeb.Server.Models.DTO.Project
     public string? CUP { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
-    public string UserID { get; set; }
-    public int SoaCategorId { get; set; }
-    public int SoaClassificationID { get; set; }
-    public List<JobDTO> Jobs { get; set; }
+    public string? UserID { get; set; }
+    public int? SoaCategoryId { get; set; }
+    public int? SoaClassificationID { get; set; }
+
+    // Lista dei lavori associati al progetto
+    public List<JobDTO>? Jobs { get; set; }
+
+    // Lista dei soggetti associati al progetto
+    public List<SubjectDTO>? Subjects { get; set; } // Nuova proprietà aggiunta
+
+    public List<ProjectTaskDTO> Tasks { get; set; }
   }
 }

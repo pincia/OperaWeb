@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Project;
+using OperaWeb.Server.Models.DTO.Project.ProjectManagement.Models.DTO;
 
 namespace OperaWeb.Server.Models.Mapper
 {
@@ -23,18 +24,33 @@ namespace OperaWeb.Server.Models.Mapper
           CUP = model.CUP,
           CreationDate = model.CreationDate,
           LastUpdateDate = model.LastUpdateDate,
-          SoaCategorId = model.SoaCategory?.Id ?? -1,
+          SoaCategoryId = model.SoaCategory?.Id ?? -1,
           SoaClassificationID = model.SoaClassification?.Id ?? -1,
           Jobs = new List<JobDTO>()
         };
+
+        // Mappa i ProjectTask in TaskDTO
+        dtoProject.Tasks = model.ProjectTasks?.Select(task => new ProjectTaskDTO
+        {
+          Id = task.Id,
+          Text = task.Name,
+          StartDate = task.StartDate,
+          Duration = task.Duration,
+          Progress = (double)task.Progress,
+          ParentId = task.ParentId,
+          EndDate = task.EndDate,
+          Priority = task.Priority,
+          Color = task.Color,
+          Type = task.Type
+        }).ToList() ?? new List<ProjectTaskDTO>();
 
         // Pre-caricare lookup per accesso rapido
         var elencoPrezziLookup = model.ElencoPrezzi.ToDictionary(p => p.ID);
         var vociComputoLookup = model.VociComputo.GroupBy(v => v.SuperCategoriaID).ToDictionary(g => g.Key);
         var misureLookup = model.VociComputo
-                            .Where(v => v.Misure != null) // Escludi VociComputo con Misure null
-                            .SelectMany(v => v.Misure)
-                            .ToList();
+            .Where(v => v.Misure != null)
+            .SelectMany(v => v.Misure)
+            .ToList();
 
         // LAVORI A MISURA
         var lavoroAMisura = new JobDTO
@@ -156,6 +172,56 @@ namespace OperaWeb.Server.Models.Mapper
       }
     }
 
+    public static Project ToProject(ProjectDTO dto, List<ProjectSubjectRole> roles, Project existingProject = null)
+    {
+      try
+      {
+        var project = existingProject ?? new Project();
+
+        project.ID = dto.Id;
+        project.Object = dto.Object;
+        project.City = dto.City;
+        project.Works = dto.Works;
+        project.TotalAmount = dto.TotalAmount;
+        project.Notes = dto.Notes;
+        project.Public = dto.Public;
+        project.GIG = dto.GIG;
+        project.CUP = dto.CUP;
+        project.CreationDate = dto.CreationDate;
+        project.LastUpdateDate = dto.LastUpdateDate;
+
+        if (dto.SoaCategoryId > 0)
+        {
+          project.SoaCategoryId = dto.SoaCategoryId ?? 0;
+        }
+
+        if (dto.SoaClassificationID > 0)
+        {
+          project.SoaClassificationId = dto.SoaClassificationID ?? 0;
+        }
+
+        project.ProjectTasks = dto.Tasks?.Select(task => new ProjectTask
+        {
+          Id = task.Id,
+          Name = task.Text,
+          StartDate = task.StartDate,
+          Duration = task.Duration,
+          Progress = (decimal)task.Progress,
+          ParentId = task.ParentId,
+          EndDate = task.EndDate ?? task.StartDate.AddDays(task.Duration),
+          Priority = task.Priority,
+          Color = task.Color,
+          Type = task.Type,
+          ProjectId = dto.Id
+        }).ToList();
+
+        return project;
+      }
+      catch (Exception ex)
+      {
+        throw new Exception("Errore durante la mappatura del DTO su Project", ex);
+      }
+    }
   }
 
 }

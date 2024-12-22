@@ -11,6 +11,8 @@ using OperaWeb.Server.Models.DTO.Templates;
 using Microsoft.AspNetCore.SignalR;
 using OperaWeb.Server.Hubs;
 using Azure.Identity;
+using OperaWeb.Server.Models.Mapper;
+using OperaWeb.Server.Models.DTO;
 
 namespace OperaWeb.Server.Services
 {
@@ -121,11 +123,13 @@ namespace OperaWeb.Server.Services
         var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == id);
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
         var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
+        var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
         project.VociComputo = vociComputo.ToList();
         project.Categorie = categorie.ToList();
         project.SubCategorie = subCategorie.ToList();
         project.SuperCategorie = superCategorie.ToList();
         project.ElencoPrezzi = elencoPrezzi.ToList();
+        project.ProjectTasks = projectTasks.ToList();
         return project;
       }
       catch (Exception ex)
@@ -221,25 +225,39 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public async Task UpdateProjectAsync(UpdateProjectRequestDTO request)
+    public async Task<ProjectDTO> UpdateProjectAsync(ProjectDTO projectDto)
     {
-      try
+      var existingProject = await _context.Projects.Include(p => p.Categorie)
+      .Include(p => p.DatiGenerali)
+            .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
+
+      if (existingProject == null)
       {
-        var project = _mapper.Map<Project>(request);
-        var found = _context.Projects.Any(p => p.ID == request.ID);
-        if (!found)
-        {
-          _logger.LogTrace("Project not found!");
-          throw new Exception("Project not found!");
-        }
-        _context.Projects.Update(project);
-        await _context.SaveChangesAsync();
+        _logger.LogTrace("Project not found!");
+        throw new Exception("Project not found!");
       }
-      catch (Exception ex)
-      {
-        _logger.LogError(ex, "An error occurred while updating the Project item.");
-        throw new Exception("An error occurred while updating the Project item.");
-      }
+      var vociComputo = _context.VociComputo.Include(v => v.Misure).Where(e => e.ProjectID == existingProject.ID);
+      var categorie = _context.Categorie.Where(e => e.ProjectID == existingProject.ID);
+      var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == existingProject.ID);
+      var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == existingProject.ID);
+      var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == existingProject.ID);
+      existingProject.VociComputo = vociComputo.ToList();
+      existingProject.Categorie = categorie.ToList();
+      existingProject.SubCategorie = subCategorie.ToList();
+      existingProject.SuperCategorie = superCategorie.ToList();
+      existingProject.ElencoPrezzi = elencoPrezzi.ToList();
+
+   
+
+      // Mappatura dal DTO all'entità
+      existingProject = ProjectMapper.ToProject(projectDto,_context.SubjectRoles.ToList(), existingProject);
+
+      // Aggiorna il database
+      _context.Projects.Update(existingProject);
+      await _context.SaveChangesAsync();
+
+      // Ritorna il progetto aggiornato come DTO
+      return _mapper.Map<ProjectDTO>(existingProject);
     }
   }
 }

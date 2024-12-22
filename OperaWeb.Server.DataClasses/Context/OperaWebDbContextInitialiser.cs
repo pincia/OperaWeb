@@ -14,6 +14,7 @@ using File = System.IO.File;
 using OperaWeb.Server.DataClasses.DTO;
 using OperaWeb.Server.Models;
 using OperaWeb.Server.DataClasses.Models.User;
+using Task = System.Threading.Tasks.Task;
 namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContextInitialiser
@@ -323,6 +324,20 @@ namespace OperaWeb.Server.DataClasses.Context
         //Organization
         ("Organization","Impresa,Committente","")
     };
+
+      _context.SaveChanges();
+
+      //Project Roles
+      var projectRoles = new List<string> { "Direttore Lavori", "Ruolo2", "Ruolo3", "Ruolo4"};
+
+
+      foreach (var role in projectRoles)
+      {
+        if (!_context.SubjectRoles.Any(r=>r.Name == role))
+        {
+          var res = _context.SubjectRoles.Add(new ProjectSubjectRole() { Name = role});
+        }
+      }
 
       _context.SaveChanges();
 

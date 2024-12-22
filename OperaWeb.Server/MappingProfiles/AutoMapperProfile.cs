@@ -2,6 +2,7 @@
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.DataClasses.Models;
 using System.Data;
+using OperaWeb.Server.Models.DTO.Project.ProjectManagement.Models.DTO;
 
 namespace OperaWeb.Server.MappingProfiles
 {
@@ -51,6 +52,23 @@ namespace OperaWeb.Server.MappingProfiles
            .ForMember(dest => dest.SoaCategoryId, opt => opt.MapFrom(src => src.SoaCategory.Id))
            .ForMember(dest => dest.SoaClassification, opt => opt.MapFrom(src => src.SoaClassification.Description))
            .ForMember(dest => dest.SoaClassificationId, opt => opt.MapFrom(src => src.SoaClassification.Id));
+
+      CreateMap<ProjectTask, ProjectTaskDTO>()
+           .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Name))
+           .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate == DateTime.MinValue ? (DateTime?)null : src.EndDate))
+           .ForMember(dest => dest.Progress, opt => opt.MapFrom(src => (double)src.Progress))
+           .ForMember(dest => dest.Open, opt => opt.Ignore()) // Da implementare se necessario
+           .ForMember(dest => dest.Order, opt => opt.Ignore()); // Da implementare se necessario
+
+      // Mappa da ProjectTaskDTO a ProjectTask
+      CreateMap<ProjectTaskDTO, ProjectTask>()
+          .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Text))
+          .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate ?? src.StartDate.AddDays(src.Duration)))
+          .ForMember(dest => dest.Progress, opt => opt.MapFrom(src => (decimal)src.Progress))
+          .ForMember(dest => dest.Description, opt => opt.Ignore()) // Da aggiungere se il DTO include una descrizione più completa
+          .ForMember(dest => dest.Project, opt => opt.Ignore()) // Da gestire tramite navigazione se necessario
+          .ForMember(dest => dest.SubTasks, opt => opt.Ignore()); // Ignoriamo la navigazione dei subtasks per ora
+
 
     }
   }

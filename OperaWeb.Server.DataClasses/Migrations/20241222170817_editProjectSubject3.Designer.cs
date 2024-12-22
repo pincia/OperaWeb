@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241222170817_editProjectSubject3")]
+    partial class editProjectSubject3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -698,59 +701,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ProjectTask", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Priority")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Progress")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ProjectTasks");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>
@@ -1517,24 +1467,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ProjectTask", b =>
-                {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.ProjectTask", "Parent")
-                        .WithMany("SubTasks")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithMany("ProjectTasks")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Parent");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.SubCategoria", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
@@ -1731,18 +1663,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("ProjectSubjects");
 
-                    b.Navigation("ProjectTasks");
-
                     b.Navigation("SubCategorie");
 
                     b.Navigation("SuperCategorie");
 
                     b.Navigation("VociComputo");
-                });
-
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ProjectTask", b =>
-                {
-                    b.Navigation("SubTasks");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>

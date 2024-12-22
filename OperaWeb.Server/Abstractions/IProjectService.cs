@@ -1,6 +1,7 @@
 ﻿using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Templates;
+using Task = System.Threading.Tasks.Task;
 
 namespace OperaWeb.Server.Abstractions
 {
@@ -33,7 +34,7 @@ namespace OperaWeb.Server.Abstractions
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    Task UpdateProjectAsync(UpdateProjectRequestDTO request);
+    Task<ProjectDTO> UpdateProjectAsync(ProjectDTO request);
 
     /// <summary>
     /// Delete project

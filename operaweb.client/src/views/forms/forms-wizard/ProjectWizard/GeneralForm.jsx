@@ -9,9 +9,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import {
-    Box
-} from '@mui/material';
+import { Box } from '@mui/material';
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
@@ -26,12 +24,20 @@ const validationSchema = yup.object({
     // Add any required validation here if needed
 });
 
-// ==============================|| PROJECT WIZARD - VALIDATION ||============================== //
-
-const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, soaOptions, soaClassificationsOptions }) => {
+const GeneralForm = ({
+    projectData,
+    setProjectData,
+    handleNext,
+    setErrorIndex,
+    soaOptions,
+    soaClassificationsOptions,
+}) => {
     const [selectedSoa, setSelectedSoa] = useState(projectData.selectedSoa || null);
-    const [selectedSoaClassification, setSelectedSoaClassification] = useState(projectData.selectedSoaClassification || null);
+    const [selectedSoaClassification, setSelectedSoaClassification] = useState(
+        projectData.selectedSoaClassification || null
+    );
     const [selectedLocation, setSelectedLocation] = useState(projectData.selectedLocation || '');
+    const [isPublic, setIsPublic] = useState(projectData.public || false);
 
     const {
         suggestions: { status, data },
@@ -57,6 +63,9 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                 works: values.works,
                 object: values.object,
                 location: values.location,
+                public: isPublic,
+                soaCategoryId: selectedSoa ? selectedSoa.id : null,
+                soaClassificationId: selectedSoaClassification ? selectedSoaClassification.id : null,
                 selectedSoa,
                 selectedSoaClassification,
                 selectedLocation,
@@ -69,6 +78,7 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
         setSelectedSoa(projectData.selectedSoa || null);
         setSelectedSoaClassification(projectData.selectedSoaClassification || null);
         setSelectedLocation(projectData.selectedLocation || '');
+        setIsPublic(projectData.public || false);
     }, [projectData]);
 
     const handleSoaChange = (event, newValue) => {
@@ -95,13 +105,22 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
         }));
     };
 
+    const handlePublicChange = (event) => {
+        const value = event.target.checked;
+        setIsPublic(value);
+        setProjectData((prev) => ({
+            ...prev,
+            public: value,
+        }));
+    };
+
     return (
         <>
             <Box
                 sx={{
                     minHeight: '400px',
-                    maxHeight: '500px', // Limita l'altezza
-                    overflowY: 'auto', // Scroll interno
+                    maxHeight: '500px',
+                    overflowY: 'auto',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
                     padding: 2,
@@ -114,8 +133,8 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                id="comune"
-                                name="comune"
+                                id="city"
+                                name="city"
                                 label={<FormattedMessage id="cityLabel" />}
                                 value={formik.values.city}
                                 onChange={formik.handleChange}
@@ -126,8 +145,8 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                id="provincia"
-                                name="provincia"
+                                id="province"
+                                name="province"
                                 label={<FormattedMessage id="provinceLabel" />}
                                 value={formik.values.province}
                                 onChange={formik.handleChange}
@@ -138,8 +157,8 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                id="parteOpera"
-                                name="parteOpera"
+                                id="works"
+                                name="works"
                                 label={<FormattedMessage id="worksLabel" />}
                                 value={formik.values.works}
                                 onChange={formik.handleChange}
@@ -150,8 +169,8 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                id="oggetto"
-                                name="oggetto"
+                                id="object"
+                                name="object"
                                 label={<FormattedMessage id="objectLabel" />}
                                 value={formik.values.object}
                                 onChange={formik.handleChange}
@@ -207,7 +226,13 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
                         </Grid>
                         <Grid item xs={12}>
                             <FormControlLabel
-                                control={<Checkbox color="secondary" name="saveCard" value="yes" />}
+                                control={
+                                    <Checkbox
+                                        color="secondary"
+                                        checked={isPublic}
+                                        onChange={handlePublicChange}
+                                    />
+                                }
                                 label={<FormattedMessage id="publicLabel" />}
                             />
                         </Grid>
@@ -232,7 +257,6 @@ const GeneralForm = ({ projectData, setProjectData, handleNext, setErrorIndex, s
             </Stack>
         </>
     );
-
 };
 
 GeneralForm.propTypes = {
@@ -241,7 +265,7 @@ GeneralForm.propTypes = {
     handleNext: PropTypes.func,
     setErrorIndex: PropTypes.func,
     soaOptions: PropTypes.array,
-    soaClassificationsOptions: PropTypes.array
+    soaClassificationsOptions: PropTypes.array,
 };
 
 export default GeneralForm;

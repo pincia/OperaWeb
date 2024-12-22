@@ -11,9 +11,14 @@ public class ProjectSubject
 
   public string SubjectName { get; set; }
 
-  public string Email { get; set; }
+  public string? Email { get; set; }
 
-  public string Status { get; set; } = "Pending"; // Pending, Registered
+  public string? Status { get; set; } = "Pending"; // Pending, Registered
+  public string Type { get; set; }
+
+
+  public int ProjectSubjectRoleId { get; set; }
+  public ProjectSubjectRole ProjectSubjectRole { get; set; }
 
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -23,4 +28,5 @@ public class ProjectSubject
   public Project Project { get; set; }
 
   public ApplicationUser? User { get; set; }
+
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -32,12 +32,13 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchSubjects } from 'api/subjects';
 import Stack from '@mui/material/Stack';
+import { getProjectSubjectRoles } from 'api/subjects'; 
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 const validationSchema = yup.object({});
-export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext, handleBack, projectData, setProjectData}) {
+export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext, handleBack, setErrorIndex, projectData, setProjectData}) {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchDialogOpen, setSearchDialogOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -49,8 +50,22 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
     const [subjects, setSubjects] = useState(projectData.subjects || []);
     const [inviteSubject, setInviteSubject] = useState({ name: '', email: '' });
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+    
+    const [roles, setRoles] = useState([]); // Stato per i ruoli
 
-    const roles = ['Direttore lavori', 'ruolo2', 'ruolo3', 'ruolo4']; // Esempio di ruoli disponibili
+    // Recupera i ruoli dall'API
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const rolesData = await getProjectSubjectRoles();
+                setRoles(rolesData); // Aggiorna i ruoli con i dati ricevuti dall'API
+            } catch (error) {
+                console.error('Errore nel recupero dei ruoli:', error);
+            }
+        };
+
+        fetchRoles();
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -103,8 +118,9 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
         }
 
         const invitedSubject = {
-            subject: inviteSubject.name,
-            cfPiva: inviteSubject.email,
+            name: inviteSubject.name,
+            email: inviteSubject.email,
+            status: 'pending'
         };
         setSelectedSubject(invitedSubject);
         setSnackbar({ open: true, message: 'Soggetto invitato con successo.', severity: 'success' });
@@ -127,10 +143,13 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
 
         const newSubject = {
             id: Date.now(),
-            subject: selectedSubject.subject,
+            subjectId: 0,
+            name: selectedSubject.name,
+            email: selectedSubject.email,
             cfPiva: selectedSubject.cfPiva,
-            roles: selectedRole,
+            subjectRole: selectedRole,
             type: selectedType,
+            status: selectedSubject.status
         };
 
         const updatedSubjects = [...subjects, newSubject];
@@ -160,9 +179,9 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
     };
 
     const columns = [
-        { field: 'subject', headerName: 'Soggetto', flex: 1 },
+        { field: 'name', headerName: 'Soggetto', flex: 1 },
         { field: 'cfPiva', headerName: 'CF / PIVA', flex: 1 },
-        { field: 'roles', headerName: 'Ruolo', flex: 1 },
+        { field: 'subjectRole', headerName: 'Ruolo', flex: 1 },
         { field: 'type', headerName: 'Tipo', flex: 1 },
         {
             field: 'actions',
@@ -182,7 +201,16 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
     ];
 
     return (<>
-        <Box>
+        <Box
+            sx={{
+                minHeight: '400px',
+                maxHeight: '500px', // Limita l'altezza
+                overflowY: 'auto', // Scroll interno
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                padding: 2,
+            }}
+        >
             <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
                 Aggiungi Soggetti
             </Typography>
@@ -216,7 +244,7 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
                             {selectedSubject ? (
                                 <Card sx={{ mb: 2 }}>
                                     <CardContent>
-                                        <Typography variant="body1">Nome: {selectedSubject.subject}</Typography>
+                                        <Typography variant="body1">Nome: {selectedSubject.name}</Typography>
                                         <Typography variant="body2">CF/PIVA: {selectedSubject.cfPiva}</Typography>
                                     </CardContent>
                                     <Button
@@ -241,8 +269,8 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
                                     disabled={!selectedSubject}
                                 >
                                     {roles.map((role) => (
-                                        <MenuItem key={role} value={role}>
-                                            {role}
+                                        <MenuItem key={role.id} value={role.name}>
+                                            {role.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -340,7 +368,7 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
                             <React.Fragment key={subject.id}>
                                 <ListItem button onClick={() => handleSelectSubject(subject)}>
                                     <ListItemText
-                                        primary={subject.subject}
+                                        primary={subject.name}
                                         secondary={`CF / PIVA: ${subject.cfPiva}`}
                                     />
                                 </ListItem>

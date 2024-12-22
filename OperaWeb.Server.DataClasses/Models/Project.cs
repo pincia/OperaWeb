@@ -25,8 +25,11 @@ namespace OperaWeb.Server.DataClasses.Models
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
     public virtual File File { get; set; }
+    public string UserId { get; set; }
     public virtual ApplicationUser User { get; set; }
+    public int? SoaCategoryId { get; set;  }
     public virtual Soa? SoaCategory { get; set; }
+    public int? SoaClassificationId { get; set; }
     public virtual SoaClassification? SoaClassification { get; set; }
     public ICollection<VoceComputo> VociComputo { get; set; }
     public ICollection<Categoria> Categorie { get; set; }
@@ -36,6 +39,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public DatiGenerali DatiGenerali { get; set; } // Cambiato da ICollection a singolo elemento
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
+    public ICollection<ProjectTask> ProjectTasks { get; set; }
   }
 
 }

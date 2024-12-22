@@ -17,7 +17,8 @@ import {
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { getProjects } from 'api/projects';
-
+import { useDispatch } from "react-redux";
+import { setCurrentProjectId } from "store/slices/project";
 const StyledCard = styled(Card)(({ theme }) => ({
     border: `1px solid ${theme.palette.divider}`,
     boxShadow: theme.shadows[1],
@@ -51,6 +52,7 @@ const Projects = () => {
     const projectsPerPage = 10;
 
     const navigate = useNavigate();
+    const dispatch = useDispatch(); 
 
     useEffect(() => {
         // Fetch data from API
@@ -93,7 +95,10 @@ const Projects = () => {
     );
 
     const handleOpenProject = (id) => {
-        navigate(`/project/${id}`);
+        // Imposta l'ID del progetto corrente nello stato Redux
+        dispatch(setCurrentProjectId(id));
+        // Naviga alla pagina del progetto
+        navigate(`/project`);
     };
 
     if (isLoading) {

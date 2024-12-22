@@ -1,5 +1,6 @@
 import React from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'store';
 // material-ui
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -7,19 +8,29 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
-
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle
+} from '@mui/material';
 // project imports
 import { getProject, getSoaClassifications, getSoas } from 'api/projects';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import GeneralForm from './GeneralForm';
+import EconomicsForm from './EconomicsForm';
+import ConfigurationsForm from './ConfigurationsForm';
 import SubjectsForm from './SubjectsForm';
 import Tasks from './Tasks';
 import { openSnackbar } from 'store/slices/snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
+import { saveProject } from 'api/projects';
+//redux slices
+import { setCurrentProject, clearImportedProject } from 'store/slices/project';
 
 // step options
 const steps = ['Generali', 'Soggetti', 'Lavorazioni', 'Quadro economico', 'Configurazioni'];
@@ -46,6 +57,7 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                     }
                     handleNext={handleNext}
                     handleBack={handleBack}
+                    setErrorIndex={setErrorIndex}
                     projectData={projectData}
                     setProjectData={setProjectData}
                 />
@@ -57,6 +69,19 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 setErrorIndex={setErrorIndex}
                 projectData={projectData}
                 setProjectData={setProjectData}
+            />;
+        case 3:
+            return <EconomicsForm
+                handleNext={handleNext}
+                handleBack={handleBack}
+                projectData={projectData}
+                setProjectData={setProjectData}
+            />;
+        case 4:
+            return <ConfigurationsForm
+                handleNext={handleNext}
+                handleBack={handleBack}
+                projectData={projectData}
             />;
         default:
             throw new Error('Unknown step');
@@ -73,15 +98,15 @@ const ProjectWizard = () => {
     const [errorIndex, setErrorIndex] = React.useState(null);
     const [soaOptions, setSoaOptions] = useState(null);
     const [soaClassificationOptions, setSoaClassificationOptions] = useState(null);
-
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const currentImportedProject = useSelector((state) => state.project.currentImportedProject);
 
     useEffect(() => {
-
-
         const controller = new AbortController();
         const signal = controller.signal;
 
@@ -124,13 +149,36 @@ const ProjectWizard = () => {
         };
     }, [id]);
 
-    const handleNext = () => {
-        setActiveStep(activeStep + 1);
-        setErrorIndex(null);
+    const handleNext = async () => {
+        if (activeStep === steps.length - 1) {
+            try {
+                const savedProject = await saveProject(projectData.id, projectData);
+
+                // Imposta il progetto come currentProject nello stato Redux
+                dispatch(setCurrentProject(savedProject));
+
+                // Resetta currentImportedProject
+                dispatch(clearImportedProject());
+
+                // Mostra il dialog di conferma
+                setDialogOpen(true);
+            } catch (error) {
+                console.error('Errore durante il salvataggio del progetto:', error);
+            }
+        } else {
+            setActiveStep(activeStep + 1);
+            setErrorIndex(null);
+        }
     };
+
 
     const handleBack = () => {
         setActiveStep(activeStep - 1);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+        navigate('/project'); // Naviga alla pagina del progetto
     };
 
     if (loading) {
@@ -172,64 +220,47 @@ const ProjectWizard = () => {
                 })}
             </Stepper>
             <>
-                {activeStep === steps.length ? (
-                    <>
-                        <Typography variant="h5" gutterBottom>
-                            Thank you for your order.
-                        </Typography>
-                        <Typography variant="subtitle1">
-                            Your order number is #2001539. We have emailed your order confirmation, and will send you an update when your
-                            order has shipped.
-                        </Typography>
-                        <Stack direction="row" justifyContent="flex-end">
+                <>
+                    {getStepContent(
+                        activeStep,
+                        handleNext,
+                        handleBack,
+                        setErrorIndex,
+                        projectData,
+                        setProjectData,
+                        soaOptions,
+                        soaClassificationOptions,
+                        setSubjectsData,
+                        tasksData,
+                        setTasksData
+                    )}
+                    {activeStep === steps.length - 1 && (
+                        <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>
+                            {activeStep !== 0 && (
+                                <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
+                                    Back
+                                </Button>
+                            )}
                             <AnimateButton>
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={() => {
-                                        setGeneralData({});
-                                        setPaymentData({});
-                                        setActiveStep(0);
-                                    }}
-                                    sx={{ my: 3, ml: 1 }}
-                                >
-                                    Reset
+                                <Button variant="contained" onClick={handleNext} sx={{ my: 3, ml: 1 }}>
+                                    {activeStep === steps.length - 1 ? 'Salva progetto' : 'Next'}
                                 </Button>
                             </AnimateButton>
                         </Stack>
-                    </>
-                ) : (
-                    <>
-                        {getStepContent(
-                            activeStep,
-                            handleNext,
-                            handleBack,
-                            setErrorIndex,
-                            projectData,
-                            setProjectData,
-                            soaOptions,
-                            soaClassificationOptions,
-                            setSubjectsData,
-                            tasksData,
-                            setTasksData
-                        )}
-                        {activeStep === steps.length - 1 && (
-                            <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>
-                                {activeStep !== 0 && (
-                                    <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
-                                        Back
-                                    </Button>
-                                )}
-                                <AnimateButton>
-                                    <Button variant="contained" onClick={handleNext} sx={{ my: 3, ml: 1 }}>
-                                        {activeStep === steps.length - 1 ? 'Place order' : 'Next'}
-                                    </Button>
-                                </AnimateButton>
-                            </Stack>
-                        )}
-                    </>
-                )}
+                    )}
+                </>
             </>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Progetto Salvato</DialogTitle>
+                <DialogContent>
+                    <Typography>Il progetto è stato salvato con successo!</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} variant="contained" color="primary">
+                        Vai al progetto
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </MainCard>
     );
 };

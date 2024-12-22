@@ -38,6 +38,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
            .WithOne(ps => ps.Project)
            .HasForeignKey(ps => ps.ProjectId);
 
+    builder.HasOne(p => p.User)
+        .WithMany()
+        .HasForeignKey(p => p.UserId)
+        .OnDelete(DeleteBehavior.Restrict);
+
     builder.HasOne(p => p.DatiGenerali)
            .WithOne(dg => dg.Project)
            .HasForeignKey<DatiGenerali>(dg => dg.ProjectID)
