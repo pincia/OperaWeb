@@ -34,6 +34,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<ConfigNumeri> ConfigNumeri { get; set; }
     public DatiGenerali DatiGenerali { get; set; } // Cambiato da ICollection a singolo elemento
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
+    public ICollection<ProjectSubject> ProjectSubjects { get; set; }
   }
 
 }
