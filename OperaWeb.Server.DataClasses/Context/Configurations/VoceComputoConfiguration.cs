@@ -26,6 +26,6 @@ public class VoceComputoConfiguration : IEntityTypeConfiguration<VoceComputo>
     builder.HasOne(vc => vc.Project)
            .WithMany(p => p.VociComputo)
            .HasForeignKey(vc => vc.ProjectID)
-           .OnDelete(DeleteBehavior.Cascade);
+           .OnDelete(DeleteBehavior.Restrict);
   }
 }

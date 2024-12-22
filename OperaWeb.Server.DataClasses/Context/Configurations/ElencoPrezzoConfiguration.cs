@@ -11,6 +11,6 @@ public class ElencoPrezzoConfiguration : IEntityTypeConfiguration<ElencoPrezzo>
     builder.HasOne(ep => ep.Project)
            .WithMany(p => p.ElencoPrezzi)
            .HasForeignKey(ep => ep.ProjectID)
-           .OnDelete(DeleteBehavior.Cascade);
+           .OnDelete(DeleteBehavior.Restrict);
   }
 }

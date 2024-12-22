@@ -1,16 +1,15 @@
 ﻿
-  using Microsoft.AspNetCore.Authorization;
-  using Microsoft.AspNetCore.Identity;
-  using Microsoft.AspNetCore.Mvc;
-  using Microsoft.EntityFrameworkCore;
-  using OperaWeb.Server.DataClasses.Models.User;
-  using OperaWeb.Server.DataClasses;
-  using System.Linq;
-  using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OperaWeb.Server.DataClasses.Models.User;
+using System.Linq;
+using System.Threading.Tasks;
 using OperaWeb.Server.DataClasses.Context;
 
-  namespace OperaWeb.Server.Controllers
-  {
+namespace OperaWeb.Server.Controllers
+{
     [Authorize(Roles = "Admin")] // Solo gli Admin possono gestire SubRoles
     [Route("api/[controller]")]
     [ApiController]

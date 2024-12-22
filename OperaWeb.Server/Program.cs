@@ -6,12 +6,12 @@ using Microsoft.OpenApi.Models;
 using OperaWeb.Server.Abstractions;
 using OperaWeb.Server.DataClasses.Context;
 using OperaWeb.Server.DataClasses.Models;
-using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.Services;
 using Services.UserGroup;
 using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using OperaWeb.Server.Hubs;
+using OperaWeb.Server.DataClasses.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 

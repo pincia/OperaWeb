@@ -2,10 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using OperaWeb.Server.DataClasses.Models.User;
 
 namespace OperaWeb.Server.DataClasses.Models
 {
-  [Table("Projects")]
+    [Table("Projects")]
   public class Project
   {
     public int ID { get; set; }

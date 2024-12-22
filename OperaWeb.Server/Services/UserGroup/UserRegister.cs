@@ -1,5 +1,4 @@
-﻿using OperaWeb.Server.DataClasses;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Azure.Core;
 using System;
 using System.Security.Cryptography;
@@ -14,7 +13,7 @@ using OperaWeb.SharedClasses.Enums;
 
 namespace Services.UserGroup
 {
-  public class UserRegisterRequest
+    public class UserRegisterRequest
   {
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";

@@ -9,13 +9,13 @@ public class ProjectSubjectConfiguration : IEntityTypeConfiguration<ProjectSubje
     builder.HasKey(ps => ps.Id);
 
     builder.HasOne(ps => ps.Project)
-           .WithMany(p => p.ProjectSubjects)
-           .HasForeignKey(ps => ps.ProjectId)
-           .OnDelete(DeleteBehavior.Cascade);
+          .WithMany(p => p.ProjectSubjects)
+          .HasForeignKey(ps => ps.ProjectId)
+          .OnDelete(DeleteBehavior.NoAction); // Nessuna azione
 
     builder.HasOne(ps => ps.User)
            .WithMany()
            .HasForeignKey(ps => ps.UserId)
-           .OnDelete(DeleteBehavior.SetNull);
+           .OnDelete(DeleteBehavior.Restrict); // Evita il comportamento a cascata
   }
 }

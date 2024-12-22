@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using File = System.IO.File;
 using OperaWeb.Server.DataClasses.DTO;
 using OperaWeb.Server.Models;
+using OperaWeb.Server.DataClasses.Models.User;
 namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContextInitialiser

@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OperaWeb.Server.Abstractions;
 using OperaWeb.Server.Models;
-using OperaWeb.Server.DataClasses;
 using System.Security.Claims;
+using OperaWeb.Server.DataClasses.Models.User;
 
 namespace OperaWeb.Server.Controllers
 {
-  [Route("api/[controller]")]
+    [Route("api/[controller]")]
   [ApiController]
   public class FileController : ControllerBase
   {

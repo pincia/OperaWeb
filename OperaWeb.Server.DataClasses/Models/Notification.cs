@@ -1,4 +1,4 @@
-﻿using OperaWeb.Server.DataClasses;
+﻿using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.SharedClasses.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +12,7 @@ public class Notification
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
   // Relazione con ApplicationUser
+  public string UserId { get; set; }
   public virtual ApplicationUser User { get; set; }
 
   // Nuovo campo Type

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFirstMigration : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -139,7 +139,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IdentityRoleOrganizationRoleMapping",
+                name: "OrganizationRoleMappings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -149,15 +149,15 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityRoleOrganizationRoleMapping", x => x.Id);
+                    table.PrimaryKey("PK_OrganizationRoleMappings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityRoleOrganizationRoleMapping_AspNetRoles_IdentityRoleId",
+                        name: "FK_OrganizationRoleMappings_AspNetRoles_IdentityRoleId",
                         column: x => x.IdentityRoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IdentityRoleOrganizationRoleMapping_OrganizationRoles_OrganizationRoleId",
+                        name: "FK_OrganizationRoleMappings_OrganizationRoles_OrganizationRoleId",
                         column: x => x.OrganizationRoleId,
                         principalTable: "OrganizationRoles",
                         principalColumn: "Id",
@@ -274,8 +274,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         name: "FK_AspNetUsers_Comuni_ComuneId",
                         column: x => x.ComuneId,
                         principalTable: "Comuni",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Province_CompanyProvinciaId",
                         column: x => x.CompanyProvinciaId,
@@ -421,7 +420,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -447,8 +446,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         name: "FK_OrganizationMembers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_OrganizationMembers_OrganizationRoles_RoleId",
                         column: x => x.RoleId,
@@ -676,6 +674,36 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         name: "FK_ElencoPrezzi_Projects_ProjectID",
                         column: x => x.ProjectID,
                         principalTable: "Projects",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProjectSubjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    SubjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectSubjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectSubjects_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProjectSubjects_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
                         principalColumn: "ID");
                 });
 
@@ -767,7 +795,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         column: x => x.ProjectID,
                         principalTable: "Projects",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_VociComputo_SubCategorie_SubCategoriaID",
                         column: x => x.SubCategoriaID,
@@ -908,16 +936,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IdentityRoleOrganizationRoleMapping_IdentityRoleId",
-                table: "IdentityRoleOrganizationRoleMapping",
-                column: "IdentityRoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IdentityRoleOrganizationRoleMapping_OrganizationRoleId",
-                table: "IdentityRoleOrganizationRoleMapping",
-                column: "OrganizationRoleId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Misure_VoceComputoID",
                 table: "Misure",
                 column: "VoceComputoID");
@@ -943,6 +961,16 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrganizationRoleMappings_IdentityRoleId",
+                table: "OrganizationRoleMappings",
+                column: "IdentityRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrganizationRoleMappings_OrganizationRoleId",
+                table: "OrganizationRoleMappings",
+                column: "OrganizationRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrganizationRoles_ParentRoleId",
                 table: "OrganizationRoles",
                 column: "ParentRoleId");
@@ -965,6 +993,16 @@ namespace OperaWeb.Server.DataClasses.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_UserId",
                 table: "Projects",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectSubjects_ProjectId",
+                table: "ProjectSubjects",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectSubjects_UserId",
+                table: "ProjectSubjects",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1041,9 +1079,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 name: "DatiGenerali");
 
             migrationBuilder.DropTable(
-                name: "IdentityRoleOrganizationRoleMapping");
-
-            migrationBuilder.DropTable(
                 name: "Misure");
 
             migrationBuilder.DropTable(
@@ -1051,6 +1086,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrganizationMembers");
+
+            migrationBuilder.DropTable(
+                name: "OrganizationRoleMappings");
+
+            migrationBuilder.DropTable(
+                name: "ProjectSubjects");
 
             migrationBuilder.DropTable(
                 name: "RoleSubRoles");

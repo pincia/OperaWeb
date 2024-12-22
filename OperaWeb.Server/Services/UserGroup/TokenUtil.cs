@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.DataClasses.Models;
+using OperaWeb.Server.DataClasses.Models.User;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

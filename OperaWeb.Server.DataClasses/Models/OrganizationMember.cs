@@ -1,5 +1,5 @@
-﻿using OperaWeb.Server.DataClasses;
-using OperaWeb.Server.DataClasses.Models;
+﻿using OperaWeb.Server.DataClasses.Models;
+using OperaWeb.Server.DataClasses.Models.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Identity
 {
-  public class OrganizationMember
+    public class OrganizationMember
   {
     public int Id { get; set; }
     public string UserId { get; set; } // Chiave esterna verso ApplicationUser

@@ -1,15 +1,15 @@
-﻿using OperaWeb.Server.DataClasses;
-using OperaWeb.Server.DataClasses.Models;
+﻿using OperaWeb.Server.DataClasses.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using OperaWeb.Server.DataClasses.Context;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Controllers.Account;
+using OperaWeb.Server.DataClasses.Models.User;
 
 namespace Services.UserGroup
 {
-  public partial class UserService
+    public partial class UserService
   {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;

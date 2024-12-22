@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OperaWeb.Server.DataClasses;
+using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Models.DTO.Account;
 using Services;
@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace OperaWeb.Server.Controllers.Account
 {
-  [ApiController]
+    [ApiController]
   [Route("api/[controller]/[action]")]
   public class UserController : ControllerBase
   {

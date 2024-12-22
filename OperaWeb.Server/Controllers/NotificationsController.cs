@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OperaWeb.Server.DataClasses;
+using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Services;
 using System.Security.Claims;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using OperaWeb.Server.DataClasses.Models;
+using OperaWeb.Server.DataClasses.Models.User;
 using System;
 
 public class ProjectSubject
@@ -21,5 +22,5 @@ public class ProjectSubject
   // Navigational Properties
   public Project Project { get; set; }
 
-  public IdentityUser? User { get; set; }
+  public ApplicationUser? User { get; set; }
 }

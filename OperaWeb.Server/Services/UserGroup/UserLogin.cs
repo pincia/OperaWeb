@@ -1,11 +1,11 @@
 ﻿using OperaWeb.Server.Models.DTO;
-using OperaWeb.Server.DataClasses;
 using Azure.Core;
 using OperaWeb.SharedClasses.Enums;
+using OperaWeb.Server.DataClasses.Models.User;
 
 namespace Services.UserGroup
 {
-  public class UserLoginRequest
+    public class UserLoginRequest
   {
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";

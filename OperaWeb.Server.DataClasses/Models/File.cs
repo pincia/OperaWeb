@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using OperaWeb.Server.DataClasses.Models.User;
 
 namespace OperaWeb.Server.DataClasses.Models
 {
