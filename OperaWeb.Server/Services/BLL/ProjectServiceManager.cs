@@ -175,8 +175,26 @@ namespace OperaWeb.Server.Services.BLL
         var categoryLookup = categories.ToDictionary(c => c.ExternalID);
         var superCategoryLookup = superCategories.ToDictionary(c => c.ExternalID);
         var subCategoryLookup = subCategories.ToDictionary(c => c.ExternalID);
+        //Step5 Configurazioni
+        var configNumeri = new ConfigNumeri
+        {
+          Valuta = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Divisa.Split('|')[0],
+          PartiUguali = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.PartiUguali.Split('|')[0],
+          Lunghezza = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Lunghezza.Split('|')[0],
+          Larghezza = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Larghezza.Split('|')[0],
+          HPeso = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.HPeso.Split('|')[0],
+          Quantita = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Quantita.Split('|')[0],
+          Prezzi = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Prezzi.Split('|')[0],
+          PrezziTotale = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.PrezziTotale.Split('|')[0],
+          ConvPrezzi = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.ConvPrezzi.Split('|')[0],
+          ConvPrezziTotale = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.ConvPrezziTotale.Split('|')[0],
+          IncidenzaPercentuale = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.IncidenzaPercentuale.Split('|')[0],
+          Aliquote = importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Aliquote.Split('|')[0]
+        };
 
-        // Step 5: Importazione Voci Computo e Misurazioni
+        _context.ConfigNumeri.AddRange(configNumeri);
+        
+        // Step 6: Importazione Voci Computo e Misurazioni
         // (Aggiungere il conteggio per VociComputo e Misure)
         var totalAmount = 0M;
         var vociComputo = new List<VoceComputo>();

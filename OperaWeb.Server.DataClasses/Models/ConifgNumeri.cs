@@ -6,13 +6,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public class ConfigNumeri
     {
         public int ID { get; set; }
-        public string Divisa { get; set; }
-
-        public string ConversioniIN { get; set; }
-
-        public string FattoreConversione { get; set; }
-
-        public byte Cambio { get; set; }
+        public string Valuta { get; set; }
 
         public string PartiUguali { get; set; }
 
