@@ -22,59 +22,42 @@ export default function TaskDetailsDialog({
         }
 
         if (task.id === null) {
-            // Operazione di aggiunta
-            const newTask = {
-                ...task,
-                id: generatedId,
-                children: [],
-                entries: []
-            };
+            // Aggiungi nuovo task
+            const newTask = { ...task, id: generateId(), children: [] };
 
-            if (task.parentId) {
-                setTasks((prevTasks) => {
-                    const newTask = {
-                        ...task,
-                        id: task.id || new Date().getTime(),
-                        children: task.children || [],
-                        entries: task.entries || []
+            setTasks((prevTasks) => {
+                if (task.parentId) {
+                    // Aggiungi al genitore
+                    const addChildToParent = (tasks, parentId, child) => {
+                        return tasks.map((t) => {
+                            if (t.id === parentId) {
+                                return { ...t, children: [...(t.children || []), child] };
+                            } else if (t.children) {
+                                return { ...t, children: addChildToParent(t.children, parentId, child) };
+                            }
+                            return t;
+                        });
                     };
-
-                    if (task.parentId) {
-                        const addChildToParent = (tasks, parentId, child) => {
-                            return tasks.map((t) => {
-                                if (t.id === parentId) {
-                                    return { ...t, children: [...(t.children || []), child] };
-                                } else if (t.children) {
-                                    return { ...t, children: addChildToParent(t.children, parentId, child) };
-                                }
-                                return t;
-                            });
-                        };
-                        return addChildToParent(prevTasks, task.parentId, newTask);
-                    }
-
+                    return addChildToParent(prevTasks, task.parentId, newTask);
+                } else {
                     return [...prevTasks, newTask];
-                });
-
-                setSnackbar({ open: true, message: 'Lavorazione salvata con successo.', severity: 'success' });
-            } else {
-                setSnackbar({ open: true, message: 'Non è possibile aggiungere altre lavorazioni principali.', severity: 'warning' });
-            }
-
-            setSnackbar({ open: true, message: 'Lavorazione aggiunta con successo.', severity: 'success' });
+                }
+            });
         } else {
-            // Operazione di modifica
+            // Modifica task esistente
             setTasks((prevTasks) =>
                 prevTasks.map((t) =>
-                    t.id === task.id ? { ...t, description: task.description } : { ...t, children: updateTask(t.children, task) }
+                    t.id === task.id
+                        ? { ...t, description: task.description }
+                        : { ...t, children: updateTask(t.children, task) }
                 )
             );
-            setSnackbar({ open: true, message: 'Lavorazione modificata con successo.', severity: 'success' });
         }
 
-        setTask({ id: null, description: '', parentId: null });
         setOpen(false);
+        setSnackbar({ open: true, message: task.id ? 'Lavorazione modificata.' : 'Lavorazione aggiunta.', severity: 'success' });
     };
+
 
     const updateTask = (tasks, updatedTask) => {
         return tasks.map((t) =>

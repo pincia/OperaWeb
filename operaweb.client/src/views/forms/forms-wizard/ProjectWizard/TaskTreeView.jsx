@@ -90,12 +90,12 @@ export default function TaskTreeView({
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="body2">{task.description}</Typography>
                         <Box>
-                            {!task.hasEntry && task.children.length === 0 && level < 5 && level > 1 &&(
+                            {!task.hasEntry && task.children.length === 0 && level < 5 && level > 1 && (
                                 <Tooltip title="Aggiungi Voce">
                                     <IconButton
                                         color="primary"
                                         onClick={(e) => {
-                                            e.stopPropagation();
+                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
                                             handleEntryOpen(task.id);
                                         }}
                                     >
@@ -108,7 +108,7 @@ export default function TaskTreeView({
                                     <IconButton
                                         color="primary"
                                         onClick={(e) => {
-                                            e.stopPropagation();
+                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
                                             handleOpen(task);
                                         }}
                                     >
@@ -116,13 +116,13 @@ export default function TaskTreeView({
                                     </IconButton>
                                 </Tooltip>
                             )}
-                            {level < 4 && !(task.entries && task.entries.length >0) && (
+                            {level < 4 && !(task.entries && task.entries.length > 0) && (
                                 <Tooltip title="Aggiungi Sottolavorazione">
                                     <IconButton
                                         color="default"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleOpen(null, task.id);
+                                            handleOpen(null, task.id); // Passa task.id come parentId
                                         }}
                                     >
                                         <AddCircleIcon />
@@ -134,7 +134,7 @@ export default function TaskTreeView({
                                     <IconButton
                                         color="secondary"
                                         onClick={(e) => {
-                                            e.stopPropagation();
+                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
                                             confirmDeleteTask(task.id);
                                         }}
                                     >
@@ -150,7 +150,6 @@ export default function TaskTreeView({
             </TreeItem>
         ));
     };
-
 
     return (
         <>

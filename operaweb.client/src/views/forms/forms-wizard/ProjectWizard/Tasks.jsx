@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import "dhtmlx-gantt";
-import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { Button, Box } from '@mui/material';
-import TaskTreeView from './TaskTreeView';
-import TaskDetailsDialog from './TaskDetailsDialog';
-import EntryDetailsDialog from './EntryDetailsDialog';
-import EntryList from './EntryList';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import AnimateButton from 'ui-component/extended/AnimateButton';
+import React, { useState } from 'react';
+import { Box, Button, Grid, Stack } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import TaskTreeView from './TaskTreeView';
+import EntryList from './EntryList';
+import TaskDetailsDialog from './TaskDetailsDialog';
+import AnimateButton from 'ui-component/extended/AnimateButton';
 
 const validationSchema = yup.object({});
 
@@ -19,7 +14,7 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
         id: null,
         description: '',
         parentId: null,
-        hasEntry: false
+        hasEntry: false,
     });
 
     const formik = useFormik({
@@ -29,23 +24,18 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
         enableReinitialize: true,
         validationSchema,
         onSubmit: () => {
-            setProjectData(projectData); // Salva lo stato dei soggetti prima di andare avanti
+            setProjectData(projectData); // Salva lo stato del progetto prima di procedere
             handleNext();
         },
     });
-    const [entry, setEntry] = useState({
-        id: null,
-        description: '',
-        code: '',
-        unit: '',
-        price: ''
-    });
 
-    const [tasks, setTasks] = useState(projectData.jobs ||[
-        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false },
-        { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false },
-        { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false }
-    ]);
+    const [tasks, setTasks] = useState(
+        projectData.jobs || [
+            { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false },
+            { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false },
+            { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false },
+        ]
+    );
 
     const [open, setOpen] = useState(false);
     const [entryDialogOpen, setEntryDialogOpen] = useState(false);
@@ -53,36 +43,50 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
     const [expanded, setExpanded] = useState([]);
     const [selectedTaskEntries, setSelectedTaskEntries] = useState([]);
 
-
     const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
 
     const defaultTaskIds = [1, 2, 3]; // ID delle lavorazioni di default
 
     const handleOpen = (taskToEdit = null, parentId = null) => {
+        console.log('handleOpen called', { taskToEdit, parentId });
         if (taskToEdit) {
-            if (defaultTaskIds.includes(taskToEdit.id)) {
-                setSnackbar({ open: true, message: 'Non è possibile modificare le lavorazioni di default.', severity: 'warning' });
-                return;
-            }
+            // Modifica di un task esistente
             setTask(taskToEdit);
         } else {
-            setTask({ id: null, description: '', parentId });
+            // Creazione di un nuovo task
+            setTask({ id: null, description: '', parentId, hasEntry: false });
             if (parentId) {
                 setExpanded((prevExpanded) => [...new Set([...prevExpanded, parentId.toString()])]);
             }
         }
-        setOpen(true);
+        setOpen(true); // Apre il dialog
     };
 
-    const findTask = (tasks, id) => {
-        for (const task of tasks) {
-            if (task.id === id) return task;
-            if (task.children) {
-                const found = findTask(task.children, id);
-                if (found) return found;
-            }
+
+    const handleSaveTask = (updatedTask) => {
+        if (updatedTask.id) {
+            // Modifica task esistente
+            setTasks((prevTasks) =>
+                prevTasks.map((t) =>
+                    t.id === updatedTask.id ? { ...t, description: updatedTask.description } : t
+                )
+            );
+        } else {
+            // Aggiungi nuovo task
+            const newTask = { ...updatedTask, id: generateId(), children: [] };
+            setTasks((prevTasks) =>
+                prevTasks.map((t) =>
+                    t.id === updatedTask.parentId
+                        ? { ...t, children: [...t.children, newTask] }
+                        : t
+                )
+            );
         }
-        return null;
+        setSnackbar({ open: true, message: 'Lavorazione salvata con successo.', severity: 'success' });
+    };
+
+    const generateId = () => {
+        return Math.floor(Date.now() + Math.random() * 10000); // Genera un ID univoco
     };
 
     const handleEntryOpen = (taskId) => {
@@ -101,16 +105,21 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
         setEntryDialogOpen(true);
     };
 
-    const generateId = () => {
-        return Math.floor(Date.now() + Math.random() * 10000); // Genera un ID univoco
+    const findTask = (tasks, id) => {
+        for (const task of tasks) {
+            if (task.id === id) return task;
+            if (task.children) {
+                const found = findTask(task.children, id);
+                if (found) return found;
+            }
+        }
+        return null;
     };
-
-   
 
     return (
         <>
             <Box sx={{ padding: 1, display: 'flex', flexDirection: 'row', gap: 1 }}>
-                <Box sx={{ flex: 4 }}> {/* TaskTreeView prende il 40% */}
+                <Box sx={{ flex: 4 }}>
                     <TaskTreeView
                         tasks={tasks}
                         setTasks={setTasks}
@@ -124,8 +133,7 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                         defaultTaskIds={defaultTaskIds}
                     />
                 </Box>
-
-                <Box sx={{ flex: 6 }}> {/* EntryList prende il 60% */}
+                <Box sx={{ flex: 6 }}>
                     <EntryList
                         selectedTaskEntries={selectedTaskEntries}
                         setTasks={setTasks}
@@ -157,7 +165,14 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                     </Stack>
                 </Grid>
             </form>
+
+            {/* Dialog per aggiungere/modificare lavorazioni */}
+            <TaskDetailsDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                onSave={handleSaveTask}
+                task={task}
+            />
         </>
     );
-
 }

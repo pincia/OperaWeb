@@ -30,7 +30,7 @@ import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { saveProject } from 'api/projects';
 //redux slices
-import { setCurrentProject, clearImportedProject } from 'store/slices/project';
+import { setCurrentProject, clearImportedProject, setCurrentProjectId } from 'store/slices/project';
 
 // step options
 const steps = ['Generali', 'Soggetti', 'Lavorazioni', 'Quadro economico', 'Configurazioni'];
@@ -178,6 +178,7 @@ const ProjectWizard = () => {
 
     const handleDialogClose = () => {
         setDialogOpen(false);
+        dispatch(setCurrentProjectId(projectData.id));
         navigate('/project'); // Naviga alla pagina del progetto
     };
 

@@ -3,50 +3,24 @@ import { useState } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import CardMedia from '@mui/material/CardMedia';
 
 // project imports
-import Avatar from '../extended/Avatar';
-import { getImageUrl, ImagePath } from 'utils/getImageUrl';
-import useImage from 'utils/useImage';
 import { ThemeMode } from 'config';
-import CardMedia from '@mui/material/CardMedia';
 import { gridSpacing } from 'store/constant';
-
-// assets
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-
-// styles
 
 // ==============================|| USER SIMPLE CARD ||============================== //
 
 const TemplateCard = ({ imagePath, name, description }) => {
     const theme = useTheme();
-    const { loading, error, image } = useImage(imagePath);
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
     const StyledCard = styled(Card)(({ theme }) => ({
         border: `1px solid ${theme.palette.divider}`,
         boxShadow: theme.shadows[1],
         borderRadius: theme.shape.borderRadius,
-        padding: theme.spacing(2),
+        padding: theme.spacing(1),
         transition: "transform 0.2s",
         "&:hover": {
             transform: "scale(1.03)",
@@ -54,7 +28,9 @@ const TemplateCard = ({ imagePath, name, description }) => {
         height: "260px", // Altezza fissa
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center", // Per allineare il testo
     }));
 
     const Description = styled(Typography)(({ theme }) => ({
@@ -63,12 +39,12 @@ const TemplateCard = ({ imagePath, name, description }) => {
         display: "-webkit-box",
         WebkitLineClamp: 2, // Limita a 2 righe
         WebkitBoxOrient: "vertical",
+        textAlign: "center",
     }));
 
     return (
         <StyledCard
             sx={{
-                p: 2,
                 bgcolor: theme.palette.mode === ThemeMode.DARK ? 'background.default' : 'grey.50',
                 border: '1px solid',
                 borderColor: 'divider',
@@ -77,24 +53,18 @@ const TemplateCard = ({ imagePath, name, description }) => {
                 }
             }}
         >
-            <Grid container spacing={gridSpacing}>
-                <Grid item xs={12}>
-                    <CardMedia
-                        component="img"
-                        image={new URL(imagePath, import.meta.url).href}
-                        sx={{ width: 72, height: 72 }}
-                        title="Slider5 image"
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="h4">{name}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    <Description>{description}</Description>
-                </Grid>
-            </Grid>
+            <CardMedia
+                component="img"
+                image={new URL(imagePath, import.meta.url).href}
+                sx={{ width: 150, height: 150 }} // Immagine centrata e arrotondata
+                title="Slider5 image"
+            />
+            <Typography variant="h4" sx={{ mt: 2 }}>
+                {name}
+            </Typography>
+            <Description sx={{ mt: 1 }}>{description}</Description>
         </StyledCard>
     );
 };
 
-export default TemplateCard
+export default TemplateCard;

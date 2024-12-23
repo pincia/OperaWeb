@@ -2,9 +2,9 @@ import React from 'react';
 import { Grid } from '@mui/material';
 import TemplateCard from 'ui-component/cards/TemplateCard';
 import MainCard from 'ui-component/cards/MainCard';
-import generico from 'assets/images/templates/generico.png';
-import xpwe from 'assets/images/templates/xpwe.png';
-import bonusristrutturazione from 'assets/images/templates/generico.png';
+import generico from 'assets/images/templates/nuovo_progetto.png';
+import xpwe from 'assets/images/templates/nuovo_da_xpwe.png';
+import bonusristrutturazione from 'assets/images/templates/template_ristrutturazione.png';
 import { useNavigate } from 'react-router-dom';
 import ImportXpwe from 'views/pages/projects/ImportXpwe';
 

@@ -232,7 +232,7 @@ namespace OperaWeb.Server.Services.BLL
         importedProject.Entity.TotalAmount = totalAmount;
  
         transaction.Commit();
-        result.ImportedProject = ProjectMapper.ToProjectDTO(importedProject.Entity);
+        result.ImportedProject = ProjectMapper.ToProjectDTO(importedProject.Entity, true);
 
         await UpdateProgress();
 

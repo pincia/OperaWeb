@@ -2,12 +2,13 @@
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.Models.DTO.Project.ProjectManagement.Models.DTO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OperaWeb.Server.Models.Mapper
 {
   public class ProjectMapper
   {
-    public static ProjectDTO ToProjectDTO(Project model)
+    public static ProjectDTO ToProjectDTO(Project model, bool excludeTasks = false)
     {
       try
       {
@@ -29,21 +30,23 @@ namespace OperaWeb.Server.Models.Mapper
           Jobs = new List<JobDTO>()
         };
 
-        // Mappa i ProjectTask in TaskDTO
-        dtoProject.Tasks = model.ProjectTasks?.Select(task => new ProjectTaskDTO
+        if (!excludeTasks)
         {
-          Id = task.Id,
-          Text = task.Name,
-          StartDate = task.StartDate,
-          Duration = task.Duration,
-          Progress = (double)task.Progress,
-          ParentId = task.ParentId,
-          EndDate = task.EndDate,
-          Priority = task.Priority,
-          Color = task.Color,
-          Type = task.Type
-        }).ToList() ?? new List<ProjectTaskDTO>();
-
+          // Mappa i ProjectTask in TaskDTO
+          dtoProject.Tasks = model.ProjectTasks?.Select(task => new ProjectTaskDTO
+          {
+            Id = task.Id,
+            Text = task.Name,
+            StartDate = task.StartDate,
+            Duration = task.Duration,
+            Progress = (double)task.Progress,
+            ParentId = task.ParentId,
+            EndDate = task.EndDate,
+            Priority = task.Priority,
+            Color = task.Color,
+            Type = task.Type
+          }).ToList() ?? new List<ProjectTaskDTO>();
+        }
         // Pre-caricare lookup per accesso rapido
         var elencoPrezziLookup = model.ElencoPrezzi.ToDictionary(p => p.ID);
         var vociComputoLookup = model.VociComputo.GroupBy(v => v.SuperCategoriaID).ToDictionary(g => g.Key);

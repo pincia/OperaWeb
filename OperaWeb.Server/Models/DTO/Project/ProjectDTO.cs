@@ -29,6 +29,6 @@ namespace OperaWeb.Server.Models.DTO.Project
     // Lista dei soggetti associati al progetto
     public List<SubjectDTO>? Subjects { get; set; } // Nuova proprietà aggiunta
 
-    public List<ProjectTaskDTO> Tasks { get; set; }
+    public List<ProjectTaskDTO>? Tasks { get; set; }
   }
 }
