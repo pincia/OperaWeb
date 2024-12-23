@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+Ôªøimport React, { useState } from 'react';
 import {
     Box,
     Typography,
@@ -21,7 +21,10 @@ import {
     Paper,
     Snackbar,
     Alert,
+    Menu,
+    MenuItem
 } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -37,6 +40,9 @@ export default function EntryList({
     setSelectedTaskEntries,
     snackbar
 }) {
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const [menuAnchor2, setMenuAnchor2] = useState(null);
+    const [menuTask, setMenuTask] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [measurementDialogOpen, setMeasurementDialogOpen] = useState(false);
     const [entryToDelete, setEntryToDelete] = useState(null);
@@ -174,12 +180,23 @@ export default function EntryList({
         });
     };
 
+    const handleMenuOpen = (event, task) => {
+        setMenuAnchor(event.currentTarget);
+        setMenuAnchor2(event.currentTarget);
+        setMenuTask(task);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchor(null);
+        setMenuAnchor2(null);
+        setMenuTask(null);
+    };
 
     const handleAddMeasurement = () => {
         if (!newMeasurement.description || !newMeasurement.quantita) {
             setSnackbar({
                 open: true,
-                message: 'Descrizione e Quantit‡ sono obbligatori.',
+                message: 'Descrizione e Quantit√† sono obbligatori.',
                 severity: 'error',
             });
             return;
@@ -346,28 +363,35 @@ export default function EntryList({
                                         <TableCell>{entry.unit}</TableCell>
                                         <TableCell>{getEntryPrice(entry)}</TableCell>
                                         <TableCell>
-                                            <Tooltip title="Aggiungi Misurazione">
-                                                <IconButton
-                                                    color="primary"
+                                            <IconButton onClick={(e) => handleMenuOpen(e, entry)}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                            <Menu
+                                                anchorEl={menuAnchor}
+                                                open={Boolean(menuAnchor)}
+                                                onClose={handleMenuClose}
+                                            >
+                                                <MenuItem
                                                     onClick={() => {
                                                         setCurrentEntryId(entry.id);
+                                                        handleMenuClose();
                                                         setMeasurementDialogOpen(true);
                                                     }}
                                                 >
-                                                    <AddCircleIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Elimina Voce">
-                                                <IconButton
-                                                    color="secondary"
+                                                    Aggiungi Misurazione
+                                                </MenuItem>
+
+
+                                                <MenuItem
                                                     onClick={() => {
-                                                        setEntryToDelete(entry); 
+                                                        setEntryToDelete(entry);
+                                                        handleMenuClose();
                                                         setConfirmDialogOpen(true);
                                                     }}
                                                 >
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Tooltip>
+                                                    Elimina Voce
+                                                </MenuItem>
+                                            </Menu>
 
                                         </TableCell>
                                     </TableRow>
@@ -385,7 +409,7 @@ export default function EntryList({
                                                                 <TableCell>Lunghezza</TableCell>
                                                                 <TableCell>Larghezza</TableCell>
                                                                 <TableCell>HPeso</TableCell>
-                                                                <TableCell>Quantit‡</TableCell>
+                                                                <TableCell>Quantit√†</TableCell>
                                                                 <TableCell>Azione</TableCell>
                                                             </TableRow>
                                                         </TableHead>
@@ -433,22 +457,36 @@ export default function EntryList({
                                                                         />
                                                                     </TableCell>
                                                                     <TableCell>
-                                                                        <Tooltip title="Duplica Misurazione">
-                                                                            <IconButton
-                                                                                color="primary"
-                                                                                onClick={() => handleDuplicateMeasurement(entry.id, m)}
+                                                                        <IconButton onClick={(e) => handleMenuOpen(e, entry)}>
+                                                                            <MoreVertIcon />
+                                                                        </IconButton>
+                                                                        <Menu
+                                                                            anchorEl={menuAnchor}
+                                                                            open={Boolean(menuAnchor)}
+                                                                            onClose={handleMenuClose}
+                                                                        >
+                                                                            <MenuItem
+                                                                                onClick={() => {
+                                                                                    handleDuplicateMeasurement(entry.id, m)
+                                                                                    handleMenuClose();
+                                                                                    setMeasurementDialogOpen(true);
+                                                                                }}
                                                                             >
-                                                                                <ContentCopy />
-                                                                            </IconButton>
-                                                                        </Tooltip>
-                                                                        <Tooltip title="Elimina Misurazione">
-                                                                            <IconButton
-                                                                                color="secondary"
-                                                                                onClick={() => handleDeleteMeasurement(entry.id, m.id)}
+                                                                                Duplica misurazione
+                                                                            </MenuItem>
+
+
+                                                                            <MenuItem
+                                                                                onClick={() => {
+                                                                                    handleDeleteMeasurement(entry.id, m.id)                                                                                
+                                                                                    handleMenuClose();
+                                                                                    setMeasurementDialogOpen(true);
+                                                                                }}
                                                                             >
-                                                                                <DeleteIcon />
-                                                                            </IconButton>
-                                                                        </Tooltip>
+                                                                                Elimina Misurazione
+                                                                            </MenuItem>
+                                                                        </Menu>
+                                                                      
 
                                                                     </TableCell>
                                                                 </TableRow>
@@ -505,7 +543,7 @@ export default function EntryList({
                         sx={{ mb: 2 }}
                     />
                     <TextField
-                        label="Quantit‡"
+                        label="Quantit√†"
                         fullWidth
                         value={newMeasurement.quantita}
                         onChange={(e) => setNewMeasurement({ ...newMeasurement, quantita: e.target.value })}

@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { TreeView, TreeItem } from '@mui/x-tree-view';
-import { Box, Typography, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import {
+    Box,
+    Typography,
+    Tooltip,
+    IconButton,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Button,
+    Menu,
+    MenuItem
+} from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { TreeView, TreeItem } from '@mui/x-tree-view';
 
 export default function TaskTreeView({
     tasks,
@@ -21,6 +31,8 @@ export default function TaskTreeView({
 }) {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState(null);
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const [menuTask, setMenuTask] = useState(null);
 
     const defaultTaskIds = [1, 2, 3]; // ID delle lavorazioni principali
 
@@ -80,6 +92,16 @@ export default function TaskTreeView({
         setConfirmDialogOpen(false);
     };
 
+    const handleMenuOpen = (event, task) => {
+        setMenuAnchor(event.currentTarget);
+        setMenuTask(task);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchor(null);
+        setMenuTask(null);
+    };
+
     const renderTreeItems = (tasks, level = 1) => {
         return tasks.map((task) => (
             <TreeItem
@@ -89,60 +111,9 @@ export default function TaskTreeView({
                 label={
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="body2">{task.description}</Typography>
-                        <Box>
-                            {!task.hasEntry && task.children.length === 0 && level < 5 && level > 1 && (
-                                <Tooltip title="Aggiungi Voce">
-                                    <IconButton
-                                        color="primary"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEntryOpen(task.id);
-                                        }}
-                                    >
-                                        <PlaylistAddIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                            {level > 1 && (
-                                <Tooltip title="Modifica">
-                                    <IconButton
-                                        color="primary"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleOpen(task);
-                                        }}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                            {level < 4 && !(task.entries && task.entries.length > 0) && (
-                                <Tooltip title="Aggiungi Sottolavorazione">
-                                    <IconButton
-                                        color="default"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleOpen(null, task.id);
-                                        }}
-                                    >
-                                        <AddCircleIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                            {level > 1 && (
-                                <Tooltip title="Elimina">
-                                    <IconButton
-                                        color="secondary"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            confirmDeleteTask(task.id);
-                                        }}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                        </Box>
+                        <IconButton onClick={(e) => handleMenuOpen(e, task)}>
+                            <MoreVertIcon />
+                        </IconButton>
                     </Box>
                 }
             >
@@ -151,6 +122,54 @@ export default function TaskTreeView({
         ));
     };
 
+    const renderMenu = () => (
+        <Menu
+            anchorEl={menuAnchor}
+            open={Boolean(menuAnchor)}
+            onClose={handleMenuClose}
+        >
+            {menuTask && menuTask.level > 1 && (
+                <MenuItem
+                    onClick={() => {
+                        handleOpen(menuTask);
+                        handleMenuClose();
+                    }}
+                >
+                    Modifica
+                </MenuItem>
+            )}
+            {menuTask && menuTask.children && menuTask.level < 4 && (
+                <MenuItem
+                    onClick={() => {
+                        handleOpen(null, menuTask.id);
+                        handleMenuClose();
+                    }}
+                >
+                    Aggiungi Sottolavorazione
+                </MenuItem>
+            )}
+            {menuTask && menuTask.level > 1 && menuTask.children.length === 0 && (
+                <MenuItem
+                    onClick={() => {
+                        handleEntryOpen(menuTask.id);
+                        handleMenuClose();
+                    }}
+                >
+                    Aggiungi Voce
+                </MenuItem>
+            )}
+            {menuTask && menuTask.level > 1 && !defaultTaskIds.includes(menuTask.id) && (
+                <MenuItem
+                    onClick={() => {
+                        confirmDeleteTask(menuTask.id);
+                        handleMenuClose();
+                    }}
+                >
+                    Elimina
+                </MenuItem>
+            )}
+        </Menu>
+    );
 
     return (
         <>
@@ -166,6 +185,7 @@ export default function TaskTreeView({
                 >
                     {renderTreeItems(tasks)}
                 </TreeView>
+                {renderMenu()}
             </Box>
 
             <Dialog

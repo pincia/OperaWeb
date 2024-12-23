@@ -108,7 +108,8 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
 
 
     return (
-        <><Box sx={{ padding: 4, display: 'flex', flexDirection: 'row', gap: 4 }}>
+        <><Box sx={{ padding: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
+            <Box sx={{ flex: 4}}>
             <TaskTreeView
                 tasks={tasks}
                 setTasks={setTasks}
@@ -121,9 +122,8 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                 setSelectedTaskEntries={setSelectedTaskEntries}
                 defaultTaskIds={defaultTaskIds}
             />
-
-            <Box sx={{ flex: 1 }}>
-                <Typography variant="h5" gutterBottom>Voci della Lavorazione Selezionata</Typography>
+            </Box>
+            <Box sx={{ flex: 4 }}>
                 <EntryList
                     selectedTaskEntries={selectedTaskEntries}
                     setTasks={setTasks}
