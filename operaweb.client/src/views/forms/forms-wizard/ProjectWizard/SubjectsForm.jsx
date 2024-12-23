@@ -240,6 +240,44 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
                     <Grid container spacing={4}>
                         {/* Colonna Sinistra: Ruolo e Tipo */}
                         <Grid item xs={12} md={6}>
+              
+                            <FormControl component="fieldset" sx={{ mb: 2 }}>
+                                <FormLabel component="legend">Tipo</FormLabel>
+                                <RadioGroup
+                                    row
+                                    value={selectedType}
+                                    onChange={(e) => setSelectedType(e.target.value)}
+                                    disabled={!selectedSubject}
+                                >
+                                    <FormControlLabel value="committente" control={<Radio />} label="Committente" />
+                                    <FormControlLabel value="professionista" control={<Radio />} label="Professionista" />
+                                    <FormControlLabel
+                                        value="impresa"
+                                        control={<Radio />}
+                                        label="Impresa"
+                                    />
+                                </RadioGroup>
+                            </FormControl>
+                            <FormControl fullWidth sx={{ mb: 2 }}>
+                                <InputLabel id="role-select-label">Ruolo</InputLabel>
+                                <Select
+                                    labelId="role-select-label"
+                                    value={selectedRole}
+                                    onChange={(e) => setSelectedRole(e.target.value)}
+                                    disabled={!selectedSubject}
+                                >
+                                    {roles.map((role) => (
+                                        <MenuItem key={role.id} value={role.name}>
+                                            {role.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+
+                        {/* Colonna Destra: Ricerca e Invito */}
+                        <Grid item xs={12} md={6}>
                             <Typography variant="h6">Dettagli del Soggetto Selezionato</Typography>
                             {selectedSubject ? (
                                 <Card sx={{ mb: 2 }}>
@@ -259,44 +297,6 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
                             ) : (
                                 <Typography color="textSecondary">Nessun soggetto selezionato.</Typography>
                             )}
-
-                            <FormControl fullWidth sx={{ mb: 2 }}>
-                                <InputLabel id="role-select-label">Ruolo</InputLabel>
-                                <Select
-                                    labelId="role-select-label"
-                                    value={selectedRole}
-                                    onChange={(e) => setSelectedRole(e.target.value)}
-                                    disabled={!selectedSubject}
-                                >
-                                    {roles.map((role) => (
-                                        <MenuItem key={role.id} value={role.name}>
-                                            {role.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl component="fieldset" sx={{ mb: 2 }}>
-                                <FormLabel component="legend">Tipo</FormLabel>
-                                <RadioGroup
-                                    row
-                                    value={selectedType}
-                                    onChange={(e) => setSelectedType(e.target.value)}
-                                    disabled={!selectedSubject}
-                                >
-                                    <FormControlLabel value="committente" control={<Radio />} label="Committente" />
-                                    <FormControlLabel value="professionista" control={<Radio />} label="Professionista" />
-                                    <FormControlLabel
-                                        value="impresa"
-                                        control={<Radio />}
-                                        label="Impresa/Operatore Economico"
-                                    />
-                                </RadioGroup>
-                            </FormControl>
-                        </Grid>
-
-                        {/* Colonna Destra: Ricerca e Invito */}
-                        <Grid item xs={12} md={6}>
                             {!selectedSubject && (
                                 <>
                                     <Typography variant="h6" gutterBottom>

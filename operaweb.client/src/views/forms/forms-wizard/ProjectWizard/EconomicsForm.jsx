@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
-export default function EconomicsForm({ handleBack, handleNext, projectData, setProjectData }) {
+export default function EconomicsForm({ handleBack, projectData }) {
     return (
         <>
             {/* Contenitore principale del contenuto */}
@@ -25,26 +25,6 @@ export default function EconomicsForm({ handleBack, handleNext, projectData, set
                 </Typography>
             </Box>
 
-            {/* Contenitore dei pulsanti */}
-            <Grid item xs={12}>
-                <Stack direction="row" justifyContent="space-between">
-                    <Button
-                        onClick={handleBack}
-                        sx={{ my: 3, ml: 1 }}
-                    >
-                        Back
-                    </Button>
-                    <AnimateButton>
-                        <Button
-                            variant="contained"
-                            sx={{ my: 3, ml: 1 }}
-                            onClick={handleNext}
-                        >
-                            Next
-                        </Button>
-                    </AnimateButton>
-                </Stack>
-            </Grid>
         </>
     );
 }

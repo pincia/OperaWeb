@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.DataClasses.Models.User;
 
 namespace OperaWeb.Server.DataClasses.Models
@@ -40,6 +41,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
     public ICollection<ProjectTask> ProjectTasks { get; set; }
+    public  ProjectConfigurations ProjectConfigurations { get; set; }
   }
 
 }

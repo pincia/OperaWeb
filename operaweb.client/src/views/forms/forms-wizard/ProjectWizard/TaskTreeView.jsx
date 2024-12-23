@@ -95,7 +95,7 @@ export default function TaskTreeView({
                                     <IconButton
                                         color="primary"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
+                                            e.stopPropagation();
                                             handleEntryOpen(task.id);
                                         }}
                                     >
@@ -108,7 +108,7 @@ export default function TaskTreeView({
                                     <IconButton
                                         color="primary"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
+                                            e.stopPropagation();
                                             handleOpen(task);
                                         }}
                                     >
@@ -122,7 +122,7 @@ export default function TaskTreeView({
                                         color="default"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleOpen(null, task.id); // Passa task.id come parentId
+                                            handleOpen(null, task.id);
                                         }}
                                     >
                                         <AddCircleIcon />
@@ -134,7 +134,7 @@ export default function TaskTreeView({
                                     <IconButton
                                         color="secondary"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Impedisce l'espansione dell'albero
+                                            e.stopPropagation();
                                             confirmDeleteTask(task.id);
                                         }}
                                     >
@@ -151,18 +151,10 @@ export default function TaskTreeView({
         ));
     };
 
+
     return (
         <>
-            <Box
-                sx={{
-                    minHeight: '400px',
-                    maxHeight: '500px', // Limita l'altezza
-                    overflowY: 'auto', // Scroll interno
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    padding: 2,
-                }}
-            >
+            <Box sx={{ flex: 1 }}>
                 <Typography variant="h4" gutterBottom>Lavorazioni Principali</Typography>
 
                 <TreeView

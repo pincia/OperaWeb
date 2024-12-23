@@ -33,7 +33,7 @@ import { saveProject } from 'api/projects';
 import { setCurrentProject, clearImportedProject, setCurrentProjectId } from 'store/slices/project';
 
 // step options
-const steps = ['Generali', 'Soggetti', 'Lavorazioni', 'Quadro economico', 'Configurazioni'];
+const steps = ['Generali', 'Soggetti', 'Configurazioni', 'Lavorazioni', 'Quadro economico'];
 
 const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData, soaOptions, soaClassificationOptions, setSubjectsData, tasksData, setTasksData) => {
     switch (step) {
@@ -63,6 +63,14 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 />
             );
         case 2:
+            return <ConfigurationsForm
+                handleNext={handleNext}
+                handleBack={handleBack}
+                projectData={projectData}
+                setProjectData={setProjectData}             
+            />;
+
+        case 3:
             return <Tasks
                 handleNext={handleNext}
                 handleBack={handleBack}
@@ -70,15 +78,9 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 projectData={projectData}
                 setProjectData={setProjectData}
             />;
-        case 3:
-            return <EconomicsForm
-                handleNext={handleNext}
-                handleBack={handleBack}
-                projectData={projectData}
-                setProjectData={setProjectData}
-            />;
+
         case 4:
-            return <ConfigurationsForm
+            return <EconomicsForm
                 handleNext={handleNext}
                 handleBack={handleBack}
                 projectData={projectData}
@@ -125,9 +127,9 @@ const ProjectWizard = () => {
                         ...currentImportedProject
                     }));
 
-                    console.log(projectData)
                 }
 
+                console.log("PROJHCT DATA" + JSON.stringify(projectData, null, 2))
                 const soasResponse = await getSoas();
                 setSoaOptions(soasResponse);
 

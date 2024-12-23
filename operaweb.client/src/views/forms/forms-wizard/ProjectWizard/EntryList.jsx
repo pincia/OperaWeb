@@ -300,7 +300,11 @@ export default function EntryList({
         return null;
     };
 
-    const getEntryPrice = (entry) => entry.measurements.reduce((sum, item) => sum + item.quantita, 0).toFixed(2)
+    const getEntryPrice = (entry) => {
+        const measurements = entry.measurements || []; // Imposta un array vuoto se undefined
+        return measurements.reduce((sum, item) => sum + (item.quantita || 0), 0).toFixed(2);
+    };
+
 
 
     return (
