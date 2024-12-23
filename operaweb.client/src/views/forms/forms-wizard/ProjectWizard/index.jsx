@@ -84,6 +84,7 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 handleNext={handleNext}
                 handleBack={handleBack}
                 projectData={projectData}
+                setProjectData={setProjectData}
             />;
         default:
             throw new Error('Unknown step');

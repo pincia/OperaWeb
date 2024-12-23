@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241223130752_editedConfigNumeri")]
+    partial class editedConfigNumeri
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -378,14 +381,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("Quantita")
                         .HasColumnType("int");
 
-                    b.Property<string>("Valuta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Valuta")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ProjectID")
-                        .IsUnique();
+                    b.HasIndex("ProjectID");
 
                     b.ToTable("ConfigNumeri");
                 });
@@ -1403,8 +1404,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ConfigNumeri", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithOne("ConfigNumeri")
-                        .HasForeignKey("OperaWeb.Server.DataClasses.Models.ConfigNumeri", "ProjectID")
+                        .WithMany("ConfigNumeri")
+                        .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1701,8 +1702,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 {
                     b.Navigation("Categorie");
 
-                    b.Navigation("ConfigNumeri")
-                        .IsRequired();
+                    b.Navigation("ConfigNumeri");
 
                     b.Navigation("DatiGenerali")
                         .IsRequired();

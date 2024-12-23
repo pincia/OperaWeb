@@ -1,101 +1,104 @@
-﻿// ConfigurationsController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.DataClasses.Context;
-using YourNamespace.Models;
+using OperaWeb.Server.DataClasses.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OperaWeb.Server.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
-  public class ConfigurationsController : ControllerBase
+  public class ConfigNumeriController : ControllerBase
   {
     private readonly OperaWebDbContext _context;
 
-    public ConfigurationsController(OperaWebDbContext context)
+    public ConfigNumeriController(OperaWebDbContext context)
     {
       _context = context;
     }
 
-    // Endpoint per salvare o aggiornare le configurazioni di un progetto
-    [HttpPost("{projectId}/save-configurations")]
-    public async Task<IActionResult> SaveConfigurations(int projectId, [FromBody] ProjectConfigurations configurations)
+    // GET: api/ConfigNumeri
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ConfigNumeri>>> GetConfigNumeri()
     {
-      // Trova il progetto associato
-      var project = await _context.Projects
-          .Include(p => p.ProjectConfigurations)
-          .FirstOrDefaultAsync(p => p.ID == projectId);
+      return await _context.ConfigNumeri.ToListAsync();
+    }
 
-      if (project == null)
+    // GET: api/ConfigNumeri/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ConfigNumeri>> GetConfigNumeri(int id)
+    {
+      var configNumeri = await _context.ConfigNumeri.FindAsync(id);
+
+      if (configNumeri == null)
       {
-        return NotFound(new { message = "Progetto non trovato." });
+        return NotFound();
       }
 
-      // Aggiorna o crea le configurazioni
-      if (project.ConfigNumeri == null)
-      {
-        project.Configurations = new ProjectConfigurations
-        {
-          NPU = configurations.NPU,
-          Lunghezza = configurations.Lunghezza,
-          Larghezza = configurations.Larghezza,
-          AltezzaPeso = configurations.AltezzaPeso,
-          ProdottoQta = configurations.ProdottoQta,
-          PrezzoValuta1 = configurations.PrezzoValuta1,
-          PrezzoValuta2 = configurations.PrezzoValuta2,
-          ImportoValuta1 = configurations.ImportoValuta1,
-          ImportoValuta2 = configurations.ImportoValuta2,
-          Aliquote = configurations.Aliquote,
-          Currency = configurations.Currency
-        };
+      return configNumeri;
+    }
 
-        _context.Entry(project).State = EntityState.Modified;
-      }
-      else
+    // POST: api/ConfigNumeri
+    [HttpPost]
+    public async Task<ActionResult<ConfigNumeri>> PostConfigNumeri(ConfigNumeri configNumeri)
+    {
+      _context.ConfigNumeri.Add(configNumeri);
+      await _context.SaveChangesAsync();
+
+      return CreatedAtAction("GetConfigNumeri", new { id = configNumeri.ID }, configNumeri);
+    }
+
+    // PUT: api/ConfigNumeri/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutConfigNumeri(int id, ConfigNumeri configNumeri)
+    {
+      if (id != configNumeri.ID)
       {
-        // Aggiorna i campi esistenti
-        project.Configurations.NPU = configurations.NPU;
-        project.Configurations.Lunghezza = configurations.Lunghezza;
-        project.Configurations.Larghezza = configurations.Larghezza;
-        project.Configurations.AltezzaPeso = configurations.AltezzaPeso;
-        project.Configurations.ProdottoQta = configurations.ProdottoQta;
-        project.Configurations.PrezzoValuta1 = configurations.PrezzoValuta1;
-        project.Configurations.PrezzoValuta2 = configurations.PrezzoValuta2;
-        project.Configurations.ImportoValuta1 = configurations.ImportoValuta1;
-        project.Configurations.ImportoValuta2 = configurations.ImportoValuta2;
-        project.Configurations.Aliquote = configurations.Aliquote;
-        project.Configurations.Currency = configurations.Currency;
+        return BadRequest();
       }
+
+      _context.Entry(configNumeri).State = EntityState.Modified;
 
       try
       {
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Configurazioni salvate con successo." });
       }
-      catch (DbUpdateException ex)
+      catch (DbUpdateConcurrencyException)
       {
-        return StatusCode(500, new { message = "Errore durante il salvataggio delle configurazioni.", details = ex.Message });
+        if (!ConfigNumeriExists(id))
+        {
+          return NotFound();
+        }
+        else
+        {
+          throw;
+        }
       }
-    }
-  }
-}
 
-// ProjectConfigurations.cs
-namespace YourNamespace.Models
-{
-  public class ProjectConfigurations
-  {
-    public int Id { get; set; }
-    public int NPU { get; set; }
-    public int Lunghezza { get; set; }
-    public int Larghezza { get; set; }
-    public int AltezzaPeso { get; set; }
-    public int ProdottoQta { get; set; }
-    public int PrezzoValuta1 { get; set; }
-    public int PrezzoValuta2 { get; set; }
-    public int ImportoValuta1 { get; set; }
-    public int ImportoValuta2 { get; set; }
-    public int Aliquote { get; set; }
-    public string Currency { get; set; }
+      return NoContent();
+    }
+
+    // DELETE: api/ConfigNumeri/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteConfigNumeri(int id)
+    {
+      var configNumeri = await _context.ConfigNumeri.FindAsync(id);
+      if (configNumeri == null)
+      {
+        return NotFound();
+      }
+
+      _context.ConfigNumeri.Remove(configNumeri);
+      await _context.SaveChangesAsync();
+
+      return NoContent();
+    }
+
+    private bool ConfigNumeriExists(int id)
+    {
+      return _context.ConfigNumeri.Any(e => e.ID == id);
+    }
   }
 }

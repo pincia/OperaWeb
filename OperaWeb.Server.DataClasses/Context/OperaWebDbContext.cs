@@ -11,7 +11,6 @@ namespace OperaWeb.Server.DataClasses.Context
   {
     public virtual DbSet<SubRole> SubRoles { get; set; }
     public DbSet<OrganizationRole> OrganizationRoles { get; set; }
-    public virtual DbSet<ProjectConfiguration> ProjectConfigurations { get; set; }
     public DbSet<OrganizationMember> OrganizationMembers { get; set; }
     public virtual DbSet<Comune> Comuni { get; set; }
     public virtual DbSet<Provincia> Province { get; set; }

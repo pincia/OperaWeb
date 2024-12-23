@@ -124,12 +124,14 @@ namespace OperaWeb.Server.Services
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
         var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
         var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
+        var configurazioni = _context.ConfigNumeri.FirstOrDefault(e => e.ProjectID == id);
         project.VociComputo = vociComputo.ToList();
         project.Categorie = categorie.ToList();
         project.SubCategorie = subCategorie.ToList();
         project.SuperCategorie = superCategorie.ToList();
         project.ElencoPrezzi = elencoPrezzi.ToList();
         project.ProjectTasks = projectTasks.ToList();
+        project.ConfigNumeri = configurazioni;
         return project;
       }
       catch (Exception ex)

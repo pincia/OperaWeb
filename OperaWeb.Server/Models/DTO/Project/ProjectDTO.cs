@@ -30,5 +30,7 @@ namespace OperaWeb.Server.Models.DTO.Project
     public List<SubjectDTO>? Subjects { get; set; } // Nuova proprietà aggiunta
 
     public List<ProjectTaskDTO>? Tasks { get; set; }
+
+    public ConfigNumeriDTO Configurations { get; set; }
   }
 }

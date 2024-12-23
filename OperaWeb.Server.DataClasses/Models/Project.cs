@@ -36,12 +36,11 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<Categoria> Categorie { get; set; }
     public ICollection<SubCategoria> SubCategorie { get; set; }
     public ICollection<SuperCategoria> SuperCategorie { get; set; }
-    public ICollection<ConfigNumeri> ConfigNumeri { get; set; }
-    public DatiGenerali DatiGenerali { get; set; } // Cambiato da ICollection a singolo elemento
+    public ConfigNumeri ConfigNumeri { get; set; }
+    public DatiGenerali DatiGenerali { get; set; } 
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
     public ICollection<ProjectTask> ProjectTasks { get; set; }
-    public  ProjectConfigurations ProjectConfigurations { get; set; }
   }
 
 }

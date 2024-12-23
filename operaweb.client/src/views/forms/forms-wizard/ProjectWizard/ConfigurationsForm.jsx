@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -15,12 +15,19 @@ import {
 } from '@mui/material';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
-export default function ConfigurationsForm({ handleBack, handleNext, configurations, setConfigurations }) {
-    const [localConfigurations, setLocalConfigurations] = useState(configurations || {});
+export default function ConfigurationsForm({ handleBack, handleNext, projectData, setProjectData }) {
+    const [localConfigurations, setLocalConfigurations] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
 
+    // Inizializza configurazioni dal projectData
+    useEffect(() => {
+        if (projectData.configurations) {
+            setLocalConfigurations({ ...projectData.configurations });
+        }
+    }, [projectData.configurations]);
+
     const handleDecimalChange = (key, value) => {
-        if (value >= 0 && value <= 6) { // Limita il numero di decimali tra 0 e 6
+        if (value >= 0 && value <= 6) {
             setLocalConfigurations((prev) => ({
                 ...prev,
                 [key]: value
@@ -33,29 +40,43 @@ export default function ConfigurationsForm({ handleBack, handleNext, configurati
     const handleCurrencyChange = (event) => {
         setLocalConfigurations((prev) => ({
             ...prev,
-            currency: event.target.value
+            Valuta: event.target.value
         }));
     };
 
     const handleSubmit = () => {
-        setConfigurations(localConfigurations);
+        setProjectData((prev) => ({
+            ...prev,
+            configurations: localConfigurations
+        }));
         handleNext();
     };
 
     const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
 
     const decimalFields = [
-        { key: 'npu', label: 'N.P.U.' },
+        { key: 'partiUguali', label: 'Parti Uguali' },
         { key: 'lunghezza', label: 'Lunghezza' },
         { key: 'larghezza', label: 'Larghezza' },
-        { key: 'altezzaPeso', label: 'Altezza/Peso' },
-        { key: 'prodottoQta', label: 'Prodotto/Qtà' },
-        { key: 'prezzoValuta1', label: 'Prezzo/Valuta(1)' },
-        { key: 'prezzoValuta2', label: 'Prezzo/Valuta(2)' },
-        { key: 'importoValuta1', label: 'Importo/Valuta(1)' },
-        { key: 'importoValuta2', label: 'Importo/Valuta(2)' },
+        { key: 'hPeso', label: 'HPeso' },
+        { key: 'quantita', label: 'Quantità' },
+        { key: 'prezzi', label: 'Prezzi' },
+        { key: 'prezziTotale', label: 'Prezzi Totale' },
+        { key: 'convPrezzi', label: 'Conv. Prezzi' },
+        { key: 'convPrezziTotale', label: 'Conv. Prezzi Totale' },
+        { key: 'incidenzaPercentuale', label: 'Incidenza Percentuale' },
         { key: 'aliquote', label: 'Aliquote' }
     ];
+
+    if (!localConfigurations) {
+        return (
+            <Box sx={{ padding: 4 }}>
+                <Typography variant="h5" color="textSecondary">
+                    Caricamento configurazioni...
+                </Typography>
+            </Box>
+        );
+    }
 
     return (
         <>
@@ -64,7 +85,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, configurati
                     Configurazioni Avanzate
                 </Typography>
                 <Typography variant="body2" gutterBottom>
-                    Parametri numerici e di valuta: scegli il numero di decimali per ciascuna voce.
+                    Configura i parametri numerici e seleziona la valuta.
                 </Typography>
                 <Grid container spacing={3} sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
                     {decimalFields.map((field) => (
@@ -73,7 +94,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, configurati
                             <TextField
                                 type="number"
                                 inputProps={{ min: 0, max: 6 }}
-                                value={localConfigurations && localConfigurations[field.key] !== undefined ? localConfigurations[field.key] : 0}
+                                value={localConfigurations[field.key] || 0}
                                 onChange={(e) => handleDecimalChange(field.key, parseInt(e.target.value, 10))}
                                 sx={{ width: '100px' }}
                             />
@@ -82,11 +103,12 @@ export default function ConfigurationsForm({ handleBack, handleNext, configurati
                     <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
                         <FormLabel sx={{ minWidth: '150px', marginRight: '16px' }}>Valuta</FormLabel>
                         <Select
-                            value={localConfigurations.currency || 'EUR'}
+                            value={localConfigurations.Valuta || 'EUR'}
                             onChange={handleCurrencyChange}
                             sx={{ width: '150px' }}
                         >
                             <MenuItem value="EUR">EUR</MenuItem>
+                            <MenuItem value="USD">USD</MenuItem>
                         </Select>
                     </Grid>
                 </Grid>
@@ -100,20 +122,16 @@ export default function ConfigurationsForm({ handleBack, handleNext, configurati
                     </Alert>
                 </Snackbar>
             </Box>
-            {/* Contenitore dei pulsanti */}
             <Grid item xs={12}>
                 <Stack direction="row" justifyContent="space-between">
-                    <Button
-                        onClick={handleBack}
-                        sx={{ my: 3, ml: 1 }}
-                    >
+                    <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
                         Back
                     </Button>
                     <AnimateButton>
                         <Button
                             variant="contained"
                             sx={{ my: 3, ml: 1 }}
-                            onClick={handleNext}
+                            onClick={handleSubmit}
                         >
                             Next
                         </Button>

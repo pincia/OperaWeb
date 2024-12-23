@@ -27,7 +27,21 @@ namespace OperaWeb.Server.Models.Mapper
           LastUpdateDate = model.LastUpdateDate,
           SoaCategoryId = model.SoaCategory?.Id ?? -1,
           SoaClassificationID = model.SoaClassification?.Id ?? -1,
-          Jobs = new List<JobDTO>()
+          Jobs = new List<JobDTO>(),
+          Configurations = model.ConfigNumeri != null ?new ConfigNumeriDTO()
+          {
+            PartiUguali = model.ConfigNumeri.PartiUguali,
+            Lunghezza = model.ConfigNumeri.Lunghezza,
+            Larghezza = model.ConfigNumeri.Larghezza,
+            HPeso = model.ConfigNumeri.HPeso,
+            Quantita = model.ConfigNumeri.Quantita,
+            Prezzi = model.ConfigNumeri.Prezzi,
+            PrezziTotale = model.ConfigNumeri.PrezziTotale,
+            ConvPrezzi = model.ConfigNumeri.ConvPrezzi,
+            ConvPrezziTotale = model.ConfigNumeri.ConvPrezziTotale,
+            IncidenzaPercentuale = model.ConfigNumeri.IncidenzaPercentuale,
+            Aliquote = model.ConfigNumeri.Aliquote
+          }: new ConfigNumeriDTO()
         };
 
         if (!excludeTasks)
@@ -47,6 +61,7 @@ namespace OperaWeb.Server.Models.Mapper
             Type = task.Type
           }).ToList() ?? new List<ProjectTaskDTO>();
         }
+
         // Pre-caricare lookup per accesso rapido
         var elencoPrezziLookup = model.ElencoPrezzi.ToDictionary(p => p.ID);
         var vociComputoLookup = model.VociComputo.GroupBy(v => v.SuperCategoriaID).ToDictionary(g => g.Key);
@@ -218,6 +233,24 @@ namespace OperaWeb.Server.Models.Mapper
           ProjectId = dto.Id
         }).ToList();
 
+        if (dto.Configurations != null)
+        {
+          project.ConfigNumeri = new ConfigNumeri
+          {
+            PartiUguali = dto.Configurations.PartiUguali,
+            Lunghezza = dto.Configurations.Lunghezza,
+            Larghezza = dto.Configurations.Larghezza,
+            HPeso = dto.Configurations.HPeso,
+            Quantita = dto.Configurations.Quantita,
+            Prezzi = dto.Configurations.Prezzi,
+            PrezziTotale = dto.Configurations.PrezziTotale,
+            ConvPrezzi = dto.Configurations.ConvPrezzi,
+            ConvPrezziTotale = dto.Configurations.ConvPrezziTotale,
+            IncidenzaPercentuale = dto.Configurations.IncidenzaPercentuale,
+            Aliquote = dto.Configurations.Aliquote,
+            ProjectID = project.ID
+          };
+        }
         return project;
       }
       catch (Exception ex)
@@ -226,5 +259,4 @@ namespace OperaWeb.Server.Models.Mapper
       }
     }
   }
-
 }
