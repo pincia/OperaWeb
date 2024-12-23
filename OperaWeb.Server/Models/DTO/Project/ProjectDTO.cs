@@ -31,6 +31,7 @@ namespace OperaWeb.Server.Models.DTO.Project
 
     public List<ProjectTaskDTO>? Tasks { get; set; }
 
-    public ConfigNumeriDTO Configurations { get; set; }
+    public ConfigurationDTO Configurations { get; set; }
+
   }
 }

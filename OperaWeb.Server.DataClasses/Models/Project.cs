@@ -37,7 +37,8 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<SubCategoria> SubCategorie { get; set; }
     public ICollection<SuperCategoria> SuperCategorie { get; set; }
     public ConfigNumeri ConfigNumeri { get; set; }
-    public DatiGenerali DatiGenerali { get; set; } 
+    public DatiGenerali DatiGenerali { get; set; }
+    public Analisi Analisi { get; set; }
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
     public ICollection<ProjectTask> ProjectTasks { get; set; }

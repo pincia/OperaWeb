@@ -18,11 +18,29 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 export default function ConfigurationsForm({ handleBack, handleNext, projectData, setProjectData }) {
     const [localConfigurations, setLocalConfigurations] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
-
+    const [selectedMetodoIndex, setSelectedMetodoIndex] = useState({});
+    const [selectedApplicataAIndex, setSelectedApplicataAIndex] = useState({});
     // Inizializza configurazioni dal projectData
     useEffect(() => {
         if (projectData.configurations) {
             setLocalConfigurations({ ...projectData.configurations });
+            setSelectedMetodoIndex(projectData.configurations.analisi.metodo); 
+            setSelectedApplicataAIndex(projectData.configurations.analisi.applicataA); 
+        } else {
+            setLocalConfigurations({
+                partiUguali: 0,
+                lunghezza: 0,
+                larghezza: 0,
+                hPeso: 0,
+                quantita: 0,
+                prezzi: 0,
+                prezziTotale: 0,
+                convPrezzi: 0,
+                convPrezziTotale: 0,
+                incidenzaPercentuale: 0,
+                aliquote: 0,
+                valuta: "Euro"
+            });
         }
     }, [projectData.configurations]);
 
@@ -42,6 +60,17 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
             ...prev,
             Valuta: event.target.value
         }));
+    };
+
+    // Gestione del cambio di valore
+    const handleChangeMetodo = (event) => {
+        setSelectedMetodoIndex(event.target.value); // Aggiorna il valore selezionato
+        console.log('Indice selezionato:', event.target.value);
+    };
+
+    const handleChangeApplicataA = (event) => {
+        setSelectedApplicataAIndex(event.target.value); // Aggiorna il valore selezionato
+        console.log('Indice selezionato:', event.target.value);
     };
 
     const handleSubmit = () => {
@@ -68,6 +97,9 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
         { key: 'aliquote', label: 'Aliquote' }
     ];
 
+    const metodoOptions = ['NETTO + (Netto*SG) + (Netto*UI)', 'NETTO + (Netto*SG) + ((Netto+SG)*UI)'];
+    const applicataAOptions = ['Netto', 'Spese+Utile', 'Solo spese', 'Solo Utile', 'Totale'];
+
     if (!localConfigurations) {
         return (
             <Box sx={{ padding: 4 }}>
@@ -81,46 +113,172 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
     return (
         <>
             <Box sx={{ padding: 4 }}>
-                <Typography variant="h3" gutterBottom>
-                    Configurazioni Avanzate
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                    Configura i parametri numerici e seleziona la valuta.
-                </Typography>
-                <Grid container spacing={3} sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
-                    {decimalFields.map((field) => (
-                        <Grid item xs={12} md={6} key={field.key} sx={{ display: 'flex', alignItems: 'center' }}>
-                            <FormLabel sx={{ minWidth: '150px', marginRight: '16px' }}>{field.label}</FormLabel>
-                            <TextField
-                                type="number"
-                                inputProps={{ min: 0, max: 6 }}
-                                value={localConfigurations[field.key] || 0}
-                                onChange={(e) => handleDecimalChange(field.key, parseInt(e.target.value, 10))}
-                                sx={{ width: '100px' }}
-                            />
+                <Grid container spacing={3}>
+                    {/* Grid 70% */}
+                    <Grid item xs={12} md={8} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                        <Typography variant="h3" gutterBottom>
+                            Configurazioni Avanzate
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                            Configura i parametri numerici e seleziona la valuta.
+                        </Typography>
+                        <Grid container spacing={2} marginTop={2}>
+                            {/* Column 1 */}
+                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Typography variant="h4" gutterBottom align="center">
+                                  Fattori
+                                </Typography>
+                                <FormLabel sx={{ minWidth: '150px' }}>N.P.U</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.partiUguali}
+                                    onChange={(e) => handleFieldChange('partiUguali', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Lunghezza</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.lunghezza}
+                                    onChange={(e) => handleFieldChange('lunghezza', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Larghezza</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.larghezza}
+                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Altezza/Peso</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.hPeso}
+                                    onChange={(e) => handleFieldChange('hPeso', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                            </Grid>
+
+                            {/* Column 2 */}
+                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Typography variant="h4" gutterBottom align="center">
+                                    Valorizzatori
+                                </Typography>
+                                <FormLabel sx={{ minWidth: '150px' }}>Prodotto/q.ta</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.quantita}
+                                    onChange={(e) => handleFieldChange('quantita', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Prezzo</FormLabel>
+                                <TextField
+                                    label="Prezzo"
+                                    type="number"
+                                    value={localConfigurations.numeri.prezzi}
+                                    onChange={(e) => handleFieldChange('prezzi', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Imoorto</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.larghezza}
+                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                            </Grid>
+
+                            {/* Column 3 */}
+                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Typography variant="h4" gutterBottom align="center">
+                                    Altro
+                                </Typography>
+                                <FormLabel sx={{ minWidth: '150px' }}>Aliquota</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.aliquote}
+                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                    <FormLabel sx={{ minWidth: '150px' }}>Valuta</FormLabel>
+                                    <Select
+                                        value={localConfigurations.Valuta || 'EUR'}
+                                    onChange={handleCurrencyChange}
+                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
+                                    >
+                                        <MenuItem value="EUR">Euro</MenuItem>
+                                    </Select>
+                            </Grid>
                         </Grid>
-                    ))}
-                    <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                        <FormLabel sx={{ minWidth: '150px', marginRight: '16px' }}>Valuta</FormLabel>
-                        <Select
-                            value={localConfigurations.Valuta || 'EUR'}
-                            onChange={handleCurrencyChange}
-                            sx={{ width: '150px' }}
-                        >
-                            <MenuItem value="EUR">EUR</MenuItem>
-                            <MenuItem value="USD">USD</MenuItem>
-                        </Select>
+                    </Grid>
+
+                    {/* Grid 30% */}
+                    <Grid item xs={12} md={4} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                        <Typography variant="h3" gutterBottom>
+                            Configurazioni Analisi
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                            Parametri per il calcolo delle analisi e dei prezzi.
+                        </Typography>
+                        <Grid container spacing={2} marginTop={2}>
+                            {/* Column 1 */}
+                            <Grid item xs={12} md={12} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Typography variant="h4" gutterBottom align="center">
+                                    Calcolo
+                                </Typography>
+                                <FormLabel sx={{ minWidth: '150px' }}>Metodo</FormLabel>
+                                <Select
+                                    labelId="dropdown-label"
+                                    value={selectedMetodoIndex}
+                                    onChange={handleChangeMetodo}
+                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
+                                >
+                                    {metodoOptions.map((option, index) => (
+                                        <MenuItem key={index} value={index}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                <FormLabel sx={{ minWidth: '150px' }}>Spese Generali</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.partiUguali}
+                                    onChange={(e) => handleFieldChange('partiUguali', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Utile Impresa</FormLabel>
+                                <TextField
+                                    type="number"
+                                    value={localConfigurations.numeri.lunghezza}
+                                    onChange={(e) => handleFieldChange('lunghezza', parseInt(e.target.value, 10) || 0)}
+                                    variant="outlined"
+                                    sx={{ marginBottom: 2, width: '150px' }}
+                                />
+                                <FormLabel sx={{ minWidth: '150px' }}>Applicata A</FormLabel>
+                                <Select
+                                    labelId="dropdown-label"
+                                    value={selectedApplicataAIndex}
+                                    onChange={handleChangeApplicataA}
+                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
+                                >
+                                    {applicataAOptions.map((option, index) => (
+                                        <MenuItem key={index} value={index}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
-                <Snackbar
-                    open={snackbar.open}
-                    autoHideDuration={3000}
-                    onClose={handleSnackbarClose}
-                >
-                    <Alert severity={snackbar.severity} onClose={handleSnackbarClose}>
-                        {snackbar.message}
-                    </Alert>
-                </Snackbar>
             </Box>
             <Grid item xs={12}>
                 <Stack direction="row" justifyContent="space-between">

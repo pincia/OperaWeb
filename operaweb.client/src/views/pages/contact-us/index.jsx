@@ -6,14 +6,14 @@ import ContactCard from './ContactCard';
 import AppBar from 'ui-component/extended/AppBar';
 
 // assets
-import headerBackground from 'assets/images/landing/bg-header.jpg';
+//import headerBackground from 'assets/images/landing/bg-header.jpg';
 
 // ============================|| CONTACT US MAIN ||============================ //
 
 const ContactUsPage = () => (
     <Box
         sx={{
-            backgroundImage: `url(${headerBackground})`,
+           // backgroundImage: `url(${headerBackground})`,
             backgroundSize: '100% 600px',
             backgroundAttachment: 'fixed',
             backgroundRepeat: 'no-repeat',

@@ -193,7 +193,20 @@ namespace OperaWeb.Server.Services.BLL
         };
         configNumeri.Project = importedProject.Entity;
         newProject.ConfigNumeri = configNumeri;
-        // Step 6: Importazione Voci Computo e Misurazioni
+
+        //Step 6 Configurazioni
+        var analisi = new Analisi
+        {
+          SpeseUtili = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGModuli.PweDGAnalisi.SpeseUtili),
+          SpeseGenerali = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGModuli.PweDGAnalisi.SpeseGenerali),
+          UtiliImpresa = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGModuli.PweDGAnalisi.UtiliImpresa),
+          OneriAccessoriSc = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGModuli.PweDGAnalisi.OneriAccessoriSc),
+          ConfQuantita = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGModuli.PweDGAnalisi.ConfQuantita),
+        };
+        analisi.Project = importedProject.Entity;
+        newProject.Analisi = analisi;
+
+        // Step 7: Importazione Voci Computo e Misurazioni
         // (Aggiungere il conteggio per VociComputo e Misure)
         var totalAmount = 0M;
         var vociComputo = new List<VoceComputo>();

@@ -28,20 +28,33 @@ namespace OperaWeb.Server.Models.Mapper
           SoaCategoryId = model.SoaCategory?.Id ?? -1,
           SoaClassificationID = model.SoaClassification?.Id ?? -1,
           Jobs = new List<JobDTO>(),
-          Configurations = model.ConfigNumeri != null ?new ConfigNumeriDTO()
+          Configurations = new ConfigurationDTO
           {
-            PartiUguali = model.ConfigNumeri.PartiUguali,
-            Lunghezza = model.ConfigNumeri.Lunghezza,
-            Larghezza = model.ConfigNumeri.Larghezza,
-            HPeso = model.ConfigNumeri.HPeso,
-            Quantita = model.ConfigNumeri.Quantita,
-            Prezzi = model.ConfigNumeri.Prezzi,
-            PrezziTotale = model.ConfigNumeri.PrezziTotale,
-            ConvPrezzi = model.ConfigNumeri.ConvPrezzi,
-            ConvPrezziTotale = model.ConfigNumeri.ConvPrezziTotale,
-            IncidenzaPercentuale = model.ConfigNumeri.IncidenzaPercentuale,
-            Aliquote = model.ConfigNumeri.Aliquote
-          }: new ConfigNumeriDTO()
+            Numeri = model.ConfigNumeri != null ? new ConfigNumeriDTO()
+            {
+              PartiUguali = model.ConfigNumeri.PartiUguali,
+              Lunghezza = model.ConfigNumeri.Lunghezza,
+              Larghezza = model.ConfigNumeri.Larghezza,
+              HPeso = model.ConfigNumeri.HPeso,
+              Quantita = model.ConfigNumeri.Quantita,
+              Prezzi = model.ConfigNumeri.Prezzi,
+              PrezziTotale = model.ConfigNumeri.PrezziTotale,
+              ConvPrezzi = model.ConfigNumeri.ConvPrezzi,
+              ConvPrezziTotale = model.ConfigNumeri.ConvPrezziTotale,
+              IncidenzaPercentuale = model.ConfigNumeri.IncidenzaPercentuale,
+              Aliquote = model.ConfigNumeri.Aliquote
+            } : new ConfigNumeriDTO(),
+            Analisi = model.Analisi != null ? new ConfigAnalisiDTO()
+            {
+              SpeseUtili = model.Analisi.SpeseUtili,
+              SpeseGenerali = model.Analisi.SpeseGenerali,
+              UtiliImpresa = model.Analisi.UtiliImpresa,
+              OneriAccessoriSc = model.Analisi.OneriAccessoriSc,
+              ConfQuantita = model.Analisi.ConfQuantita,
+              Metodo = model.Analisi.Metodo,
+              ApplicataA = model.Analisi.ApplicataA
+            } : new ConfigAnalisiDTO(),
+          }
         };
 
         if (!excludeTasks)
@@ -235,21 +248,38 @@ namespace OperaWeb.Server.Models.Mapper
 
         if (dto.Configurations != null)
         {
-          project.ConfigNumeri = new ConfigNumeri
+          if (dto.Configurations.Numeri != null)
           {
-            PartiUguali = dto.Configurations.PartiUguali,
-            Lunghezza = dto.Configurations.Lunghezza,
-            Larghezza = dto.Configurations.Larghezza,
-            HPeso = dto.Configurations.HPeso,
-            Quantita = dto.Configurations.Quantita,
-            Prezzi = dto.Configurations.Prezzi,
-            PrezziTotale = dto.Configurations.PrezziTotale,
-            ConvPrezzi = dto.Configurations.ConvPrezzi,
-            ConvPrezziTotale = dto.Configurations.ConvPrezziTotale,
-            IncidenzaPercentuale = dto.Configurations.IncidenzaPercentuale,
-            Aliquote = dto.Configurations.Aliquote,
-            ProjectID = project.ID
-          };
+            project.ConfigNumeri = new ConfigNumeri
+            {
+              PartiUguali = dto.Configurations.Numeri.PartiUguali,
+              Lunghezza = dto.Configurations.Numeri.Lunghezza,
+              Larghezza = dto.Configurations.Numeri.Larghezza,
+              HPeso = dto.Configurations.Numeri.HPeso,
+              Quantita = dto.Configurations.Numeri.Quantita,
+              Prezzi = dto.Configurations.Numeri.Prezzi,
+              PrezziTotale = dto.Configurations.Numeri.PrezziTotale,
+              ConvPrezzi = dto.Configurations.Numeri.ConvPrezzi,
+              ConvPrezziTotale = dto.Configurations.Numeri.ConvPrezziTotale,
+              IncidenzaPercentuale = dto.Configurations.Numeri.IncidenzaPercentuale,
+              Aliquote = dto.Configurations.Numeri.Aliquote,
+              ProjectID = project.ID
+            };
+          }
+          if (dto.Configurations.Analisi != null)
+          {
+            project.Analisi = new Analisi
+            {
+              SpeseUtili = dto.Configurations.Analisi.SpeseUtili,
+              SpeseGenerali = dto.Configurations.Analisi.SpeseGenerali,
+              UtiliImpresa = dto.Configurations.Analisi.UtiliImpresa,
+              OneriAccessoriSc = dto.Configurations.Analisi.OneriAccessoriSc,
+              ConfQuantita = dto.Configurations.Analisi.ConfQuantita,
+              Metodo = dto.Configurations.Analisi.Metodo,
+              ApplicataA = dto.Configurations.Analisi.ApplicataA,
+              ProjectID = project.ID
+            };
+          }
         }
         return project;
       }

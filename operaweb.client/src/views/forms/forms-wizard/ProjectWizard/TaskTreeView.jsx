@@ -173,7 +173,16 @@ export default function TaskTreeView({
 
     return (
         <>
-            <Box sx={{ flex: 1 }}>
+            <Box
+                sx={{
+                    minHeight: '400px',
+                    maxHeight: '500px',
+                    overflowY: 'auto',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    padding: 2,
+                }}
+            >
                 <Typography variant="h4" gutterBottom>Lavorazioni Principali</Typography>
 
                 <TreeView
@@ -181,7 +190,12 @@ export default function TaskTreeView({
                     defaultExpandIcon={<ChevronRightIcon />}
                     expanded={expanded}
                     onNodeToggle={(event, nodeIds) => setExpanded(nodeIds)}
-                    sx={{ maxWidth: 400, backgroundColor: 'background.paper', borderRadius: 2 }}
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column', // Organizza il contenuto verticalmente
+                        width: '100%', // Adatta alla larghezza del contenitore
+                    }}
                 >
                     {renderTreeItems(tasks)}
                 </TreeView>
