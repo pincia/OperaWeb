@@ -2,6 +2,7 @@
 using Azure.Core;
 using OperaWeb.SharedClasses.Enums;
 using OperaWeb.Server.DataClasses.Models.User;
+using Newtonsoft.Json.Linq;
 
 namespace Services.UserGroup
 {
@@ -89,17 +90,20 @@ namespace Services.UserGroup
       }
     }
 
-    public async Task<AppResponse<ApplicationUser>> Me(string userId)
+    public async Task<AppResponse<UserDTO>> Me(string userId)
     {
       var user = await _userManager.FindByIdAsync(userId);
 
       if (user == null)
       {
-        return new AppResponse<ApplicationUser>().SetErrorResponse("user", "user id not found");
+        return new AppResponse<UserDTO>().SetErrorResponse("user", "user id not found");
       }
       else
       {
-        return new AppResponse<ApplicationUser>().SetSuccessResponse(user);
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var userDTO =  new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList() } ;
+
+        return new AppResponse<UserDTO>().SetSuccessResponse(userDTO);
       }
     }
 

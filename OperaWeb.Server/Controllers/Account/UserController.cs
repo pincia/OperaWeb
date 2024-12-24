@@ -31,7 +31,7 @@ namespace OperaWeb.Server.Controllers.Account
 
 
     [HttpGet]
-    public async Task<AppResponse<ApplicationUser>> Me()
+    public async Task<AppResponse<UserDTO>> Me()
     {
       var userId = User.FindFirstValue("Id");
 

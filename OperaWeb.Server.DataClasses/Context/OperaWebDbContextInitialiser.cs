@@ -434,7 +434,8 @@ namespace OperaWeb.Server.DataClasses.Context
 
           var imprese = new List<string>
 {
-       "Impresa Affidataria",
+    "Impresa Appaltatrice",
+    "Impresa Subappaltatrice",
     "Impresa Lavori",
     "Impresa fornitrice",
     "Lavoratore Autonomo"
