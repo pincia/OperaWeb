@@ -53,7 +53,7 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
     const [inviteSubject, setInviteSubject] = useState({ name: '', email: '' });
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
     const user = useSelector((state) => state.account.user);
-    const [roles, setRoles] = useState(user.roles); // Stato per i ruoli
+    const [roles, setRoles] = useState(user?.roles || {}); // Stato per i ruoli
 
     // Recupera i ruoli dall'API basati sul tipo selezionato
     const fetchRoles = async (typeToFetch) => {
@@ -81,7 +81,7 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
 
     useEffect(() => {
         if (openRoleDialog) {
-            fetchRoles(user?.roles?.[0]);
+            fetchRoles(user?.roles?.[0] );
         }
     }, [user, openRoleDialog]);
 
