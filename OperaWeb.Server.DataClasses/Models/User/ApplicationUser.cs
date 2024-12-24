@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 namespace OperaWeb.Server.DataClasses.Models.User
 {
@@ -54,6 +55,7 @@ namespace OperaWeb.Server.DataClasses.Models.User
         public string? PEC { get; set; }              // Posta Elettronica Certificata
         public string? CompanyType { get; set; }      // Tipo di azienda (es. SRL, SPA, ecc.)
         public bool MustChangePassword { get; set; }
+        public ICollection<UserProjectAccess> UserProjectAccesses { get; set; }
 
     }
 }

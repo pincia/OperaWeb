@@ -8,11 +8,10 @@ import { jwtDecode } from 'jwt-decode';
 // reducer - state management
 import { LOGIN, LOGOUT, REGISTER } from 'store/actions';
 import accountReducer from 'store/accountReducer';
-
+import { store } from 'store';
 // project imports
 import Loader from 'ui-component/Loader';
 import axios from 'utils/axios';
-
 const chance = new Chance();
 
 // constant
@@ -90,6 +89,8 @@ export const JWTProvider = ({ children }) => {
                 }
             });
         }
+
+        console.log('Stato globale Redux', store.getState());
         return response;
     };
 

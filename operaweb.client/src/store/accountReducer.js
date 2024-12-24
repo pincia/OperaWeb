@@ -1,30 +1,29 @@
-// action - state management
 import { LOGIN, LOGOUT, REGISTER } from './actions';
-
-// ==============================|| ACCOUNT REDUCER ||============================== //
 
 const initialState = {
     isLoggedIn: false,
     isInitialized: false,
-    user: null
+    user: null, // Stato utente centralizzato
+    error: null // Per gestire eventuali errori
 };
 
 const accountReducer = (state = initialState, action) => {
     switch (action.type) {
         case REGISTER: {
-            const { user } = action.payload;
+            const { user } = action.payload || {};
             return {
                 ...state,
-                user
+                user: user || null
             };
         }
         case LOGIN: {
-            const { user } = action.payload;
+            console.log('Payload ricevuto in LOGIN:', action.payload);
+            const  user = action.payload.user || {};
             return {
                 ...state,
                 isLoggedIn: true,
                 isInitialized: true,
-                user
+                user: user || null
             };
         }
         case LOGOUT: {
@@ -35,8 +34,14 @@ const accountReducer = (state = initialState, action) => {
                 user: null
             };
         }
+        case 'SET_ERROR': {
+            return {
+                ...state,
+                error: action.payload
+            };
+        }
         default: {
-            return { ...state };
+            return state;
         }
     }
 };

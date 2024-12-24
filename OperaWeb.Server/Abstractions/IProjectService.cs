@@ -20,7 +20,7 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="id"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Project GetProjectById(int id, string userId);
+    Task<Project> GetProjectById(int id, string userId);
 
     /// <summary>
     /// Creates project
@@ -66,5 +66,18 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="userId"></param>
     /// <returns></returns>
     IEnumerable<TemplateDTO> GetAllTemplates();
+    /// <summary>
+    /// Get recent projects
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<List<ProjectHeaderDTO>> GetRecentProjectsAsync(string userId);
+    /// <summary>
+    /// Update recent projects
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    Task UpdateRecentProjectAsync(string userId, int projectId);
   }
 }

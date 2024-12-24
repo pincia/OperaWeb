@@ -28,6 +28,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
             setSelectedApplicataAIndex(projectData.configurations.analisi.applicataA); 
         } else {
             setLocalConfigurations({
+                numeri: {
                 partiUguali: 0,
                 lunghezza: 0,
                 larghezza: 0,
@@ -40,6 +41,11 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                 incidenzaPercentuale: 0,
                 aliquote: 0,
                 valuta: "Euro"
+                },
+                analisi: {
+                    speseGenerali: 0,
+                    utileImpresa:0
+                }
             });
         }
     }, [projectData.configurations]);
@@ -249,7 +255,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>Spese Generali</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.partiUguali}
+                                    value={localConfigurations.numeri.speseGenerali}
                                     onChange={(e) => handleFieldChange('partiUguali', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
@@ -257,7 +263,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>Utile Impresa</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.lunghezza}
+                                    value={localConfigurations.numeri.utileImpresa}
                                     onChange={(e) => handleFieldChange('lunghezza', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}

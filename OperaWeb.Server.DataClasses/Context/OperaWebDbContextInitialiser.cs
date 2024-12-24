@@ -17,7 +17,7 @@ using OperaWeb.Server.DataClasses.Models.User;
 using Task = System.Threading.Tasks.Task;
 namespace OperaWeb.Server.DataClasses.Context
 {
-    public class OperaWebDbContextInitialiser
+  public class OperaWebDbContextInitialiser
   {
     private readonly ILogger<OperaWebDbContextInitialiser> _logger;
     private readonly OperaWebDbContext _context;
@@ -327,18 +327,129 @@ namespace OperaWeb.Server.DataClasses.Context
 
       _context.SaveChanges();
 
-      //Project Roles
-      var projectRoles = new List<string> { "Direttore Lavori", "Ruolo2", "Ruolo3", "Ruolo4"};
+      //Project Subject Roles
+      var projectSubjectRoles = new List<string>
+{
+    "Committente",
+    "Responsabile lavori",
+    "Certificatore energetico",
+    "Collaudatore",
+    "Coordinatore della progettazione strutturale",
+    "Coordinatore per la sicurezza in fase di esecuzione",
+    "Coordinatore per la sicurezza in fase di progettazione",
+    "Co-Progettista",
+    "Direttore Lavori acciaio",
+    "Direttore lavori architettonico",
+    "Direttore Lavori CAO",
+    "Direttore Lavori CAP",
+    "Direttore lavori impianti",
+    "Direttore Lavori muratura",
+    "Direttore lavori strutture",
+    "Estensore della perizia",
+    "Geologo",
+    "Incaricato Presentazione NP",
+    "Professionista incaricato prestazioni specialistiche",
+    "Professionista incaricato redazione Schede AeDES",
+    "Progettista architettonico",
+    "Progettista degli impianti",
+    "Progettista impianti elettrici",
+    "Progettista impianti termici",
+    "Progettista incaricato altre progettazioni (agroindustriali, agroturistiche, zootecniche, ecc.)",
+    "Progettista responsabile dell'ETC",
+    "Progettista strutture",
+    "Progettista Strutture acciaio",
+    "Progettista Strutture CAO",
+    "Progettista Strutture CAP",
+    "Progettista Strutture muratura",
+    "Tecnico incaricato Agibilità",
+    "Tecnico incaricato Fine Lavori e Collaudo",
+    "Impresa Affidataria",
+    "Impresa Appaltatrice",
+    "Impresa Subappaltatrice",
+    "Impresa fornitrice",
+    "Lavoratore Autonomo"
+};
+
+      var actualProjectSubjectRoles = _context.ProjectSubjectRoles.ToList();
 
 
-      foreach (var role in projectRoles)
+      foreach (var role in projectSubjectRoles)
       {
-        if (!_context.SubjectRoles.Any(r=>r.Name == role))
+        if (!actualProjectSubjectRoles.Exists(S => S.Name == role))
         {
-          var res = _context.SubjectRoles.Add(new ProjectSubjectRole() { Name = role});
+          var res = _context.ProjectSubjectRoles.Add(new ProjectSubjectRole() { Name = role });
+
+          var committenti = new List<string>
+{
+    "Committente",
+    "Responsabile lavori" };
+
+          if (committenti.Contains(role))
+          {
+            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole() { ProjectRole = res.Entity, Role = await _roleManager.FindByNameAsync("Committente") });
+          }
+          var professionisti = new List<string>
+{
+    "Certificatore energetico",
+    "Collaudatore",
+    "Coordinatore della progettazione strutturale",
+    "Coordinatore per la sicurezza in fase di esecuzione",
+    "Coordinatore per la sicurezza in fase di progettazione",
+    "Co-Progettista",
+    "Direttore Lavori acciaio",
+    "Direttore lavori architettonico",
+    "Direttore Lavori CAO",
+    "Direttore Lavori CAP",
+    "Direttore lavori impianti",
+    "Direttore Lavori muratura",
+    "Direttore lavori strutture",
+    "Estensore della perizia",
+    "Geologo",
+    "Incaricato Presentazione NP",
+    "Professionista incaricato prestazioni specialistiche",
+    "Professionista incaricato redazione Schede AeDES",
+    "Progettista architettonico",
+    "Progettista degli impianti",
+    "Progettista impianti elettrici",
+    "Progettista impianti termici",
+    "Progettista incaricato altre progettazioni (agroindustriali, agroturistiche, zootecniche, ecc.)",
+    "Progettista responsabile dell'ETC",
+    "Progettista strutture",
+    "Progettista Strutture acciaio",
+    "Progettista Strutture CAO",
+    "Progettista Strutture CAP",
+    "Progettista Strutture muratura",
+    "Tecnico incaricato Agibilità",
+    "Tecnico incaricato Fine Lavori e Collaudo"
+};
+
+          if (professionisti.Contains(role))
+          {
+            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole()
+            {
+              ProjectRole = res.Entity,
+              Role = await _roleManager.FindByNameAsync("Professionista")
+            });
+          }
+
+          var imprese = new List<string>
+{
+       "Impresa Affidataria",
+    "Impresa Lavori",
+    "Impresa fornitrice",
+    "Lavoratore Autonomo"
+};
+
+          if (imprese.Contains(role))
+          {
+            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole()
+            {
+              ProjectRole = res.Entity,
+              Role = await _roleManager.FindByNameAsync("Impresa")
+            });
+          }
         }
       }
-
       _context.SaveChanges();
 
       var existingRoles = _context.OrganizationRoles.ToList();
@@ -367,7 +478,7 @@ namespace OperaWeb.Server.DataClasses.Context
 
             var mapping = new IdentityRoleOrganizationRoleMapping()
             {
-              OrganizationRole =  organizationRole,
+              OrganizationRole = organizationRole,
               IdentityRole = roleType
             };
 

@@ -1,13 +1,13 @@
 import React from 'react';
-import ProjectTemplates from './ProjectTemplates';
-import ProjectTables from './ProjectTable';
+import RecentTemplates from 'views/dashboard/Default/RecentTemplates';
+import ProjectTable from './ProjectTable';
 
 const Dashboard = () => {
     return (
         <>
             {/* Tabella Progetti e Template */}
-            <ProjectTemplates />
-            <ProjectTables />
+            <RecentTemplates />
+            <ProjectTable />
         </>
     );
 };

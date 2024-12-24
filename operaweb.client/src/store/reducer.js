@@ -11,10 +11,10 @@ import productReducer from './slices/product';
 import chatReducer from './slices/chat';
 import calendarReducer from './slices/calendar';
 import mailReducer from './slices/mail';
-import userReducer from './slices/user';
 import cartReducer from './slices/cart';
 import kanbanReducer from './slices/kanban';
 import projectReducer from './slices/project';
+import accountReducer from './accountReducer'; // Rimuovo `userReducer`
 
 // ==============================|| COMBINE REDUCER ||============================== //
 
@@ -35,7 +35,7 @@ const reducer = combineReducers({
     chat: chatReducer,
     calendar: calendarReducer,
     mail: mailReducer,
-    user: userReducer,
+    account: accountReducer, // Solo accountReducer gestisce lo stato utente
     project: projectReducer
 });
 

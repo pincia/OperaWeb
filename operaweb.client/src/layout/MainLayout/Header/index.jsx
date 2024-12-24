@@ -62,11 +62,11 @@ const Header = () => {
                 )}
             </Box>
 
-            {/* header search */}
-            <SearchSection />
+            {/* header search 
+            <SearchSection /> />
+            */}
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />
-
             {/* mega-menu
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                 <MegaMenuSection />

@@ -38,6 +38,14 @@ export async function getProjects() {
     }
 }
 
+export async function getRecentProjects() {
+    try {
+        const response = await axios.get('/api/projects/recent-projects');
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
 
 export async function getTemplates() {
     try {

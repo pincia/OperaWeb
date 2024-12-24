@@ -30,7 +30,7 @@ const generale = {
             id: 'nuovo',
             title: <FormattedMessage id="Nuovo" />,
             type: 'item',
-            url: 'general/new',
+            url: 'templates',
             icon: icons.IconFileAnalytics,
             breadcrumbs: false
         },

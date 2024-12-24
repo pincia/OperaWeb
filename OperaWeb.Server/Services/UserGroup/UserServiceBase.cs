@@ -52,7 +52,8 @@ namespace Services.UserGroup
       await _userManager.RemoveAuthenticationTokenAsync(user, "APP", "RefreshToken");
       var refreshToken = await _userManager.GenerateUserTokenAsync(user, "APP", "RefreshToken");
       await _userManager.SetAuthenticationTokenAsync(user, "APP", "RefreshToken", refreshToken);
-      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new User() { Username = user.UserName } };
+      var userRoles = await _userManager.GetRolesAsync(user);
+      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList() } };
     }
 
     /// <summary>

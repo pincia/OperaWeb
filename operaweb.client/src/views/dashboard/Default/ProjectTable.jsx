@@ -1,25 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Button, Stack } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import { deleteProject, loader } from 'api/projects';
-import { openSnackbar } from 'store/slices/snackbar';
+import { getRecentProjects } from 'api/projects';
+import { useDispatch } from 'react-redux';
+import { setCurrentProjectId } from 'store/slices/project'; // Importa il metodo Redux
+import { useNavigate } from 'react-router-dom';
 
-const ProjectTable = ({ rows, setRows, title }) => {
-    const [selectedRowId, setSelectedRowId] = useState(null);
-    const [openConfirmation, setOpenConfirmation] = useState(false);
+const ProjectTable = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [rows, setRows] = useState(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const handleDelete = async () => {
-        try {
-            await deleteProject(selectedRowId);
-            setRows((prev) => prev.filter((row) => row.id !== selectedRowId));
-            openSnackbar({ open: true, message: 'Project deleted successfully!', variant: 'alert', alert: { color: 'success' } });
-            setOpenConfirmation(false);
-        } catch {
-            openSnackbar({ open: true, message: 'Failed to delete project!', variant: 'alert', alert: { color: 'error' } });
-        }
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await getRecentProjects();
+                setRows(response.data || []);
+                setIsLoading(false);
+            } catch (error) {
+                setError('Failed to load projects!');
+                setIsLoading(false);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    const handleOpenProject = (projectId) => {
+        dispatch(setCurrentProjectId(projectId)); // Setta il progetto corrente
+        navigate('/project/'); // Naviga alla pagina del progetto
     };
 
     const columns = [
@@ -33,18 +46,42 @@ const ProjectTable = ({ rows, setRows, title }) => {
         {
             field: 'actions',
             headerName: '',
-            width: 100,
+            width: 150,
             renderCell: (params) => (
-                <IconButton onClick={() => { setSelectedRowId(params.row.id); setOpenConfirmation(true); }}>
-                    <DeleteIcon color="secondary" />
-                </IconButton>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleOpenProject(params.row.id)}
+                >
+                    Apri progetto
+                </Button>
             ),
             disableClickEventBubbling: true
         }
     ];
 
+    if (isLoading) {
+        return <Box>Loading...</Box>;
+    }
+
+    if (error) {
+        return <Box>{error}</Box>;
+    }
+
     return (
-        <MainCard title={title} sx={{ marginTop: 2 }}>
+        <MainCard
+            title="PROGETTI RECENTI"
+            sx={{ marginTop: 2 }}
+            secondary={
+                <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => navigate('/projects')}
+                >
+                    Altri progetti...
+                </Button>
+            }
+        >
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -54,52 +91,8 @@ const ProjectTable = ({ rows, setRows, title }) => {
                     pagination: { paginationModel: { pageSize: 5 } }
                 }}
             />
-            <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
-                <DialogTitle>Conferma</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>Sei sicuro di voler eliminare il progetto?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDelete} color="primary">Sì</Button>
-                    <Button onClick={() => setOpenConfirmation(false)} color="primary">No</Button>
-                </DialogActions>
-            </Dialog>
         </MainCard>
     );
 };
 
-const ProjectTables = () => {
-    const [projectsData, setProjectsData] = useState({ myProjects: [], involvedProjects: [] });
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        loader().then(
-            (response) => {
-                setProjectsData(response.data);
-                setIsLoading(false);
-            },
-            () => {
-                setError('Failed to load projects!');
-                setIsLoading(false);
-            }
-        );
-    }, []);
-
-    if (isLoading) {
-        return <Typography variant="h6">Loading...</Typography>;
-    }
-
-    if (error) {
-        return <Typography variant="h6" color="error">{error}</Typography>;
-    }
-
-    return (
-        <>
-            <ProjectTable rows={projectsData.myProjects} setRows={(updatedRows) => setProjectsData((prev) => ({ ...prev, myProjects: updatedRows }))} title="I miei progetti" />
-            <ProjectTable rows={projectsData.involvedProjects} setRows={(updatedRows) => setProjectsData((prev) => ({ ...prev, involvedProjects: updatedRows }))} title="Progetti in cui sei coinvolto" />
-        </>
-    );
-};
-
-export default ProjectTables;
+export default ProjectTable;

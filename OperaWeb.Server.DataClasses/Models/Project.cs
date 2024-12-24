@@ -42,6 +42,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<ElencoPrezzo> ElencoPrezzi { get; set; }
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
     public ICollection<ProjectTask> ProjectTasks { get; set; }
+    public ICollection<UserProjectAccess> UserProjectAccesses { get; set; }
   }
 
 }

@@ -104,11 +104,11 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public Project GetProjectById(int id, string userId)
+    public async Task<Project> GetProjectById(int id, string userId)
     {
       try
       {
-        var project = _context.Projects.Include(p => p.Categorie)
+        var project =  _context.Projects.Include(p => p.Categorie)
             .Include(p => p.DatiGenerali)
           .FirstOrDefault(p => p.ID == id && p.User.Id == userId);
        
@@ -132,6 +132,7 @@ namespace OperaWeb.Server.Services
         project.ElencoPrezzi = elencoPrezzi.ToList();
         project.ProjectTasks = projectTasks.ToList();
         project.ConfigNumeri = configurazioni;
+        await UpdateRecentProjectAsync(userId, id);
         return project;
       }
       catch (Exception ex)
@@ -172,6 +173,59 @@ namespace OperaWeb.Server.Services
       }
     }
 
+    // Recupera i 5 progetti recenti per un utente
+    public async Task<List<ProjectHeaderDTO>> GetRecentProjectsAsync(string userId)
+    {
+      var recentProjects = await _context.UserProjectAccess
+          .Where(rp => rp.UserId == userId)
+          .OrderByDescending(rp => rp.LastAccessed)
+          .Take(5)
+          .Select(rp => rp.Project)
+          .ToListAsync();
+
+      return recentProjects.Select(project => _mapper.Map<ProjectHeaderDTO>(project)).ToList();
+    }
+
+    // Aggiorna il progetto recente per un utente
+    public async Task UpdateRecentProjectAsync(string userId, int projectId)
+    {
+      // Verifica se esiste già un record per questo progetto e utente
+      var existingEntry = _context.UserProjectAccess.FirstOrDefault(rp => rp.UserId == userId && rp.ProjectId == projectId);
+
+      if (existingEntry != null)
+      {
+        // Aggiorna la data di accesso
+        existingEntry.LastAccessed = DateTime.UtcNow;
+      }
+      else
+      {
+        // Aggiungi un nuovo record
+        var recentProject = new UserProjectAccess
+        {
+          UserId = userId,
+          ProjectId = projectId,
+          LastAccessed = DateTime.UtcNow
+        };
+
+        _context.UserProjectAccess.Add(recentProject);
+
+        // Verifica se ci sono più di 10 progetti recenti
+        var userProjects = await _context.UserProjectAccess
+               .Where(rp => rp.UserId == userId)
+               .OrderByDescending(rp => rp.LastAccessed)
+               .ToListAsync();
+
+        if (userProjects.Count > 10)
+        {
+          var projectsToRemove = userProjects.Skip(10).ToList();
+          _context.UserProjectAccess.RemoveRange(projectsToRemove);
+        }
+
+      }
+
+      // Salva le modifiche al database
+      await _context.SaveChangesAsync();
+    }
     /// <inheritdoc/>
     public async Task<ImportResult> ImportNewProject(IFormFile file, string userId, string connectionId)
     {

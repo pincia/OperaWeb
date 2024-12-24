@@ -14,7 +14,7 @@ namespace Services.UserGroup
   {
     public string AccessToken { get; set; } = "";
     public string RefreshToken { get; set; } = "";
-    public User User { get; set; }
+    public UserDTO User { get; set; }
   }
   public partial class UserService
   {

@@ -1104,6 +1104,21 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.RoleProjectSubjectRole", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProjectSubjectRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoleId", "ProjectSubjectRoleId");
+
+                    b.HasIndex("ProjectSubjectRoleId");
+
+                    b.ToTable("RoleProjectRoles");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.SubRole", b =>
                 {
                     b.Property<int>("ID")
@@ -1134,6 +1149,33 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasIndex("SubRoleId");
 
                     b.ToTable("UserSubRoles");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.UserProjectAccess", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastAccessed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserProjectAccess");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>
@@ -1266,7 +1308,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubjectRoles");
+                    b.ToTable("ProjectSubjectRole");
                 });
 
             modelBuilder.Entity("RoleSubRole", b =>
@@ -1378,7 +1420,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithOne("Analisi")
                         .HasForeignKey("OperaWeb.Server.DataClasses.Models.Analisi", "ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1389,7 +1431,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("Categorie")
                         .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1411,7 +1453,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithOne("ConfigNumeri")
                         .HasForeignKey("OperaWeb.Server.DataClasses.Models.ConfigNumeri", "ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1422,7 +1464,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithOne("DatiGenerali")
                         .HasForeignKey("OperaWeb.Server.DataClasses.Models.DatiGenerali", "ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1433,7 +1475,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("ElencoPrezzi")
                         .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1525,7 +1567,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("SubCategorie")
                         .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1536,7 +1578,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("SuperCategorie")
                         .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1575,6 +1617,25 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("SubRole");
                 });
 
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.RoleProjectSubjectRole", b =>
+                {
+                    b.HasOne("ProjectSubjectRole", "ProjectRole")
+                        .WithMany()
+                        .HasForeignKey("ProjectSubjectRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectRole");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.UserSubRole", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.User.SubRole", "SubRole")
@@ -1590,6 +1651,25 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .IsRequired();
 
                     b.Navigation("SubRole");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.UserProjectAccess", b =>
+                {
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
+                        .WithMany("UserProjectAccesses")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("OperaWeb.Server.DataClasses.Models.User.ApplicationUser", "User")
+                        .WithMany("UserProjectAccesses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Project");
 
                     b.Navigation("User");
                 });
@@ -1726,6 +1806,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("SuperCategorie");
 
+                    b.Navigation("UserProjectAccesses");
+
                     b.Navigation("VociComputo");
                 });
 
@@ -1737,6 +1819,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Provincia", b =>
                 {
                     b.Navigation("Comuni");
+                });
+
+            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.User.ApplicationUser", b =>
+                {
+                    b.Navigation("UserProjectAccesses");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.VoceComputo", b =>

@@ -6,6 +6,7 @@ using OperaWeb.Server.DataClasses.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using OperaWeb.Server.Models.Mapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace OperaWeb.Server.Controllers
 {
@@ -70,7 +71,7 @@ namespace OperaWeb.Server.Controllers
       try
       {
         var userId = User.FindFirstValue("Id");
-        var project = _projectService.GetProjectById(id, userId);
+        var project = await _projectService.GetProjectById(id, userId);
 
         if (project == null)
         {
@@ -170,6 +171,18 @@ namespace OperaWeb.Server.Controllers
       }
     }
 
+    [HttpGet("recent-projects")]
+    public async Task<IActionResult> GetRecentProjects()
+    {
+      var userId = User.FindFirstValue("Id");
 
+      var recentProjects = await _projectService.GetRecentProjectsAsync(userId);
+
+      var filteredProjects = recentProjects
+          .OrderByDescending(rp => rp.LastUpdateDate)
+          .Take(5);
+
+      return Ok(new { message = "Successfully retrieved recent projects", data =recentProjects});
+    }
   }
 }

@@ -4,16 +4,18 @@ using OperaWeb.Server.DataClasses.Context;
 using OperaWeb.Server.DataClasses.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 [Route("api/[controller]")]
 [ApiController]
 public class ProjectSubjectRoleController : ControllerBase
 {
   private readonly OperaWebDbContext _context;
-
-  public ProjectSubjectRoleController(OperaWebDbContext context)
+  private readonly RoleManager<IdentityRole> _roleManager;
+  public ProjectSubjectRoleController(OperaWebDbContext context, RoleManager<IdentityRole> roleManager)
   {
     _context = context;
+    _roleManager = roleManager;
   }
 
   // GET: api/ProjectSubjectRole
@@ -23,78 +25,20 @@ public class ProjectSubjectRoleController : ControllerBase
     return await _context.SubjectRoles.ToListAsync();
   }
 
-  // GET: api/ProjectSubjectRole/5
-  [HttpGet("{id}")]
-  public async Task<ActionResult<ProjectSubjectRole>> GetProjectSubjectRole(int id)
+  // GET: api/SubRole/UserSubRoles/{userId}
+  [HttpGet("role-project-roles/{roleName}")]
+  public async Task<IActionResult> GetUserSubRoles(string roleName)
   {
-    var role = await _context.SubjectRoles.FindAsync(id);
+    var role = await _roleManager.FindByNameAsync(roleName);
 
     if (role == null)
-    {
-      return NotFound();
-    }
+      return NotFound("Ruolo non trovato.");
 
-    return role;
-  }
+    var subRoles = await _context.RoleProjectRoles
+        .Include(ur => ur.ProjectRole).Where(r=>r.Role.Name == roleName)
+        .Select(ur => ur.ProjectRole)
+        .ToListAsync();
 
-  // POST: api/ProjectSubjectRole
-  [HttpPost]
-  public async Task<ActionResult<ProjectSubjectRole>> CreateProjectSubjectRole(ProjectSubjectRole role)
-  {
-    _context.SubjectRoles.Add(role);
-    await _context.SaveChangesAsync();
-
-    return CreatedAtAction(nameof(GetProjectSubjectRole), new { id = role.Id }, role);
-  }
-
-  // PUT: api/ProjectSubjectRole/5
-  [HttpPut("{id}")]
-  public async Task<IActionResult> UpdateProjectSubjectRole(int id, ProjectSubjectRole role)
-  {
-    if (id != role.Id)
-    {
-      return BadRequest();
-    }
-
-    _context.Entry(role).State = EntityState.Modified;
-
-    try
-    {
-      await _context.SaveChangesAsync();
-    }
-    catch (DbUpdateConcurrencyException)
-    {
-      if (!ProjectSubjectRoleExists(id))
-      {
-        return NotFound();
-      }
-      else
-      {
-        throw;
-      }
-    }
-
-    return NoContent();
-  }
-
-  // DELETE: api/ProjectSubjectRole/5
-  [HttpDelete("{id}")]
-  public async Task<IActionResult> DeleteProjectSubjectRole(int id)
-  {
-    var role = await _context.SubjectRoles.FindAsync(id);
-    if (role == null)
-    {
-      return NotFound();
-    }
-
-    _context.SubjectRoles.Remove(role);
-    await _context.SaveChangesAsync();
-
-    return NoContent();
-  }
-
-  private bool ProjectSubjectRoleExists(int id)
-  {
-    return _context.SubjectRoles.Any(e => e.Id == id);
+    return Ok(subRoles);
   }
 }

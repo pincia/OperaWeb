@@ -77,7 +77,7 @@ namespace OperaWeb.Server.Models.Mapper
 
         // Pre-caricare lookup per accesso rapido
         var elencoPrezziLookup = model.ElencoPrezzi.ToDictionary(p => p.ID);
-        var vociComputoLookup = model.VociComputo.GroupBy(v => v.SuperCategoriaID).ToDictionary(g => g.Key);
+        var vociComputoLookup = model.VociComputo.GroupBy(v => v.SuperCategoria.ID).ToDictionary(g => g.Key);
         var misureLookup = model.VociComputo
             .Where(v => v.Misure != null)
             .SelectMany(v => v.Misure)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OperaWeb.Server.DataClasses.Migrations;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.Models;
@@ -14,8 +15,11 @@ namespace OperaWeb.Server.DataClasses.Context
     public DbSet<OrganizationMember> OrganizationMembers { get; set; }
     public virtual DbSet<Comune> Comuni { get; set; }
     public virtual DbSet<Provincia> Province { get; set; }
+    public virtual DbSet<UserProjectAccess> UserProjectAccess { get; set; }
     public virtual DbSet<UserSubRole> UserSubRoles { get; set; }
     public virtual DbSet<RoleSubRole> RoleSubRoles { get; set; }
+    public virtual DbSet<ProjectSubjectRole> ProjectSubjectRoles { get; set; }
+    public virtual DbSet<RoleProjectSubjectRole> RoleProjectRoles { get; set; }
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<Categoria> Categorie { get; set; }
     public virtual DbSet<SubCategoria> SubCategorie { get; set; }
