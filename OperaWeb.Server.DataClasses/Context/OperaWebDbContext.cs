@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using OperaWeb.Server.DataClasses.Migrations;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.Models;
+using AccessLog = OperaWeb.Server.DataClasses.Models.AccessLog;
 
 namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
     public virtual DbSet<SubRole> SubRoles { get; set; }
+    public DbSet<AccessLog> AccessLogs { get; set; }
     public DbSet<OrganizationRole> OrganizationRoles { get; set; }
     public DbSet<OrganizationMember> OrganizationMembers { get; set; }
     public virtual DbSet<Comune> Comuni { get; set; }

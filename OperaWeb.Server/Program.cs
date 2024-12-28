@@ -68,6 +68,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddEntityFrameworkStores<OperaWebDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("APP");
 
+builder.Services.AddScoped<AccessLogService>();
+builder.Services.AddHttpContextAccessor();
+
 // Registrazione di SignalR
 builder.Services.AddSignalR();
 

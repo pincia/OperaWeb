@@ -77,6 +77,9 @@ namespace Services.UserGroup
           }
         }
 
+        // Log accesso riuscito
+        await _accessLogService.LogAccessAsync(user.UserName, "LOGIN", success: true, user.Id);
+
         return new AppResponse<UserLoginResponse>().SetSuccessResponse(token);
       }
       else

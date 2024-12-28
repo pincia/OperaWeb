@@ -13,17 +13,16 @@ const accountReducer = (state = initialState, action) => {
             const { user } = action.payload || {};
             return {
                 ...state,
-                user: user || null
+                user
             };
         }
         case LOGIN: {
-            console.log('Payload ricevuto in LOGIN:', action.payload);
             const  user = action.payload.user || {};
             return {
                 ...state,
                 isLoggedIn: true,
                 isInitialized: true,
-                user: user || null
+                user 
             };
         }
         case LOGOUT: {

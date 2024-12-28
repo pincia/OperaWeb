@@ -4,7 +4,7 @@ import React, { createContext, useEffect, useReducer } from 'react';
 // third-party
 import { Chance } from 'chance';
 import { jwtDecode } from 'jwt-decode';
-
+import { useDispatch, useSelector } from 'react-redux';
 // reducer - state management
 import { LOGIN, LOGOUT, REGISTER } from 'store/actions';
 import accountReducer from 'store/accountReducer';
@@ -43,7 +43,8 @@ const setSession = (serviceToken) => {
 const JWTContext = createContext(null);
 
 export const JWTProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(accountReducer, initialState);
+    const dispatch = useDispatch();
+    const state = useSelector((state) => state.account); // Usa lo stato Redux
 
     useEffect(() => {
         const init = async () => {
@@ -52,7 +53,7 @@ export const JWTProvider = ({ children }) => {
                 if (serviceToken && verifyToken(serviceToken)) {
                     setSession(serviceToken);
                     const response = await axios.get('/api/user/me');
-                    const { user } = response.data;
+                    const user  = response.data.data;
                     dispatch({
                         type: LOGIN,
                         payload: {
@@ -89,8 +90,6 @@ export const JWTProvider = ({ children }) => {
                 }
             });
         }
-
-        console.log('Stato globale Redux', store.getState());
         return response;
     };
 
@@ -120,9 +119,13 @@ export const JWTProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        setSession(null);
-        dispatch({ type: LOGOUT });
+    const logout = async  () => {
+        const response = await axios.post('/api/user/logout');
+        if (response.data.isSucceed) {
+            setSession(null);
+            dispatch({ type: LOGOUT });
+        }       
+        return response;
     };
 
     const resetPassword = async (email) => {

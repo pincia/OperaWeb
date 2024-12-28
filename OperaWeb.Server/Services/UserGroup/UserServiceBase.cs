@@ -9,7 +9,7 @@ using OperaWeb.Server.DataClasses.Models.User;
 
 namespace Services.UserGroup
 {
-    public partial class UserService
+  public partial class UserService
   {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -19,6 +19,8 @@ namespace Services.UserGroup
     private IEmailSender _emailService;
     private readonly ILogger<UserService> _logger;
     private readonly INotificationService _notificationService;
+    private readonly AccessLogService _accessLogService;
+
     public UserService(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
@@ -26,8 +28,10 @@ namespace Services.UserGroup
             AppSettings appSettings,
             IEmailSender emailService,
             ILogger<UserService> logger,
+             AccessLogService accessLogService,
     INotificationService notificationService)
     {
+      _accessLogService = accessLogService;
       _notificationService = notificationService;
       _userManager = userManager;
       _signInManager = signInManager;

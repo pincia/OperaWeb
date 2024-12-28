@@ -1,6 +1,5 @@
 import React from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'store';
 // material-ui
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -8,15 +7,10 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
-import {
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle
-} from '@mui/material';
+
 // project imports
 import { getProject, getSoaClassifications, getSoas } from 'api/projects';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import GeneralForm from './GeneralForm';
@@ -29,11 +23,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { saveProject } from 'api/projects';
-//redux slices
-import { setCurrentProject, clearImportedProject, setCurrentProjectId } from 'store/slices/project';
-
 // step options
-const steps = ['Generali', 'Soggetti', 'Configurazioni', 'Lavorazioni', 'Quadro economico'];
+const steps = ['Generali', 'Configurazioni', 'Soggetti', 'Lavorazioni', 'Quadro economico'];
 
 const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData, setProjectData, soaOptions, soaClassificationOptions, setSubjectsData, tasksData, setTasksData) => {
     switch (step) {
@@ -48,7 +39,7 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                     soaClassificationsOptions={soaClassificationOptions}
                 />
             );
-        case 1:
+        case 2:
             return (
                 <SubjectsForm
                     subjectsData={projectData.subjects}
@@ -57,19 +48,11 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                     }
                     handleNext={handleNext}
                     handleBack={handleBack}
-                    setErrorIndex={setErrorIndex}
+                    setErrorIndex ={setErrorIndex}
                     projectData={projectData}
                     setProjectData={setProjectData}
                 />
             );
-        case 2:
-            return <ConfigurationsForm
-                handleNext={handleNext}
-                handleBack={handleBack}
-                projectData={projectData}
-                setProjectData={setProjectData}             
-            />;
-
         case 3:
             return <Tasks
                 handleNext={handleNext}
@@ -78,9 +61,15 @@ const getStepContent = (step, handleNext, handleBack, setErrorIndex, projectData
                 projectData={projectData}
                 setProjectData={setProjectData}
             />;
-
         case 4:
             return <EconomicsForm
+                handleNext={handleNext}
+                handleBack={handleBack}
+                projectData={projectData}
+                setProjectData={setProjectData}
+            />;
+        case 1:
+            return <ConfigurationsForm
                 handleNext={handleNext}
                 handleBack={handleBack}
                 projectData={projectData}
@@ -101,11 +90,9 @@ const ProjectWizard = () => {
     const [errorIndex, setErrorIndex] = React.useState(null);
     const [soaOptions, setSoaOptions] = useState(null);
     const [soaClassificationOptions, setSoaClassificationOptions] = useState(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
+
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const currentImportedProject = useSelector((state) => state.project.currentImportedProject);
 
@@ -128,9 +115,9 @@ const ProjectWizard = () => {
                         ...currentImportedProject
                     }));
 
+                    console.log(projectData)
                 }
 
-                console.log("PROJHCT DATA" + JSON.stringify(projectData, null, 2))
                 const soasResponse = await getSoas();
                 setSoaOptions(soasResponse);
 
@@ -155,18 +142,21 @@ const ProjectWizard = () => {
     const handleNext = async () => {
         if (activeStep === steps.length - 1) {
             try {
-                const savedProject = await saveProject(projectData.id, projectData);
-
-                // Imposta il progetto come currentProject nello stato Redux
-                dispatch(setCurrentProject(savedProject));
-
-                // Resetta currentImportedProject
-                dispatch(clearImportedProject());
-
-                // Mostra il dialog di conferma
-                setDialogOpen(true);
+                await saveProject(projectData.id, projectData);
+                console.log("Progetto salvato con successo");
+                openSnackbar({
+                    open: true,
+                    message: 'Progetto salvato con successo!',
+                    variant: 'alert',
+                    alert: { color: 'success' },
+                });
             } catch (error) {
-                console.error('Errore durante il salvataggio del progetto:', error);
+                openSnackbar({
+                    open: true,
+                    message: 'Errore durante il salvataggio del progetto.',
+                    variant: 'alert',
+                    alert: { color: 'error' },
+                });
             }
         } else {
             setActiveStep(activeStep + 1);
@@ -177,12 +167,6 @@ const ProjectWizard = () => {
 
     const handleBack = () => {
         setActiveStep(activeStep - 1);
-    };
-
-    const handleDialogClose = () => {
-        setDialogOpen(false);
-        dispatch(setCurrentProjectId(projectData.id));
-        navigate('/project'); // Naviga alla pagina del progetto
     };
 
     if (loading) {
@@ -254,17 +238,6 @@ const ProjectWizard = () => {
                     )}
                 </>
             </>
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Progetto Salvato</DialogTitle>
-                <DialogContent>
-                    <Typography>Il progetto è stato salvato con successo!</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose} variant="contained" color="primary">
-                        Vai al progetto
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </MainCard>
     );
 };
