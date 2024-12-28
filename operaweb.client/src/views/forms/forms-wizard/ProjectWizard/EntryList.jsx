@@ -319,7 +319,11 @@ export default function EntryList({
 
     const getEntryPrice = (entry) => {
         const measurements = entry.measurements || []; // Imposta un array vuoto se undefined
-        return measurements.reduce((sum, item) => sum + (item.quantita || 0), 0).toFixed(2);
+        return Array.isArray(measurements) && measurements.length > 0
+            ? measurements
+                .reduce((sum, item) => sum + (parseFloat(item.quantita) || 0), 0)
+                .toFixed(2)
+            : "0.00";
     };
 
 
@@ -469,7 +473,6 @@ export default function EntryList({
                                                                                 onClick={() => {
                                                                                     handleDuplicateMeasurement(entry.id, m)
                                                                                     handleMenuClose();
-                                                                                    setMeasurementDialogOpen(true);
                                                                                 }}
                                                                             >
                                                                                 Duplica misurazione
@@ -524,6 +527,7 @@ export default function EntryList({
                     <TextField
                         label="Lunghezza"
                         fullWidth
+                        type="number"
                         value={newMeasurement.lunghezza}
                         onChange={(e) => setNewMeasurement({ ...newMeasurement, lunghezza: e.target.value })}
                         sx={{ mb: 2 }}
@@ -531,6 +535,7 @@ export default function EntryList({
                     <TextField
                         label="Larghezza"
                         fullWidth
+                        type="number"
                         value={newMeasurement.larghezza}
                         onChange={(e) => setNewMeasurement({ ...newMeasurement, larghezza: e.target.value })}
                         sx={{ mb: 2 }}
@@ -538,6 +543,7 @@ export default function EntryList({
                     <TextField
                         label="HPeso"
                         fullWidth
+                        type="number"
                         value={newMeasurement.hPeso}
                         onChange={(e) => setNewMeasurement({ ...newMeasurement, hPeso: e.target.value })}
                         sx={{ mb: 2 }}
@@ -545,6 +551,7 @@ export default function EntryList({
                     <TextField
                         label="Quantità"
                         fullWidth
+                        type="number"
                         value={newMeasurement.quantita}
                         onChange={(e) => setNewMeasurement({ ...newMeasurement, quantita: e.target.value })}
                         sx={{ mb: 2 }}

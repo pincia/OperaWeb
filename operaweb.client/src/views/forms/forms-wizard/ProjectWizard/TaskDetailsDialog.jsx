@@ -6,9 +6,11 @@ export default function TaskDetailsDialog({
     setOpen,
     task,
     setTask,
+    tasks,
     setTasks,
     setSnackbar,
-    generatedId
+    generateId,
+    setSelectedTaskEntries
 }) {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -25,40 +27,28 @@ export default function TaskDetailsDialog({
             // Operazione di aggiunta
             const newTask = {
                 ...task,
-                id: generatedId,
+                id: generateId(),
+                level: task.parentId ? findTaskLevel(tasks, task.parentId) + 1 : 1, // Calcola il livello
                 children: [],
                 entries: []
             };
 
             if (task.parentId) {
                 setTasks((prevTasks) => {
-                    const newTask = {
-                        ...task,
-                        id: task.id || new Date().getTime(),
-                        children: task.children || [],
-                        entries: task.entries || []
+                    const addChildToParent = (tasks, parentId, child) => {
+                        return tasks.map((t) => {
+                            if (t.id === parentId) {
+                                return { ...t, children: [...(t.children || []), child] };
+                            } else if (t.children) {
+                                return { ...t, children: addChildToParent(t.children, parentId, child) };
+                            }
+                            return t;
+                        });
                     };
-
-                    if (task.parentId) {
-                        const addChildToParent = (tasks, parentId, child) => {
-                            return tasks.map((t) => {
-                                if (t.id === parentId) {
-                                    return { ...t, children: [...(t.children || []), child] };
-                                } else if (t.children) {
-                                    return { ...t, children: addChildToParent(t.children, parentId, child) };
-                                }
-                                return t;
-                            });
-                        };
-                        return addChildToParent(prevTasks, task.parentId, newTask);
-                    }
-
-                    return [...prevTasks, newTask];
+                    return addChildToParent(prevTasks, task.parentId, newTask);
                 });
-
-                setSnackbar({ open: true, message: 'Lavorazione salvata con successo.', severity: 'success' });
             } else {
-                setSnackbar({ open: true, message: 'Non è possibile aggiungere altre lavorazioni principali.', severity: 'warning' });
+                setTasks((prevTasks) => [...prevTasks, newTask]);
             }
 
             setSnackbar({ open: true, message: 'Lavorazione aggiunta con successo.', severity: 'success' });
@@ -76,6 +66,18 @@ export default function TaskDetailsDialog({
         setOpen(false);
     };
 
+    // Funzione per trovare il livello del task genitore
+    const findTaskLevel = (tasks, parentId) => {
+        for (const task of tasks) {
+            if (task.id === parentId) return task.level;
+            if (task.children) {
+                const level = findTaskLevel(task.children, parentId);
+                if (level) return level;
+            }
+        }
+        return 0;
+    };
+
     const updateTask = (tasks, updatedTask) => {
         return tasks.map((t) =>
             t.id === updatedTask.id
@@ -83,7 +85,6 @@ export default function TaskDetailsDialog({
                 : { ...t, children: updateTask(t.children, updatedTask) }
         );
     };
-
 
     return (
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>

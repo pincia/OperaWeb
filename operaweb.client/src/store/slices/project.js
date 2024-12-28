@@ -1,7 +1,7 @@
 ﻿// third-party
 import { createSlice } from '@reduxjs/toolkit';
 import { dispatch } from '../index';
-
+/*
 const initialState = {
     error: null,
     currentImportedProject: {
@@ -48130,14 +48130,14 @@ const initialState = {
     },
     currentProject: null,
     currentProjectId: null
-}; 
-/*
+}; */
+
 const initialState = {
     error: null,
     currentImportedProject: null,
     currentProject: null,
     currentProjectId: null
-};*/
+};
 
 const slice = createSlice({
     name: 'project',

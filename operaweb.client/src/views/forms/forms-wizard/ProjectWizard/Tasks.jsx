@@ -42,9 +42,9 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
     });
 
     const [tasks, setTasks] = useState(projectData.jobs || [
-        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false },
-        { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false },
-        { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false }
+        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false, level: 1},
+        { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false, level: 1 },
+        { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false, level: 1 },
     ]);
 
     const [open, setOpen] = useState(false);
@@ -141,6 +141,7 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                 setOpen={setOpen}
                 task={task}
                 setTask={setTask}
+                tasks={tasks}
                 setTasks={setTasks}
                 setSnackbar={setSnackbar}
                 generateId={generateId}
