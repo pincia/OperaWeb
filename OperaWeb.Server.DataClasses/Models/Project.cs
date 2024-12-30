@@ -43,6 +43,8 @@ namespace OperaWeb.Server.DataClasses.Models
     public ICollection<ProjectSubject> ProjectSubjects { get; set; }
     public ICollection<ProjectTask> ProjectTasks { get; set; }
     public ICollection<UserProjectAccess> UserProjectAccesses { get; set; }
+
+    public Economics Economics { get; set; }
   }
 
 }

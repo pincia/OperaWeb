@@ -10,6 +10,7 @@ namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
+    public virtual DbSet<Economics> Economics { get; set; }
     public virtual DbSet<SubRole> SubRoles { get; set; }
     public DbSet<AccessLog> AccessLogs { get; set; }
     public DbSet<OrganizationRole> OrganizationRoles { get; set; }

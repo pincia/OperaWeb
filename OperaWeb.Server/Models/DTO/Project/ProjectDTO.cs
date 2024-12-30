@@ -33,5 +33,8 @@ namespace OperaWeb.Server.Models.DTO.Project
 
     public ConfigurationDTO Configurations { get; set; }
 
+    public EconomicsDTO Economics { get; set; }
+
+
   }
 }

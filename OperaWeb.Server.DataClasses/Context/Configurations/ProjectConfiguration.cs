@@ -53,6 +53,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
            .HasForeignKey<DatiGenerali>(dg => dg.ProjectID)
            .OnDelete(DeleteBehavior.Restrict);
 
+    builder.HasOne(p => p.Economics)
+       .WithOne(dg => dg.Project)
+       .HasForeignKey<Economics>(dg => dg.ProjectId)
+       .OnDelete(DeleteBehavior.Restrict);
+
     builder.HasOne(p => p.Analisi)
        .WithOne(dg => dg.Project)
        .HasForeignKey<Analisi>(dg => dg.ProjectID)

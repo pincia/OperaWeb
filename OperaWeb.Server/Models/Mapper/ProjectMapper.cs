@@ -74,6 +74,19 @@ namespace OperaWeb.Server.Models.Mapper
             Type = task.Type
           }).ToList() ?? new List<ProjectTaskDTO>();
         }
+        if (model.Economics != null)
+        {
+          dtoProject.Economics = new EconomicsDTO
+          {
+            MeasuredWorks = model.Economics.MeasuredWorks,
+            LumpSumWorks = model.Economics.LumpSumWorks,
+            SafetyCosts = model.Economics.SafetyCosts,
+            LaborCosts = model.Economics.LaborCosts,
+            AuctionVariationPercentage = model.Economics.AuctionVariationPercentage,
+            AvailableSums = model.Economics.AvailableSums,
+            TotalProjectCalculationType = model.Economics.TotalProjectCalculationType
+          };
+        }
 
         // Pre-caricare lookup per accesso rapido
         var elencoPrezziLookup = model.ElencoPrezzi.ToDictionary(p => p.ID);
@@ -245,6 +258,23 @@ namespace OperaWeb.Server.Models.Mapper
           Type = task.Type,
           ProjectId = dto.Id
         }).ToList();
+
+        if (dto.Economics != null)
+        {
+          if (existingProject?.Economics == null)
+          {
+            project.Economics = new Economics();
+          }
+
+          project.Economics.MeasuredWorks = dto.Economics.MeasuredWorks;
+          project.Economics.LumpSumWorks = dto.Economics.LumpSumWorks;
+          project.Economics.SafetyCosts = dto.Economics.SafetyCosts;
+          project.Economics.LaborCosts = dto.Economics.LaborCosts;
+          project.Economics.AuctionVariationPercentage = dto.Economics.AuctionVariationPercentage;
+          project.Economics.AvailableSums = dto.Economics.AvailableSums;
+          project.Economics.TotalProjectCalculationType = dto.Economics.TotalProjectCalculationType;
+        }
+
 
         if (dto.Configurations != null)
         {

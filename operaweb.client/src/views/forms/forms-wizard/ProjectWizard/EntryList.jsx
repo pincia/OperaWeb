@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -42,6 +42,7 @@ export default function EntryList({
 }) {
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [menuAnchor2, setMenuAnchor2] = useState(null);
+    const [highlightedMeasurementId, setHighlightedMeasurementId] = useState(null);
     const [menuTask, setMenuTask] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [measurementDialogOpen, setMeasurementDialogOpen] = useState(false);
@@ -181,9 +182,13 @@ export default function EntryList({
     };
 
     const handleMenuOpen = (event, task) => {
-        setMenuAnchor(event.currentTarget);
-        setMenuAnchor2(event.currentTarget);
-        setMenuTask(task);
+        setMenuAnchor(event.currentTarget); // Imposta l'ancora per il menu delle voci
+        setMenuTask(task); // Salva la voce associata al menu
+    };
+
+    const handleMeasurementMenuOpen = (event, measurement) => {
+        setMenuAnchor2(event.currentTarget); // Imposta l'ancora per il menu delle misurazioni
+        setMenuTask(measurement); // Salva la misurazione associata al menu
     };
 
     const handleMenuClose = () => {
@@ -192,15 +197,23 @@ export default function EntryList({
         setMenuTask(null);
     };
 
-    const handleAddMeasurement = () => {
-        if (!newMeasurement.description || !newMeasurement.quantita) {
-            setSnackbar({
-                open: true,
-                message: 'Descrizione e Quantità sono obbligatori.',
-                severity: 'error',
-            });
-            return;
+    useEffect(() => {
+        if (highlightedMeasurementId) {
+            const timeout = setTimeout(() => setHighlightedMeasurementId(null), 2000);
+            return () => clearTimeout(timeout);
         }
+    }, [highlightedMeasurementId]);
+
+
+    const handleAddMeasurement = (entryId) => {
+        const newMeasurement = {
+            id: Date.now(),
+            description: '',
+            lunghezza: 0,
+            larghezza: 0,
+            hPeso: 0,
+            quantita: 0,
+        };
 
         const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurement) => {
             return tasks.map((task) => {
@@ -211,10 +224,7 @@ export default function EntryList({
                             if (entry.id === entryId) {
                                 return {
                                     ...entry,
-                                    measurements: [
-                                        ...(entry.measurements || []),
-                                        { id: Date.now(), ...measurement },
-                                    ],
+                                    measurements: [...(entry.measurements || []), measurement], // Aggiunge la nuova misurazione
                                 };
                             }
                             return entry;
@@ -242,7 +252,7 @@ export default function EntryList({
             const updatedTasks = updateMeasurementsInHierarchy(
                 prevTasks,
                 taskId,
-                currentEntryId,
+                entryId,
                 newMeasurement
             );
 
@@ -252,9 +262,20 @@ export default function EntryList({
             return updatedTasks;
         });
 
-        setNewMeasurement({ description: '', lunghezza: '', larghezza: '', hPeso: '', quantita: '' });
-        setSnackbar({ open: true, message: 'Misurazione aggiunta con successo.', severity: 'success' });
-        setMeasurementDialogOpen(false);
+        // Espandi automaticamente l'albero per l'entry specifica
+        setExpandedEntries((prevState) => ({
+            ...prevState,
+            [entryId]: true,
+        }));
+
+        // Evidenzia la nuova misurazione
+        setHighlightedMeasurementId(newMeasurement.id);
+
+        setSnackbar({
+            open: true,
+            message: 'Nuova misurazione aggiunta.',
+            severity: 'success',
+        });
     };
 
 
@@ -373,13 +394,12 @@ export default function EntryList({
                                             <Menu
                                                 anchorEl={menuAnchor}
                                                 open={Boolean(menuAnchor)}
-                                                onClose={handleMenuClose}
+                                                onClose={handleMenuClose} // Chiude il menu delle voci
                                             >
                                                 <MenuItem
                                                     onClick={() => {
-                                                        setCurrentEntryId(entry.id);
+                                                        handleAddMeasurement(entry.id); // Passa l'ID della voce selezionata
                                                         handleMenuClose();
-                                                        setMeasurementDialogOpen(true);
                                                     }}
                                                 >
                                                     Aggiungi Misurazione
@@ -388,7 +408,7 @@ export default function EntryList({
 
                                                 <MenuItem
                                                     onClick={() => {
-                                                        setEntryToDelete(entry);
+                                                        setEntryToDelete(menuTask);
                                                         handleMenuClose();
                                                         setConfirmDialogOpen(true);
                                                     }}
@@ -396,6 +416,7 @@ export default function EntryList({
                                                     Elimina Voce
                                                 </MenuItem>
                                             </Menu>
+
 
                                         </TableCell>
                                     </TableRow>
@@ -419,7 +440,13 @@ export default function EntryList({
                                                         </TableHead>
                                                         <TableBody>
                                                             {(entry.measurements || []).map((m) => (
-                                                                <TableRow key={m.id}>
+                                                                <TableRow
+                                                                    key={m.id}
+                                                                    sx={{
+                                                                        backgroundColor: m.id === highlightedMeasurementId ? 'rgba(0, 128, 255, 0.2)' : 'inherit',
+                                                                        transition: 'background-color 0.3s ease',
+                                                                    }}
+                                                                >
                                                                     <TableCell>
                                                                         <EditableCell
                                                                             value={m.description}
@@ -461,40 +488,36 @@ export default function EntryList({
                                                                         />
                                                                     </TableCell>
                                                                     <TableCell>
-                                                                        <IconButton onClick={(e) => handleMenuOpen(e, entry)}>
+                                                                        <IconButton onClick={(e) => handleMeasurementMenuOpen(e, m)}>
                                                                             <MoreVertIcon />
                                                                         </IconButton>
                                                                         <Menu
-                                                                            anchorEl={menuAnchor}
-                                                                            open={Boolean(menuAnchor)}
-                                                                            onClose={handleMenuClose}
+                                                                            anchorEl={menuAnchor2}
+                                                                            open={Boolean(menuAnchor2)}
+                                                                            onClose={() => setMenuAnchor2(null)}
                                                                         >
                                                                             <MenuItem
                                                                                 onClick={() => {
-                                                                                    handleDuplicateMeasurement(entry.id, m)
-                                                                                    handleMenuClose();
+                                                                                    handleDuplicateMeasurement(entry.id, m);
+                                                                                    setMenuAnchor2(null);
                                                                                 }}
                                                                             >
-                                                                                Duplica misurazione
+                                                                                Duplica Misurazione
                                                                             </MenuItem>
-
-
                                                                             <MenuItem
                                                                                 onClick={() => {
-                                                                                    handleDeleteMeasurement(entry.id, m.id)                                                                                
-                                                                                    handleMenuClose();
-                                                                                    setMeasurementDialogOpen(true);
+                                                                                    handleDeleteMeasurement(entry.id, m.id);
+                                                                                    setMenuAnchor2(null);
                                                                                 }}
                                                                             >
                                                                                 Elimina Misurazione
                                                                             </MenuItem>
                                                                         </Menu>
-                                                                      
-
                                                                     </TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
+
 
                                                     </Table>
                                                 </Box>
@@ -514,58 +537,7 @@ export default function EntryList({
                 </Typography>
             )}
 
-            <Dialog open={measurementDialogOpen} onClose={() => setMeasurementDialogOpen(false)}>
-                <DialogTitle>Aggiungi Misurazione</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Descrizione"
-                        fullWidth
-                        value={newMeasurement.description}
-                        onChange={(e) => setNewMeasurement({ ...newMeasurement, description: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Lunghezza"
-                        fullWidth
-                        type="number"
-                        value={newMeasurement.lunghezza}
-                        onChange={(e) => setNewMeasurement({ ...newMeasurement, lunghezza: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Larghezza"
-                        fullWidth
-                        type="number"
-                        value={newMeasurement.larghezza}
-                        onChange={(e) => setNewMeasurement({ ...newMeasurement, larghezza: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="HPeso"
-                        fullWidth
-                        type="number"
-                        value={newMeasurement.hPeso}
-                        onChange={(e) => setNewMeasurement({ ...newMeasurement, hPeso: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Quantità"
-                        fullWidth
-                        type="number"
-                        value={newMeasurement.quantita}
-                        onChange={(e) => setNewMeasurement({ ...newMeasurement, quantita: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setMeasurementDialogOpen(false)} color="secondary">
-                        Annulla
-                    </Button>
-                    <Button onClick={handleAddMeasurement} color="primary" variant="contained">
-                        Aggiungi
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
             <Dialog
                 open={confirmDialogOpen}
                 onClose={() => setConfirmDialogOpen(false)}

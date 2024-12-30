@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241230162529_AddEconomicsToProject")]
+    partial class AddEconomicsToProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -489,44 +492,36 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AuctionVariationPercentage")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Percentuale variazione d'asta");
+                    b.Property<decimal>("CMO")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("AvailableSums")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Somme a disposizione");
+                    b.Property<decimal>("CSI")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("LaborCosts")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Costi della manodopera");
+                    b.Property<decimal>("LCP")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("LumpSumWorks")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Importo dei lavori a corpo");
-
-                    b.Property<decimal>("MeasuredWorks")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Importo dei lavori a misura");
+                    b.Property<decimal>("LMS")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SafetyCosts")
-                        .HasColumnType("decimal(18,2)")
-                        .HasComment("Costi della sicurezza");
+                    b.Property<decimal>("SAD")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("TotalProjectCalculationType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasComment("Tipo di calcolo del totale progetto");
+                    b.Property<int>("TTP")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("VBA")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
-                    b.ToTable("Economics", (string)null);
+                    b.ToTable("Economics");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ElencoPrezzo", b =>
@@ -1562,7 +1557,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithOne("Economics")
                         .HasForeignKey("OperaWeb.Server.DataClasses.Models.Economics", "ProjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
