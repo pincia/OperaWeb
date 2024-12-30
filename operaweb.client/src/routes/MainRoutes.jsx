@@ -15,7 +15,7 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 
 //projects
 const Projects = Loadable(lazy(() => import('views/pages/projects')));
-const ProjectWizard = Loadable(lazy(() => import('views/forms/forms-wizard/ProjectWizard')));
+const ProjectWizard = Loadable(lazy(() => import('ui-component/ProjectWizard')));
 const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/Progetto')));
 
 //origanization

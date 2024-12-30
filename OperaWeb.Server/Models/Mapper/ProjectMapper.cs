@@ -42,7 +42,8 @@ namespace OperaWeb.Server.Models.Mapper
               ConvPrezzi = model.ConfigNumeri.ConvPrezzi,
               ConvPrezziTotale = model.ConfigNumeri.ConvPrezziTotale,
               IncidenzaPercentuale = model.ConfigNumeri.IncidenzaPercentuale,
-              Aliquote = model.ConfigNumeri.Aliquote
+              Aliquote = model.ConfigNumeri.Aliquote,
+              Valuta = model.ConfigNumeri.Valuta,
             } : new ConfigNumeriDTO(),
             Analisi = model.Analisi != null ? new ConfigAnalisiDTO()
             {
@@ -231,9 +232,9 @@ namespace OperaWeb.Server.Models.Mapper
         project.Public = dto.Public;
         project.GIG = dto.GIG;
         project.CUP = dto.CUP;
+        project.Province = dto.Province;
         project.CreationDate = dto.CreationDate;
         project.LastUpdateDate = dto.LastUpdateDate;
-
         if (dto.SoaCategoryId > 0)
         {
           project.SoaCategoryId = dto.SoaCategoryId ?? 0;
@@ -275,7 +276,14 @@ namespace OperaWeb.Server.Models.Mapper
           project.Economics.TotalProjectCalculationType = dto.Economics.TotalProjectCalculationType;
         }
 
-
+        project.DatiGenerali = new DatiGenerali()
+        {
+           Comune = dto.City,
+           Provincia = dto.Province,
+           Oggetto = dto.Object,
+           ParteOpera = dto.Works,
+           Impresa = ""
+        };
         if (dto.Configurations != null)
         {
           if (dto.Configurations.Numeri != null)
@@ -293,7 +301,8 @@ namespace OperaWeb.Server.Models.Mapper
               ConvPrezziTotale = dto.Configurations.Numeri.ConvPrezziTotale,
               IncidenzaPercentuale = dto.Configurations.Numeri.IncidenzaPercentuale,
               Aliquote = dto.Configurations.Numeri.Aliquote,
-              ProjectID = project.ID
+              ProjectID = project.ID,
+              Valuta = dto.Configurations.Numeri.Valuta
             };
           }
           if (dto.Configurations.Analisi != null)

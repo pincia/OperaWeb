@@ -20,45 +20,78 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
     const [selectedMetodoIndex, setSelectedMetodoIndex] = useState({});
     const [selectedApplicataAIndex, setSelectedApplicataAIndex] = useState({});
-    // Inizializza configurazioni dal projectData
+
     useEffect(() => {
         if (projectData.configurations) {
-            setLocalConfigurations({ ...projectData.configurations });
-            setSelectedMetodoIndex(projectData.configurations.analisi.metodo); 
-            setSelectedApplicataAIndex(projectData.configurations.analisi.applicataA); 
+            setLocalConfigurations({
+                numeri: {
+                    ...projectData.configurations.numeri,
+                    partiUguali: projectData.configurations.numeri?.partiUguali || 0,
+                    lunghezza: projectData.configurations.numeri?.lunghezza || 0,
+                    larghezza: projectData.configurations.numeri?.larghezza || 0,
+                    hPeso: projectData.configurations.numeri?.hPeso || 0,
+                    quantita: projectData.configurations.numeri?.quantita || 0,
+                    prezzi: projectData.configurations.numeri?.prezzi || 0,
+                    prezziTotale: projectData.configurations.numeri?.prezziTotale || 0,
+                    convPrezzi: projectData.configurations.numeri?.convPrezzi || 0,
+                    convPrezziTotale: projectData.configurations.numeri?.convPrezziTotale || 0,
+                    incidenzaPercentuale: projectData.configurations.numeri?.incidenzaPercentuale || 0,
+                    aliquote: projectData.configurations.numeri?.aliquote || 0,
+                    valuta: projectData.configurations.numeri?.valuta || "Euro"
+                },
+                analisi: {
+                    ...projectData.configurations.analisi,
+                    speseGenerali: projectData.configurations.analisi?.speseGenerali || 0,
+                    utileImpresa: projectData.configurations.analisi?.utileImpresa || 0,
+                    metodo: projectData.configurations.analisi?.metodo || 0,
+                    applicataA: projectData.configurations.analisi?.applicataA || 0
+                }
+            });
         } else {
             setLocalConfigurations({
                 numeri: {
-                partiUguali: 0,
-                lunghezza: 0,
-                larghezza: 0,
-                hPeso: 0,
-                quantita: 0,
-                prezzi: 0,
-                prezziTotale: 0,
-                convPrezzi: 0,
-                convPrezziTotale: 0,
-                incidenzaPercentuale: 0,
-                aliquote: 0,
-                valuta: "Euro"
+                    partiUguali: 0,
+                    lunghezza: 0,
+                    larghezza: 0,
+                    hPeso: 0,
+                    quantita: 0,
+                    prezzi: 0,
+                    prezziTotale: 0,
+                    convPrezzi: 0,
+                    convPrezziTotale: 0,
+                    incidenzaPercentuale: 0,
+                    aliquote: 0,
+                    valuta: "Euro"
                 },
                 analisi: {
                     speseGenerali: 0,
-                    utileImpresa:0
+                    utileImpresa: 0,
+                    metodo: 0,
+                    applicataA: 0
                 }
             });
         }
     }, [projectData.configurations]);
 
-    const handleDecimalChange = (key, value) => {
-        if (value >= 0 && value <= 6) {
-            setLocalConfigurations((prev) => ({
-                ...prev,
-                [key]: value
-            }));
-        } else {
-            setSnackbar({ open: true, message: 'I decimali devono essere tra 0 e 6.', severity: 'warning' });
-        }
+
+    const handleFieldNumeriChange = (key, value) => {
+        setLocalConfigurations((prev) => ({
+            ...prev,
+            numeri: {
+                ...prev.numeri,
+                [key]: value === '' ? '' : parseFloat(value) // Permette di sovrascrivere 0 con un altro valore
+            }
+        }));
+    };
+
+    const handleFieldAnalisiChange = (key, value) => {
+        setLocalConfigurations((prev) => ({
+            ...prev,
+            analisi: {
+                ...prev.analisi,
+                [key]: value === '' ? '' : parseFloat(value) // Permette di sovrascrivere 0 con un altro valore
+            }
+        }));
     };
 
     const handleCurrencyChange = (event) => {
@@ -68,40 +101,52 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
         }));
     };
 
-    // Gestione del cambio di valore
     const handleChangeMetodo = (event) => {
-        setSelectedMetodoIndex(event.target.value); // Aggiorna il valore selezionato
-        console.log('Indice selezionato:', event.target.value);
+        const value = event.target.value;
+        setSelectedMetodoIndex(value);
+
+        setLocalConfigurations((prev) => ({
+            ...prev,
+            analisi: {
+                ...prev.analisi,
+                metodo: value
+            }
+        }));
     };
 
     const handleChangeApplicataA = (event) => {
-        setSelectedApplicataAIndex(event.target.value); // Aggiorna il valore selezionato
-        console.log('Indice selezionato:', event.target.value);
+        const value = event.target.value;
+        setSelectedApplicataAIndex(value);
+
+        setLocalConfigurations((prev) => ({
+            ...prev,
+            analisi: {
+                ...prev.analisi,
+                applicataA: value
+            }
+        }));
     };
 
     const handleSubmit = () => {
         setProjectData((prev) => ({
             ...prev,
-            configurations: localConfigurations
+            configurations: {
+                numeri: {
+                    ...(prev.configurations?.numeri || {}), // Usa un oggetto vuoto come fallback
+                    ...localConfigurations.numeri, // Salva i valori di `numeri`
+                },
+                analisi: {
+                    ...(prev.configurations?.analisi || {}), // Usa un oggetto vuoto come fallback
+                    metodo: selectedMetodoIndex, // Salva `metodo` dal valore selezionato
+                    applicataA: selectedApplicataAIndex, // Salva `applicataA` dal valore selezionato
+                    ...localConfigurations.analisi // Salva gli altri valori di `analisi`
+                }
+            }
         }));
         handleNext();
     };
 
-    const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
 
-    const decimalFields = [
-        { key: 'partiUguali', label: 'Parti Uguali' },
-        { key: 'lunghezza', label: 'Lunghezza' },
-        { key: 'larghezza', label: 'Larghezza' },
-        { key: 'hPeso', label: 'HPeso' },
-        { key: 'quantita', label: 'Quantità' },
-        { key: 'prezzi', label: 'Prezzi' },
-        { key: 'prezziTotale', label: 'Prezzi Totale' },
-        { key: 'convPrezzi', label: 'Conv. Prezzi' },
-        { key: 'convPrezziTotale', label: 'Conv. Prezzi Totale' },
-        { key: 'incidenzaPercentuale', label: 'Incidenza Percentuale' },
-        { key: 'aliquote', label: 'Aliquote' }
-    ];
 
     const metodoOptions = ['NETTO + (Netto*SG) + (Netto*UI)', 'NETTO + (Netto*SG) + ((Netto+SG)*UI)'];
     const applicataAOptions = ['Netto', 'Spese+Utile', 'Solo spese', 'Solo Utile', 'Totale'];
@@ -137,32 +182,32 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>N.P.U</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.partiUguali}
-                                    onChange={(e) => handleFieldChange('partiUguali', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.partiUguali || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('partiUguali', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Lunghezza</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.lunghezza}
-                                    onChange={(e) => handleFieldChange('lunghezza', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.lunghezza || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('lunghezza', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Larghezza</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.larghezza}
-                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.larghezza || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('larghezza', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Altezza/Peso</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.hPeso}
-                                    onChange={(e) => handleFieldChange('hPeso', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.hPeso || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('hPeso', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
@@ -176,25 +221,24 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>Prodotto/q.ta</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.quantita}
-                                    onChange={(e) => handleFieldChange('quantita', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.quantita || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('quantita', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Prezzo</FormLabel>
                                 <TextField
-                                    label="Prezzo"
                                     type="number"
-                                    value={localConfigurations.numeri.prezzi}
-                                    onChange={(e) => handleFieldChange('prezzi', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.prezzi || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('prezzi', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Imoorto</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.larghezza}
-                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.importo || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('importo', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
@@ -208,8 +252,8 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>Aliquota</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.aliquote}
-                                    onChange={(e) => handleFieldChange('larghezza', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.numeri.aliquote || ''} 
+                                    onChange={(e) => handleFieldNumeriChange('aliquote', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
@@ -241,7 +285,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 </Typography>
                                 <FormLabel sx={{ minWidth: '150px' }}>Metodo</FormLabel>
                                 <Select
-                                    labelId="dropdown-label"
+                                    labelId="dropdown-label-metodo"
                                     value={selectedMetodoIndex}
                                     onChange={handleChangeMetodo}
                                     sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
@@ -255,22 +299,22 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                 <FormLabel sx={{ minWidth: '150px' }}>Spese Generali</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.speseGenerali}
-                                    onChange={(e) => handleFieldChange('partiUguali', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.analisi.speseGenerali || ''} 
+                                    onChange={(e) => handleFieldAnalisiChange('speseGenerali', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Utile Impresa</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.utileImpresa}
-                                    onChange={(e) => handleFieldChange('lunghezza', parseInt(e.target.value, 10) || 0)}
+                                    value={localConfigurations.analisi.utileImpresa || ''} 
+                                    onChange={(e) => handleFieldAnalisiChange('utileImpresa', parseInt(e.target.value, 10) || 0)}
                                     variant="outlined"
                                     sx={{ marginBottom: 2, width: '150px' }}
                                 />
                                 <FormLabel sx={{ minWidth: '150px' }}>Applicata A</FormLabel>
                                 <Select
-                                    labelId="dropdown-label"
+                                    labelId="dropdown-label-applicataA"
                                     value={selectedApplicataAIndex}
                                     onChange={handleChangeApplicataA}
                                     sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}

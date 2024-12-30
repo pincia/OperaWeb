@@ -15,55 +15,76 @@ import {
 } from '@mui/material';
 
 const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) => {
-    const [economics, setEconomics] = useState({
-        ...projectData.economics,
-        TTP: projectData.economics.TTP || 0, // Imposta il valore predefinito di TTP
-    });
+
+    const [economics, setEconomics] = useState(() => ({
+        MeasuredWorks: 0,
+        LumpSumWorks: 0,
+        SafetyCosts: 0,
+        LaborCosts: 0,
+        AuctionVariationPercentage: 0,
+        AvailableSums: 0,
+        TotalProjectCalculationType: 1, // Valore predefinito
+        ...projectData.economics, // Sovrascrive con i valori forniti da projectData
+    }));
+
     const activeFieldRef = useRef(null);
 
     useEffect(() => {
         calculateFields();
-    }, [economics.LMS, economics.LCP, economics.CSI, economics.CMO, economics.VBA, economics.SAD, economics.TTP]);
+    }, [
+        economics.MeasuredWorks,
+        economics.LumpSumWorks,
+        economics.SafetyCosts,
+        economics.LaborCosts,
+        economics.AuctionVariationPercentage,
+        economics.AvailableSums,
+        economics.TotalProjectCalculationType
+    ]);
 
     const calculateFields = () => {
         const {
-            LMS = 0,
-            LCP = 0,
-            CSI = 0,
-            CMO = 0,
-            VBA = 0,
-            SAD = 0,
-            TTP = 1,
+            MeasuredWorks = 0,
+            LumpSumWorks = 0,
+            SafetyCosts = 0,
+            LaborCosts = 0,
+            AuctionVariationPercentage = 0,
+            AvailableSums = 0,
+            TotalProjectCalculationType = 1,
         } = economics;
 
-        const LBA = parseFloat(LMS) + parseFloat(LCP) + parseFloat(CSI) + parseFloat(CMO);
-        const VAI = LBA * (parseFloat(VBA) / 100);
-        const TLA = LBA + VAI;
+        const BaseBidAmount =
+            parseFloat(MeasuredWorks) +
+            parseFloat(LumpSumWorks) +
+            parseFloat(SafetyCosts) +
+            parseFloat(LaborCosts);
+        const AuctionVariationAmount =
+            BaseBidAmount * (parseFloat(AuctionVariationPercentage) / 100);
+        const TotalAssignedWorks = BaseBidAmount + AuctionVariationAmount;
 
-        let CTP = 0;
-        switch (parseInt(TTP, 10)) {
+        let TotalProjectAmount = 0;
+        switch (parseInt(TotalProjectCalculationType, 10)) {
             case 1:
-                CTP = LBA;
+                TotalProjectAmount = BaseBidAmount;
                 break;
             case 2:
-                CTP = TLA;
+                TotalProjectAmount = TotalAssignedWorks;
                 break;
             case 3:
-                CTP = TLA + parseFloat(SAD);
+                TotalProjectAmount = TotalAssignedWorks + parseFloat(AvailableSums);
                 break;
             case 4:
-                CTP = LBA + parseFloat(SAD);
+                TotalProjectAmount = BaseBidAmount + parseFloat(AvailableSums);
                 break;
             default:
-                CTP = 0;
+                TotalProjectAmount = 0;
         }
 
         setEconomics((prevState) => ({
             ...prevState,
-            LBA: LBA.toFixed(2),
-            VAI: VAI.toFixed(2),
-            TLA: TLA.toFixed(2),
-            CTP: CTP.toFixed(2),
+            BaseBidAmount: BaseBidAmount.toFixed(2),
+            AuctionVariationAmount: AuctionVariationAmount.toFixed(2),
+            TotalAssignedWorks: TotalAssignedWorks.toFixed(2),
+            TotalProjectAmount: TotalProjectAmount.toFixed(2),
         }));
     };
 
@@ -130,42 +151,41 @@ const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) 
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Lavori a Misura" name="LMS" type="number" />
-                        <EconomicsField label="Lavori a Corpo" name="LCP" type="number" />
-                        <EconomicsField label="LAVORI A BASE D'ASTA" name="LBA" readOnly />
+                        <EconomicsField label="Lavori a Misura" name="MeasuredWorks" type="number" />
+                        <EconomicsField label="Lavori a Corpo" name="LumpSumWorks" type="number" />
+                        <EconomicsField label="Lavori a Base d'Asta" name="BaseBidAmount" readOnly />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Costi della Sicurezza" name="CSI" type="number" />
-                        <EconomicsField label="Costi della Manodopera" name="CMO" type="number" />
+                        <EconomicsField label="Costi della Sicurezza" name="SafetyCosts" type="number" />
+                        <EconomicsField label="Costi della Manodopera" name="LaborCosts" type="number" />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Variazione d'Asta (%)" name="VBA" type="number" />
+                        <EconomicsField label="Variazione d'Asta (%)" name="AuctionVariationPercentage" type="number" />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Importo Variazione d'Asta" name="VAI" readOnly />
-                        <EconomicsField label="TOTALE LAVORI AFFIDATI" name="TLA" readOnly />
+                        <EconomicsField label="Importo Variazione d'Asta" name="AuctionVariationAmount" readOnly />
+                        <EconomicsField label="Totale Lavori Affidati" name="TotalAssignedWorks" readOnly />
                     </Grid>
                 </Grid>
 
                 <Typography variant="h5" gutterBottom mt={1}>
-                    B) SOMME A DISPOSIZIONE
+                    B) Somme a Disposizione
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Somme a Disposizione" name="SAD" type="number" />
+                        <EconomicsField label="Somme a Disposizione" name="AvailableSums" type="number" />
                     </Grid>
                 </Grid>
 
                 <Typography variant="h5" gutterBottom mt={1}>
-                    C) TOTALE PROGETTO (A + B)
+                    C) Totale Progetto (A + B)
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
-                        <FormLabel sx={{ minWidth: '200px' }}>Classificazione TTP</FormLabel>
                         <FormControl fullWidth>
                             <Select
-                                name="TTP"
-                                value={economics.TTP || ''}
+                                name="TotalProjectCalculationType"
+                                value={economics.TotalProjectCalculationType || ''}
                                 onChange={handleChange}
                             >
                                 <MenuItem value={1}>LAVORI A BASE D'ASTA</MenuItem>
@@ -177,7 +197,7 @@ const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) 
                     </Grid>
                     <Grid item xs={12} md={3}></Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="TOTALE PROGETTO" name="CTP" readOnly />
+                        <EconomicsField label="Totale Progetto" name="TotalProjectAmount" readOnly />
                     </Grid>
                 </Grid>
             </Box>

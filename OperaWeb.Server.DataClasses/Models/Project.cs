@@ -25,7 +25,6 @@ namespace OperaWeb.Server.DataClasses.Models
     public string? CUP { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
-    public virtual File File { get; set; }
     public string UserId { get; set; }
     public virtual ApplicationUser User { get; set; }
     public int? SoaCategoryId { get; set;  }

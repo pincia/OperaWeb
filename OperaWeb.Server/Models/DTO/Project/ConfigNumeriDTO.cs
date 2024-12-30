@@ -23,5 +23,7 @@
     public int IncidenzaPercentuale { get; set; }
 
     public int Aliquote { get; set; }
+
+    public string Valuta { get; set; }
   }
 }

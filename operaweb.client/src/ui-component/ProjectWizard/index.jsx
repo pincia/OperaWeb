@@ -1,5 +1,5 @@
 import React from 'react';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 // material-ui
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -22,7 +22,15 @@ import { openSnackbar } from 'store/slices/snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
-import { saveProject } from 'api/projects';
+import { saveProject, createProject } from 'api/projects';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setCurrentProjectId } from 'store/slices/project';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 // step options
 const steps = ['Generali', 'Configurazioni', 'Soggetti', 'Lavorazioni', 'Quadro economico'];
 
@@ -90,12 +98,12 @@ const ProjectWizard = () => {
     const [errorIndex, setErrorIndex] = React.useState(null);
     const [soaOptions, setSoaOptions] = useState(null);
     const [soaClassificationOptions, setSoaClassificationOptions] = useState(null);
-
+    const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(true);
-    const { id } = useParams();
-
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const currentImportedProject = useSelector((state) => state.project.currentImportedProject);
-
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     useEffect(() => {
         const controller = new AbortController();
         const signal = controller.signal;
@@ -103,19 +111,14 @@ const ProjectWizard = () => {
         const fetchProject = async () => {
             setLoading(true);
             try {
-                if (id) {
-                    const projectResponse = await getProject(id, { signal });
-                    projectResponse.data.subjects = [];
-                    setProjectData(projectResponse.data);
-
-                } else if (currentImportedProject) {
+                if (currentImportedProject) {
                     // Copia i Dati nello stato locale
                     setProjectData((prev) => ({
                         ...prev,
                         ...currentImportedProject
                     }));
 
-                    console.log(projectData)
+                    console.log(projectData);
                 }
 
                 const soasResponse = await getSoas();
@@ -126,7 +129,6 @@ const ProjectWizard = () => {
 
             } catch (error) {
                 console.error('Errore nel caricamento dei dati SOA Classifications:', error);
-
             } finally {
                 setLoading(false);
             }
@@ -137,19 +139,72 @@ const ProjectWizard = () => {
         return () => {
             controller.abort(); // Annulla la richiesta se il componente viene smontato o l'ID cambia
         };
-    }, [id]);
+    }, [currentImportedProject]); // Aggiungi currentImportedProject come dipendenza
+
+    const handleSaveProject = async () => {
+        setIsSaving(true); // Mostra il loader
+        try {
+            if (!projectData.id) {
+                // Caso: Nuovo progetto
+                const result = await createProject(projectData);
+                const newProjectId = result.data.projectId;
+
+                // Aggiorna lo stato locale
+                setProjectData((prev) => ({ ...prev, id: newProjectId }));
+
+                // Dispatch su Redux
+                dispatch(setCurrentProjectId(newProjectId));
+
+                // Reindirizza alla pagina del progetto
+                navigate('/project/');
+
+                openSnackbar({
+                    open: true,
+                    message: 'Progetto creato con successo!',
+                    variant: 'alert',
+                    alert: { color: 'success' },
+                });
+            } else {
+                // Caso: Aggiorna progetto esistente
+                await saveProject(projectData.id, projectData);
+
+                // Dispatch su Redux
+                dispatch(setCurrentProjectId(projectData.id));
+
+                // Reindirizza alla pagina del progetto
+                navigate('/project/');
+
+                openSnackbar({
+                    open: true,
+                    message: 'Progetto aggiornato con successo!',
+                    variant: 'alert',
+                    alert: { color: 'success' },
+                });
+            }
+        } catch (error) {
+            console.error('Errore durante il salvataggio del progetto:', error);
+
+            openSnackbar({
+                open: true,
+                message: 'Errore durante il salvataggio del progetto.',
+                variant: 'alert',
+                alert: { color: 'error' },
+            });
+        } finally {
+            setIsSaving(false); // Nascondi il loader
+        }
+    };
+
+    const confirmSaveProject = async () => {
+        setIsConfirmOpen(false); // Chiudi il dialogo
+        await handleSaveProject(); // Procedi con il salvataggio
+    };
 
     const handleNext = async () => {
         if (activeStep === steps.length - 1) {
             try {
-                await saveProject(projectData.id, projectData);
-                console.log("Progetto salvato con successo");
-                openSnackbar({
-                    open: true,
-                    message: 'Progetto salvato con successo!',
-                    variant: 'alert',
-                    alert: { color: 'success' },
-                });
+                setIsConfirmOpen(true); // Apri il dialogo di conferma
+              
             } catch (error) {
                 openSnackbar({
                     open: true,
@@ -185,7 +240,7 @@ const ProjectWizard = () => {
     }
 
     return (
-        <MainCard title={id ? "Modifica dati progetto" : "Wizard Creazione Progetto"}>
+        <MainCard title={"Wizard Creazione Progetto"}>
             <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
                 {steps.map((label, index) => {
                     const labelProps = {};
@@ -230,15 +285,45 @@ const ProjectWizard = () => {
                                 </Button>
                             )}
                             <AnimateButton>
-                                <Button variant="contained" onClick={handleNext} sx={{ my: 3, ml: 1 }}>
-                                    {activeStep === steps.length - 1 ? 'Salva progetto' : 'Next'}
+                                <Button
+                                    variant="contained"
+                                    onClick={handleNext}
+                                    sx={{ my: 3, ml: 1 }}
+                                    disabled={isSaving} // Disabilita il pulsante durante il salvataggio
+                                >
+                                    {isSaving ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        activeStep === steps.length - 1 ? 'Salva progetto' : 'Next'
+                                    )}
                                 </Button>
                             </AnimateButton>
                         </Stack>
                     )}
                 </>
             </>
+            {/* Dialog di conferma */}
+            <Dialog
+                open={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)} // Chiudi il dialogo se l'utente annulla
+            >
+                <DialogTitle>Conferma Salvataggio</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Procedo con il salvataggio del progetto?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsConfirmOpen(false)} color="secondary">
+                        Annulla
+                    </Button>
+                    <Button onClick={confirmSaveProject} color="primary" autoFocus>
+                        Conferma
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </MainCard>
+
     );
 };
 

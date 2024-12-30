@@ -16,7 +16,7 @@ import UploadSingleFile from 'ui-component/third-party/dropzone/SingleFile';
 import { Formik } from 'formik';
 import { CircularProgress } from '@mui/material';
 import React from 'react';
-import ProjectWizard from 'views/forms/forms-wizard/ProjectWizard'
+import ProjectWizard from 'ui-component/ProjectWizard'
 import Backdrop from '@mui/material/Backdrop';
 // project imports
 import { gridSpacing } from 'store/constant';

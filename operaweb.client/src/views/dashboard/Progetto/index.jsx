@@ -1,59 +1,62 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Grid from '@mui/material/Grid';
-import GanttChart from 'ui-component/GanttChart';
-import { gridSpacing } from 'store/constant';
-import { getProject } from 'api/projects';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCurrentProject } from 'store/slices/project';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import GanttChart from 'ui-component/GanttChart';
+import GeneralForm from 'ui-component/ProjectWizard/GeneralForm';
+import ConfigurationsForm from 'ui-component/ProjectWizard/ConfigurationsForm';
+import SubjectsForm from 'ui-component/ProjectWizard/SubjectsForm';
+import TasksForm from 'ui-component/ProjectWizard/Tasks';
+import EconomicsForm from 'ui-component/ProjectWizard/EconomicsForm';
+import { getProject, saveProject } from 'api/projects';
+import { gridSpacing } from 'store/constant';
 
 const ProjectDashboard = () => {
     const [isLoading, setLoading] = useState(true);
-    const ganttRef = useRef(null);
-   
-    const currentProjectId = useSelector((state) => state.project.currentProjectId);
-    const currentProject = useSelector((state) => state.project.currentProject);
-    const dispatch = useDispatch();
-    const [projectData, setProjectData] = useState(currentProject)
+    const [projectData, setProjectData] = useState(null);
     const [tasks, setTasks] = useState({
         data: [],
-        links: []
+        links: [],
     });
+    const [activeTab, setActiveTab] = useState(0);
+    const ganttRef = useRef(null);
+
+    const currentProjectId = 28;//useSelector((state) => state.project.currentProjectId);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const fetchProjectData = async () => {
-            if (!currentProject || currentProject.id !== currentProjectId) {
-                try {
-                    setLoading(true);
-                    const response = await getProject(currentProjectId);
-                    console.log(response)
-                    // Aggiorna lo stato di Redux con il progetto corrente
-                    dispatch(setCurrentProject(response.data));
-                    setProjectData(response.data)
-                    // Popola i tasks se il progetto include informazioni relative al Gantt
-                    if (response.data.tasks) {
-                        setTasks({
-                            data: response.data.tasks,
-                            links: response.data.links || []
-                        });
-                    }
-                } catch (error) {
-                    console.error('Errore durante il recupero del progetto:', error);
-                } finally {
-                    setLoading(false);
+            try {
+                setLoading(true);
+                const response = await getProject(currentProjectId);
+                dispatch(setCurrentProject(response.data));
+                setProjectData(response.data);
+
+                if (response.data.tasks) {
+                    setTasks({
+                        data: response.data.tasks,
+                        links: response.data.links || [],
+                    });
                 }
-            } else {
-                setTasks({
-                    data: currentProject.tasks,
-                    links: currentProject.links || []
-                });
+            } catch (error) {
+                console.error('Errore durante il recupero del progetto:', error);
+            } finally {
                 setLoading(false);
             }
         };
 
         fetchProjectData();
-    }, [currentProjectId, currentProject, dispatch]);
+    }, [currentProjectId, dispatch]);
+
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
 
     const handleTaskUpdate = (updatedTask) => {
         setTasks((prevState) => {
@@ -78,14 +81,13 @@ const ProjectDashboard = () => {
         }));
     };
 
-    const handleSave = () => {
-        localStorage.setItem('ganttData', JSON.stringify(tasks));
-        alert('Modifiche salvate con successo!');
-    };
-
-    const handlePrint = () => {
-        if (ganttRef.current) {
-            ganttRef.current.exportToPDF();
+    const handleSaveChanges = async () => {
+        try {
+            await saveProject(projectData.id, { ...projectData, tasks: tasks.data });
+            alert('Modifiche salvate con successo!');
+        } catch (error) {
+            console.error('Errore durante il salvataggio:', error);
+            alert('Errore durante il salvataggio.');
         }
     };
 
@@ -106,23 +108,83 @@ const ProjectDashboard = () => {
 
     return (
         <Grid container spacing={gridSpacing}>
+            {/* Informazioni Generali */}
             <Grid item xs={12}>
-                <h2>Cronoprogramma</h2>
-                <div style={{ marginBottom: '1rem' }}>
-                    <button onClick={handlePrint} style={{ marginRight: '10px' }}>
-                        Stampa Cronoprogramma
-                    </button>
-                    <button onClick={handleSave}>
-                        Salva Modifiche
-                    </button>
-                </div>
-                <GanttChart
-                    ref={ganttRef}
-                    tasks={tasks}
-                    onTaskUpdate={handleTaskUpdate}
-                    onTaskDelete={handleTaskDelete}
-                    onTaskAdd={handleTaskAdd}
-                />
+                <Box mb={2}>
+                    <Typography variant="h4">{projectData?.name}</Typography>
+                    <Typography variant="body1">{projectData?.description}</Typography>
+                    <Typography variant="body2">Stato: {projectData?.status}</Typography>
+                </Box>
+            </Grid>
+
+            {/* Statistiche */}
+            <Grid item xs={12}>
+                <Box mb={2}>
+                    <Typography variant="h6">Statistiche</Typography>
+                    <Typography variant="body2">
+                        Task Completati: {tasks.data.filter((task) => task.completed).length}/{tasks.data.length}
+                    </Typography>
+                </Box>
+            </Grid>
+
+            {/* Gantt delle Lavorazioni */}
+            <Grid item xs={12}>
+                <Box mb={2}>
+                    <Typography variant="h6">Cronoprogramma</Typography>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <Button onClick={handleSaveChanges} variant="contained" style={{ marginRight: '10px' }}>
+                            Salva Modifiche
+                        </Button>
+                        <Button onClick={() => ganttRef.current?.exportToPDF()} variant="outlined">
+                            Stampa Cronoprogramma
+                        </Button>
+                    </div>
+                    <GanttChart
+                        ref={ganttRef}
+                        tasks={tasks}
+                        onTaskUpdate={handleTaskUpdate}
+                        onTaskDelete={handleTaskDelete}
+                        onTaskAdd={handleTaskAdd}
+                    />
+                </Box>
+            </Grid>
+
+            {/* Scheda Dettagli con Tabs */}
+            <Grid item xs={12}>
+                <Box>
+                    <Tabs value={activeTab} onChange={handleTabChange} aria-label="tabs">
+                        <Tab label="Generali" />
+                        <Tab label="Configurazioni" />
+                        <Tab label="Soggetti" />
+                        <Tab label="Lavorazioni" />
+                        <Tab label="Quadro Economico" />
+                    </Tabs>
+                    <Box mt={2}>
+                        {activeTab === 0 && (
+                            <GeneralForm projectData={projectData} setProjectData={setProjectData} />
+                        )}
+                        {activeTab === 1 && (
+                            <ConfigurationsForm projectData={projectData} setProjectData={setProjectData} />
+                        )}
+                        {activeTab === 2 && (
+                            <SubjectsForm
+                                subjectsData={projectData.subjects}
+                                setSubjectsData={(data) =>
+                                    setProjectData((prev) => ({ ...prev, subjects: data }))
+                                }
+                            />
+                        )}
+                        {activeTab === 3 && (
+                            <TasksForm
+                                tasksData={projectData.tasks}
+                                setTasksData={(data) => setProjectData((prev) => ({ ...prev, tasks: data }))}
+                            />
+                        )}
+                        {activeTab === 4 && (
+                            <EconomicsForm projectData={projectData} setProjectData={setProjectData} />
+                        )}
+                    </Box>
+                </Box>
             </Grid>
         </Grid>
     );

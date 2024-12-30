@@ -120,4 +120,12 @@ export async function saveProject(projectId, projectData) {
         throw error;
     }
 }
-
+export async function createProject(projectData) {
+    try {
+        const response = await axios.post(`/api/projects`, projectData);
+        return response.data;
+    } catch (error) {
+        console.error('Errore durante il salvataggio del progetto:', error);
+        throw error;
+    }
+}

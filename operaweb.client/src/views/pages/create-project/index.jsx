@@ -2,7 +2,7 @@
 import Grid from '@mui/material/Grid';
 
 // project imports
-import ProjectWizard from 'views/forms/forms-wizard/ProjectWizard'
+import ProjectWizard from 'ui-component/ProjectWizard'
 import { gridSpacing } from 'store/constant';
 
 // ==============================|| FORMS WIZARD ||============================== //

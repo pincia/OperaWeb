@@ -8,6 +8,14 @@ namespace OperaWeb.Server.Abstractions
   public interface IProjectService
   {
     /// <summary>
+    /// Creates new project in DB
+    /// </summary>
+    /// <param name="projectDto"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<int> CreateProjectAsync(ProjectDTO projectDto, string userId);
+
+    /// <summary>
     /// Gets all projects
     /// </summary>
     /// <param name="userId"></param>
@@ -21,13 +29,6 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<Project> GetProjectById(int id, string userId);
-
-    /// <summary>
-    /// Creates project
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    Task<int> CreateProjectAsync(CreateProjectRequestDTO request);
 
     /// <summary>
     /// Update projec

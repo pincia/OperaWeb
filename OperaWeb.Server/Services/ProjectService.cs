@@ -13,6 +13,8 @@ using OperaWeb.Server.Hubs;
 using Azure.Identity;
 using OperaWeb.Server.Models.Mapper;
 using OperaWeb.Server.Models.DTO;
+using OperaWeb.Server.DataClasses.Models.User;
+using Services.UserGroup;
 
 namespace OperaWeb.Server.Services
 {
@@ -23,9 +25,11 @@ namespace OperaWeb.Server.Services
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
     private ProjectServiceManager _projectServiceManager;
+    private readonly UserService _userService;
 
-    public ProjectService(OperaWebDbContext context, ILogger<ProjectService> logger, IMapper mapper, IConfiguration config, IHubContext<ImportHub> hubContext)
+    public ProjectService(OperaWebDbContext context, ILogger<ProjectService> logger, IMapper mapper, IConfiguration config, IHubContext<ImportHub> hubContext, UserService userService)
     {
+      _userService = userService;
       _context = context;
       _logger = logger;
       _mapper = mapper;
@@ -33,24 +37,30 @@ namespace OperaWeb.Server.Services
       _projectServiceManager = new ProjectServiceManager(_context, _logger, hubContext, mapper);
     }
 
-    /// <inheritdoc/>
-    public async Task<int> CreateProjectAsync(CreateProjectRequestDTO request)
+    /// <summary>
+    /// Crea un nuovo progetto nel database.
+    /// </summary>
+    /// <param name="projectDto"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<int> CreateProjectAsync(ProjectDTO projectDto, string userId)
     {
-      try
-      {
-        var project = _mapper.Map<Project>(request);
-        project.CreationDate = DateTime.UtcNow;
-        project.LastUpdateDate = DateTime.UtcNow;
-        var newProject = _context.Projects.Add(project);
-         await _context.SaveChangesAsync();
-        return newProject.Entity.ID;
-      }
-      catch (Exception ex)
-      {
-        _logger.LogError(ex, "An error occurred while creating the Project item.");
-        throw new Exception("An error occurred while creating the Project item.");
-      }
+      var user = await _userService.GetUserByIdAsync(userId);
+      // Mappa i dati del DTO al modello del database
+      var project = ProjectMapper.ToProject(projectDto, _context.SubjectRoles.ToList());
+
+      project.UserId = userId;
+      project.DatiGenerali.Committente = user.RagioneSociale ?? user.FirstName + user.LastName;
+      project.CreationDate = DateTime.Now;
+      project.LastUpdateDate = DateTime.Now;
+      // Aggiungi il progetto al database
+      _context.Projects.Add(project);
+      await _context.SaveChangesAsync();
+
+      // Restituisci l'ID del nuovo progetto
+      return project.ID;
     }
+    
 
     /// <inheritdoc/>
     public async Task DeleteProjectAsync(int id)
@@ -148,7 +158,6 @@ namespace OperaWeb.Server.Services
       try
       {
         var project = _context.Projects
-          .Include(p => p.File)
           .Include(v => v.VociComputo)
           .Include(v => v.Categorie)
           .Include(v => v.SubCategorie)
@@ -258,12 +267,7 @@ namespace OperaWeb.Server.Services
           {
             User = user,
             CreationDate = DateTime.Now,
-            LastUpdateDate = DateTime.Now,
-            File = new DataClasses.Models.File()
-            {
-              FileName = fileName,
-              User = user
-            }
+            LastUpdateDate = DateTime.Now
           }, connectionId);
 
         }
@@ -307,6 +311,7 @@ namespace OperaWeb.Server.Services
 
       // Mappatura dal DTO all'entità
       existingProject = ProjectMapper.ToProject(projectDto,_context.SubjectRoles.ToList(), existingProject);
+      existingProject.LastUpdateDate = DateTime.Now;
 
       // Aggiorna il database
       _context.Projects.Update(existingProject);
@@ -315,5 +320,7 @@ namespace OperaWeb.Server.Services
       // Ritorna il progetto aggiornato come DTO
       return _mapper.Map<ProjectDTO>(existingProject);
     }
+
+
   }
 }

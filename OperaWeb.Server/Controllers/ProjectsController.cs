@@ -22,6 +22,28 @@ namespace OperaWeb.Server.Controllers
       _projectService = projectService;
     }
 
+    [HttpPost]
+    public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDto)
+    {
+      if (projectDto == null)
+      {
+        return BadRequest("I dati del progetto non possono essere nulli.");
+      }
+      try
+      {
+        var userId = User.FindFirstValue("Id");
+        // Usa il servizio per creare un nuovo progetto
+        var newProjectId = await _projectService.CreateProjectAsync(projectDto,userId);
+
+        // Restituisci l'ID del nuovo progetto
+        return Ok(new { Data = new { ProjectId = newProjectId } });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, "Errore interno durante la creazione del progetto.");
+      }
+    }
+
     // PUT: api/projects/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectDTO projectDto)
