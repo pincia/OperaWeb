@@ -217,7 +217,7 @@ namespace OperaWeb.Server.Models.Mapper
       }
     }
 
-    public static Project ToProject(ProjectDTO dto, List<ProjectSubjectRole> roles, Project existingProject = null)
+    public static Project ToProject(ProjectDTO dto,Project existingProject = null)
     {
       try
       {

@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Folder Include="BL\" />
+    <Folder Include="Models\DTO\Account\Nuova cartella\" />
     <Folder Include="SeedFiles\" />
   </ItemGroup>
 

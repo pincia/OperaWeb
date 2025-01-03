@@ -1,11 +1,13 @@
-import  { useState } from 'react';
-import {
-    Typography,
-    TextField
-} from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Typography, TextField } from '@mui/material';
+
 const EditableCell = ({ value, onSave }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
+
+    useEffect(() => {
+        setTempValue(value);
+    }, [value]);
 
     const handleSave = () => {
         setIsEditing(false);
@@ -32,7 +34,7 @@ const EditableCell = ({ value, onSave }) => {
                 '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
             }}
         >
-            {value || '-'}
+                {tempValue || '-'}
         </Typography>
     );
 };

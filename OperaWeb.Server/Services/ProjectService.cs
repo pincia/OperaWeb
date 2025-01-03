@@ -15,6 +15,7 @@ using OperaWeb.Server.Models.Mapper;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.DataClasses.Models.User;
 using Services.UserGroup;
+using OperaWeb.SharedClasses.Enums;
 
 namespace OperaWeb.Server.Services
 {
@@ -47,10 +48,10 @@ namespace OperaWeb.Server.Services
     {
       var user = await _userService.GetUserByIdAsync(userId);
       // Mappa i dati del DTO al modello del database
-      var project = ProjectMapper.ToProject(projectDto, _context.SubjectRoles.ToList());
+      var project = ProjectMapper.ToProject(projectDto);
 
       project.UserId = userId;
-      project.DatiGenerali.Committente = user.RagioneSociale ?? user.FirstName + user.LastName;
+      project.DatiGenerali.Committente = user.Company.Name ?? user.FirstName + user.LastName;
       project.CreationDate = DateTime.Now;
       project.LastUpdateDate = DateTime.Now;
       // Aggiungi il progetto al database
@@ -267,7 +268,8 @@ namespace OperaWeb.Server.Services
           {
             User = user,
             CreationDate = DateTime.Now,
-            LastUpdateDate = DateTime.Now
+            LastUpdateDate = DateTime.Now,
+            Status = ProjectStatus.Created,
           }, connectionId);
 
         }
@@ -310,7 +312,7 @@ namespace OperaWeb.Server.Services
    
 
       // Mappatura dal DTO all'entità
-      existingProject = ProjectMapper.ToProject(projectDto,_context.SubjectRoles.ToList(), existingProject);
+      existingProject = ProjectMapper.ToProject(projectDto, existingProject);
       existingProject.LastUpdateDate = DateTime.Now;
 
       // Aggiorna il database

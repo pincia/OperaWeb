@@ -65,8 +65,27 @@ namespace OperaWeb.Server.DataClasses.Context
 
     public async Task TrySeedAsync()
     {
+      var figures = new List<string> { "Committente", "Professionista", "Impresa" };
+
+      var actualFigures = _context.Figures.ToList();
+
+      if (actualFigures.Count() == 0)
+      {
+
+        foreach (var figure in figures)
+        {
+          _context.Figures.Add(new Figure()
+          {
+            Name = figure,
+            Code = ""
+          });
+
+        }
+      }
+
       // Crea un elenco di ruoli da aggiungere
-      var roles = new List<string> { "Admin", "Committente", "Professionista", "Impresa", "OrganizationMember" };
+
+      var roles = new List<string> { "Admin", "OrganizationOwner", "OrganizationMember" };
 
       var addedRoles = new List<IdentityRole>();
 
@@ -78,8 +97,8 @@ namespace OperaWeb.Server.DataClasses.Context
         }
       }
 
-      //SubRoles
-      var subRoles = new List<string>
+      //subFigures
+      var subFigures = new List<string>
 {
     "PA",
     "Privato",
@@ -106,34 +125,35 @@ namespace OperaWeb.Server.DataClasses.Context
     "Altre"
 };
 
-      var actualSubRoles = _context.SubRoles.ToList();
-
-      foreach (var role in subRoles)
+      var actualSubFigures = _context.SubFigures.ToList();
+      var contexFigures = _context.Figures.ToList();
+      foreach (var figure in subFigures)
       {
-        if (!actualSubRoles.Exists(S => S.Name == role))
+        if (!actualSubFigures.Exists(S => S.Name == figure))
         {
-          var res = _context.SubRoles.Add(new Models.User.SubRole() { Name = role });
+          var res = _context.SubFigures.Add(new SubFigure() { Name = figure });
 
           var committenti = new List<string>
 {
-    "PA",
+    "Pubblica Amministrazione",
     "Privato" };
 
-          if (committenti.Contains(role))
+
+
+          if (committenti.Contains(figure))
           {
-            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Committente") });
+           
+            _context.FigureSubFigures.Add(new FigureSubFigure() { SubFigure = res.Entity, Figure = contexFigures.FirstOrDefault(x=>x.Name =="Committente")});
           }
           var professionisti = new List<string>
 {
-    "Ingegnere",
-    "Architetto",
-    "Geometra",
-    "Geologo"
+    "Libero professionista",
+    "Studio associato o società di ingegneria",
 };
 
-          if (professionisti.Contains(role))
+          if (professionisti.Contains(figure))
           {
-            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Professionista") });
+            _context.FigureSubFigures.Add(new FigureSubFigure() { SubFigure = res.Entity, Figure = contexFigures.FirstOrDefault(x => x.Name == "Professionista") });
           }
 
           var imprese = new List<string>
@@ -146,7 +166,6 @@ namespace OperaWeb.Server.DataClasses.Context
     "Società in Accomandita per Azioni",
     "Impresa Individuale",
     "Lavoratore Autonomo o Libero Professionista",
-    "Studio Associato o Società di Professionisti",
     "Società Cooperativa",
     "Organizzazione non lucrativa di utilità sociale",
     "Consorzio",
@@ -157,9 +176,9 @@ namespace OperaWeb.Server.DataClasses.Context
     "Altre"
 };
 
-          if (imprese.Contains(role))
+          if (imprese.Contains(figure))
           {
-            _context.RoleSubRoles.Add(new RoleSubRole() { SubRole = res.Entity, Role = await _roleManager.FindByNameAsync("Impresa") });
+            _context.FigureSubFigures.Add(new FigureSubFigure() { SubFigure = res.Entity,Figure= contexFigures.FirstOrDefault(x => x.Name == "Impresa") });
           }
         }
       }
@@ -314,7 +333,7 @@ namespace OperaWeb.Server.DataClasses.Context
         // Imprese
         ("Rappresentante Legale", "Impresa", "Organization"),
         ("Datore di Lavoro", "Impresa", "Rappresentante Legale"),
-        ("Direttore tecnico di cantiere", "Impresa", "Rappresentante Legale"),
+        ("Direttore tecnico di cantiere", "Impresa, Professionista", "Rappresentante Legale"),
         ("Medico Competente", "Impresa", "Rappresentante Legale"),
         ("Responsabile del Servizio di Prevenzione e Protezione", "Impresa", "Rappresentante Legale"),
         ("Addetto al Servizio di Prevenzione e Protezione", "Impresa", "Rappresentante Legale"),
@@ -322,7 +341,7 @@ namespace OperaWeb.Server.DataClasses.Context
         ("Rappresentante dei Lavoratori per la Sicurezza Territoriale", "Impresa", "Rappresentante Legale"),
 
         //Organization
-        ("Organization","Impresa,Committente","")
+        // ("Organization","Impresa,Committente","")
     };
 
       _context.SaveChanges();
@@ -386,7 +405,7 @@ namespace OperaWeb.Server.DataClasses.Context
 
           if (committenti.Contains(role))
           {
-            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole() { ProjectRole = res.Entity, Role = await _roleManager.FindByNameAsync("Committente") });
+            _context.FigureProjectSubjectRoles.Add(new FigureProjectSubjectRole() { ProjectSubjectRole = res.Entity, Figure = contexFigures.FirstOrDefault(x => x.Name == "Committente") });
           }
           var professionisti = new List<string>
 {
@@ -425,10 +444,10 @@ namespace OperaWeb.Server.DataClasses.Context
 
           if (professionisti.Contains(role))
           {
-            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole()
+            _context.FigureProjectSubjectRoles.Add(new FigureProjectSubjectRole()
             {
-              ProjectRole = res.Entity,
-              Role = await _roleManager.FindByNameAsync("Professionista")
+              ProjectSubjectRole = res.Entity,
+              Figure = contexFigures.FirstOrDefault(x => x.Name == "Professionista")
             });
           }
 
@@ -443,10 +462,10 @@ namespace OperaWeb.Server.DataClasses.Context
 
           if (imprese.Contains(role))
           {
-            _context.RoleProjectRoles.Add(new RoleProjectSubjectRole()
+            _context.FigureProjectSubjectRoles.Add(new FigureProjectSubjectRole()
             {
-              ProjectRole = res.Entity,
-              Role = await _roleManager.FindByNameAsync("Impresa")
+              ProjectSubjectRole = res.Entity,
+              Figure = contexFigures.FirstOrDefault(x => x.Name == "Impresa")
             });
           }
         }
@@ -455,7 +474,7 @@ namespace OperaWeb.Server.DataClasses.Context
 
       var existingRoles = _context.OrganizationRoles.ToList();
 
-      foreach (var (name, roleTypes, parentRole) in organizationRoles)
+      foreach (var (name, figureType, parentRole) in organizationRoles)
       {
         if (!existingRoles.Any(r => r.Name == name))
         {
@@ -470,17 +489,16 @@ namespace OperaWeb.Server.DataClasses.Context
           var res = _context.OrganizationRoles.Add(role);
           _context.SaveChanges();
 
-          var roleTypesArray = roleTypes.Split(',');
+          var roleTypesArray = figureType.Split(',');
 
           foreach (var roleName in roleTypesArray)
           {
             var organizationRole = res.Entity;
-            var roleType = await _roleManager.FindByNameAsync(roleName);
-
-            var mapping = new IdentityRoleOrganizationRoleMapping()
+            var figure = _context.Figures.FirstOrDefault(f => f.Name == roleName);
+            var mapping = new FigureOrganizationRoleMapping()
             {
               OrganizationRole = organizationRole,
-              IdentityRole = roleType
+              Figure = figure
             };
 
             _context.Add(mapping);

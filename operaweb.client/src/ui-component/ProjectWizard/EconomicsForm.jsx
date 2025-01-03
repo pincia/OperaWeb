@@ -10,119 +10,168 @@ import {
     FormControl,
     InputLabel,
     Stack,
-    Button,
     FormLabel,
 } from '@mui/material';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
-const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) => {
+const validationSchema = yup.object({
+    MeasuredWorks: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    LumpSumWorks: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    SafetyCosts: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    LaborCosts: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    AuctionVariationPercentage: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    AvailableSums: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+});
 
-    const [economics, setEconomics] = useState(() => ({
-        MeasuredWorks: 0,
-        LumpSumWorks: 0,
-        SafetyCosts: 0,
-        LaborCosts: 0,
-        AuctionVariationPercentage: 0,
-        AvailableSums: 0,
-        TotalProjectCalculationType: 1, // Valore predefinito
-        ...projectData.economics, // Sovrascrive con i valori forniti da projectData
-    }));
+const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
+    const [calculatedFields, setCalculatedFields] = useState({
+        BaseBidAmount: projectData.economics?.BaseBidAmount || 0,
+        AuctionVariationAmount: projectData.economics?.AuctionVariationAmount || 0,
+        TotalAssignedWorks: projectData.economics?.TotalAssignedWorks || 0,
+        TotalProjectAmount: projectData.economics?.TotalProjectAmount || 0,
+    });
 
     const activeFieldRef = useRef(null);
 
+    const formik = useFormik({
+        initialValues: {
+            MeasuredWorks: projectData.economics?.MeasuredWorks || 0,
+            LumpSumWorks: projectData.economics?.LumpSumWorks || 0,
+            SafetyCosts: projectData.economics?.SafetyCosts || 0,
+            LaborCosts: projectData.economics?.LaborCosts || 0,
+            AuctionVariationPercentage: projectData.economics?.AuctionVariationPercentage || 0,
+            AvailableSums: projectData.economics?.AvailableSums || 0,
+            TotalProjectCalculationType: projectData.economics?.TotalProjectCalculationType || 1,
+        },
+        validationSchema,
+        validateOnBlur: true,
+        onSubmit: (values) => {
+            setProjectData((prev) => ({
+                ...prev,
+                economics: {
+                    ...values,
+                    ...calculatedFields, // Include i campi calcolati
+                },
+            }));
+        },
+    });
+
     useEffect(() => {
+        const {
+            MeasuredWorks,
+            LumpSumWorks,
+            SafetyCosts,
+            LaborCosts,
+            AuctionVariationPercentage,
+            AvailableSums,
+            TotalProjectCalculationType,
+        } = formik.values;
+
+        const calculateFields = () => {
+            const BaseBidAmount =
+                parseFloat(MeasuredWorks) +
+                parseFloat(LumpSumWorks) +
+                parseFloat(SafetyCosts) +
+                parseFloat(LaborCosts);
+            const AuctionVariationAmount =
+                BaseBidAmount * (parseFloat(AuctionVariationPercentage) / 100);
+            const TotalAssignedWorks = BaseBidAmount + AuctionVariationAmount;
+
+            let TotalProjectAmount = 0;
+            switch (parseInt(TotalProjectCalculationType, 10)) {
+                case 1:
+                    TotalProjectAmount = BaseBidAmount;
+                    break;
+                case 2:
+                    TotalProjectAmount = TotalAssignedWorks;
+                    break;
+                case 3:
+                    TotalProjectAmount = TotalAssignedWorks + parseFloat(AvailableSums);
+                    break;
+                case 4:
+                    TotalProjectAmount = BaseBidAmount + parseFloat(AvailableSums);
+                    break;
+                default:
+                    TotalProjectAmount = 0;
+            }
+
+            setCalculatedFields({
+                BaseBidAmount: BaseBidAmount.toFixed(2),
+                AuctionVariationAmount: AuctionVariationAmount.toFixed(2),
+                TotalAssignedWorks: TotalAssignedWorks.toFixed(2),
+                TotalProjectAmount: TotalProjectAmount.toFixed(2),
+            });
+        };
+
         calculateFields();
     }, [
-        economics.MeasuredWorks,
-        economics.LumpSumWorks,
-        economics.SafetyCosts,
-        economics.LaborCosts,
-        economics.AuctionVariationPercentage,
-        economics.AvailableSums,
-        economics.TotalProjectCalculationType
+        formik.values.MeasuredWorks,
+        formik.values.LumpSumWorks,
+        formik.values.SafetyCosts,
+        formik.values.LaborCosts,
+        formik.values.AuctionVariationPercentage,
+        formik.values.AvailableSums,
+        formik.values.TotalProjectCalculationType,
     ]);
 
-    const calculateFields = () => {
-        const {
-            MeasuredWorks = 0,
-            LumpSumWorks = 0,
-            SafetyCosts = 0,
-            LaborCosts = 0,
-            AuctionVariationPercentage = 0,
-            AvailableSums = 0,
-            TotalProjectCalculationType = 1,
-        } = economics;
-
-        const BaseBidAmount =
-            parseFloat(MeasuredWorks) +
-            parseFloat(LumpSumWorks) +
-            parseFloat(SafetyCosts) +
-            parseFloat(LaborCosts);
-        const AuctionVariationAmount =
-            BaseBidAmount * (parseFloat(AuctionVariationPercentage) / 100);
-        const TotalAssignedWorks = BaseBidAmount + AuctionVariationAmount;
-
-        let TotalProjectAmount = 0;
-        switch (parseInt(TotalProjectCalculationType, 10)) {
-            case 1:
-                TotalProjectAmount = BaseBidAmount;
-                break;
-            case 2:
-                TotalProjectAmount = TotalAssignedWorks;
-                break;
-            case 3:
-                TotalProjectAmount = TotalAssignedWorks + parseFloat(AvailableSums);
-                break;
-            case 4:
-                TotalProjectAmount = BaseBidAmount + parseFloat(AvailableSums);
-                break;
-            default:
-                TotalProjectAmount = 0;
-        }
-
-        setEconomics((prevState) => ({
-            ...prevState,
-            BaseBidAmount: BaseBidAmount.toFixed(2),
-            AuctionVariationAmount: AuctionVariationAmount.toFixed(2),
-            TotalAssignedWorks: TotalAssignedWorks.toFixed(2),
-            TotalProjectAmount: TotalProjectAmount.toFixed(2),
-        }));
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        activeFieldRef.current = name;
-        setEconomics((prev) => ({ ...prev, [name]: value }));
+    useEffect(() => {
         setProjectData((prev) => ({
             ...prev,
-            economics: { ...prev.economics, [name]: value },
+            economics: {
+                ...formik.values,
+                ...calculatedFields,
+            },
         }));
+    }, [formik.values, calculatedFields, setProjectData]);
+
+    useEffect(() => {
+        onValidationChange(formik.isValid);
+    }, [formik.isValid, onValidationChange]);
+
+    const handleBlur = (e) => {
+        const { name } = e.target;
+        formik.handleBlur(e);
+        activeFieldRef.current = null; // Rimuovi il riferimento al campo attivo dopo il blur
     };
 
-    const EconomicsField = ({ label, name, readOnly = false, type = "text" }) => (
-        <Box sx={{ marginBottom: 2 }}>
+    const EconomicsField = ({ label, name, readOnly = false, type = 'text' }) => (
+        <Box
+            sx={{
+                marginBottom: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+            }}
+        >
             <FormLabel
                 sx={{
-                    minWidth: '200px',
                     fontWeight: 'bold',
                     color: readOnly ? 'black' : 'inherit',
+                    marginRight: name === 'AuctionVariationPercentage' ? '20px' : '0',
+                    marginLeft: name === 'AuctionVariationPercentage' ? 'auto' : '0', 
                 }}
             >
                 {label}
             </FormLabel>
             <TextField
                 name={name}
-                value={economics[name] || ''}
-                onChange={!readOnly ? handleChange : undefined}
-                fullWidth
+                value={readOnly ? calculatedFields[name] || '' : formik.values[name] || ''}
+                onChange={!readOnly ? formik.handleChange : undefined}
+                onBlur={!readOnly ? handleBlur : undefined}
                 type={type}
+                error={formik.touched[name] && Boolean(formik.errors[name])}
+                helperText={formik.touched[name] && formik.errors[name]}
                 inputRef={(input) => {
-                    if (input && activeFieldRef.current === name) {
-                        input.focus();
+                    if (activeFieldRef.current === name) {
+                        input?.focus();
                     }
                 }}
                 onFocus={() => (activeFieldRef.current = name)}
                 sx={{
-                    width: '200px',
+                    width: name === 'AuctionVariationPercentage' ? '80px' : '200px',
+                    marginRight: name === 'AuctionVariationPercentage' ? '20px' : '0',
+                    marginLeft: name === 'AuctionVariationPercentage' ? 'auto' : '0', // Sposta il campo verso destra solo per questo specifico campo
                     backgroundColor: readOnly ? 'rgba(240, 240, 240, 0.8)' : 'inherit',
                     fontWeight: readOnly ? 'bold' : 'normal',
                     pointerEvents: readOnly ? 'none' : 'auto',
@@ -137,6 +186,7 @@ const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) 
         </Box>
     );
 
+
     return (
         <Stack>
             <Box p={3}>
@@ -146,47 +196,76 @@ const EconomicsForm = ({ handleNext, handleBack, projectData, setProjectData }) 
                 <Typography variant="subtitle1" gutterBottom>
                     Gestione somme del progetto
                 </Typography>
-                <Typography variant="h5" gutterBottom mt={1}>
+                <Typography variant="h3" gutterBottom mt={1}>
                     A) LAVORI
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={3}>
                         <EconomicsField label="Lavori a Misura" name="MeasuredWorks" type="number" />
                         <EconomicsField label="Lavori a Corpo" name="LumpSumWorks" type="number" />
-                        <EconomicsField label="Lavori a Base d'Asta" name="BaseBidAmount" readOnly />
+                      
                     </Grid>
                     <Grid item xs={12} md={3}>
                         <EconomicsField label="Costi della Sicurezza" name="SafetyCosts" type="number" />
                         <EconomicsField label="Costi della Manodopera" name="LaborCosts" type="number" />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Variazione d'Asta (%)" name="AuctionVariationPercentage" type="number" />
+                        <EconomicsField label="Variazione d'Asta del (%)" name="AuctionVariationPercentage" type="number" />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Importo Variazione d'Asta" name="AuctionVariationAmount" readOnly />
-                        <EconomicsField label="Totale Lavori Affidati" name="TotalAssignedWorks" readOnly />
+                        <EconomicsField label="Importo Variazione d'Asta" name="AuctionVariationAmount" readOnly />      
+                     
                     </Grid>
                 </Grid>
-
-                <Typography variant="h5" gutterBottom mt={1}>
-                    B) Somme a Disposizione
-                </Typography>
                 <Grid container spacing={2}>
+                    <Grid item xs={12} md={3}>   <EconomicsField label="Lavori a Base d'Asta" name="BaseBidAmount" readOnly /> </Grid>
+                    <Grid item xs={12} md={3}>  </Grid>
+                    <Grid item xs={12} md={3}> </Grid>
+                    <Grid item xs={12} md={3}>          <EconomicsField label="Totale Lavori Affidati" name="TotalAssignedWorks" readOnly /></Grid>
+          
+                </Grid>
+                <Grid container spacing={2}>
+                    <Grid
+                        item
+                        xs={12}
+                        md={3}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Typography variant="h3" gutterBottom mt={1}>
+                            B) Somme a Disposizione
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={3}>  </Grid>
+                    <Grid item xs={12} md={3}>  </Grid>
                     <Grid item xs={12} md={3}>
                         <EconomicsField label="Somme a Disposizione" name="AvailableSums" type="number" />
                     </Grid>
                 </Grid>
 
-                <Typography variant="h5" gutterBottom mt={1}>
+                <Typography variant="h3" gutterBottom mt={1}>
                     C) Totale Progetto (A + B)
                 </Typography>
                 <Grid container spacing={2}>
+                
                     <Grid item xs={12} md={6}>
+                        <FormLabel
+                            sx={{
+                                minWidth: '200px',
+                                fontWeight: 'bold',
+                                color: 'black'
+                            }}
+                        >
+                            Tipologia totale
+                        </FormLabel>
                         <FormControl fullWidth>
                             <Select
                                 name="TotalProjectCalculationType"
-                                value={economics.TotalProjectCalculationType || ''}
-                                onChange={handleChange}
+                                value={formik.values.TotalProjectCalculationType || ''}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                             >
                                 <MenuItem value={1}>LAVORI A BASE D'ASTA</MenuItem>
                                 <MenuItem value={2}>LAVORI AFFIDATI</MenuItem>
@@ -210,8 +289,7 @@ EconomicsForm.propTypes = {
         economics: PropTypes.object.isRequired,
     }).isRequired,
     setProjectData: PropTypes.func.isRequired,
-    handleNext: PropTypes.func.isRequired,
-    handleBack: PropTypes.func.isRequired,
+    onValidationChange: PropTypes.func.isRequired,
 };
 
 export default EconomicsForm;

@@ -15,6 +15,7 @@ namespace OperaWeb.SharedClasses.Enums
     Warning,    // Avviso
     Error,      // Errore
     Success,     // Notifica di successo
-    ProfileIncomplete
+    ProfileIncomplete,
+    CompanyProfileIncomplete
   }
 }

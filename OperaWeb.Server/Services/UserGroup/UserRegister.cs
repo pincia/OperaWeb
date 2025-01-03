@@ -1,78 +1,113 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Azure.Core;
-using System;
 using System.Security.Cryptography;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Models.DTO.Account;
-using System.Security.Claims;
-using static System.Net.WebRequestMethods;
 using Microsoft.EntityFrameworkCore;
 using OperaWeb.Server.DataClasses.Models.User;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.SharedClasses.Enums;
+using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace Services.UserGroup
 {
-    public class UserRegisterRequest
-  {
-    public string Email { get; set; } = "";
-    public string Password { get; set; } = "";
-    public string FirstName { get; set; } = "";
-    public string LastName { get; set; } = "";
-    public string Role { get; set; } = "";
-  }
-  public partial class UserService
+
+
+    public partial class UserService
   {
     public async Task<AppResponse<object>> UserRegisterAsync(UserRegisterRequest request, string origin)
     {
+      using var transaction = await _context.Database.BeginTransactionAsync(); // Avvia la transazione
+
       try
       {
-        var user = new ApplicationUser()
+        // Verifica che il ruolo esista e sia consentito
+        var figure= _context.Figures.FirstOrDefault(x=> x.Name ==request.Figure);
+        if (figure == null)
+        {
+          return new AppResponse<object>().SetErrorResponse("Figura", "La Figura selezionata non è valida");
+        }
+
+        // Crea l'utente
+        var user = new ApplicationUser
         {
           UserName = request.Email,
           Email = request.Email,
-
+          FirstName = request.FirstName,
+          LastName = request.LastName,
+          FullName = $"{request.FirstName} {request.LastName}",
+          VerificationToken = GenerateVerificationToken()
         };
-        var result = await _userManager.CreateAsync(user, request.Password);
 
+        var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
         {
           return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
         }
 
-        var newUser = _context.Users.Where(u => u.Email == request.Email).FirstOrDefault();
+        // Assegna il ruolo
+        await _userManager.AddToRoleAsync(user, "OrganizationOwner");
 
-        var res = await _userManager.AddToRoleAsync(newUser, request.Role);
-        newUser.FirstName = request.FirstName;
-        newUser.LastName = request.LastName;
-        newUser.FullName = request.FirstName + " " + request.LastName;
-        newUser.VerificationToken = generateVerificationToken();
-
-        if (result.Succeeded)
+        // Crea l'azienda se richiesta
+        if (!string.IsNullOrEmpty(request.CompanyName) && !string.IsNullOrEmpty(request.VatOrTaxCode))
         {
-#if DEBUG
-          origin = @"https://localhost:7017";
-#endif
-          sendVerificationEmail(user, origin);
-          if (request.Role == "Impresa" || request.Role == "Committente" || request.Role == "Professionista")
+          var companyFigure = _context.Figures.FirstOrDefault(x => x.Name == request.Figure);
+
+          // Crea la compagnia
+          var company = new Company
           {
-            await CreateNewOrganizationAsync(newUser.Id);
-          }
-          await sendNotifcation(newUser);
-          _context.SaveChanges();
-          return new AppResponse<object>().SetSuccessResponse(new { Name = newUser.UserName, Id = newUser.Id, Email = newUser.Email });
+            Name = request.CompanyName,
+            VatOrTaxCode = request.VatOrTaxCode,
+            Figure = figure
+          };
+
+          var companyEntity = _context.Companies.Add(company).Entity;
+          await _context.SaveChangesAsync();
+
+          //crea organization member
+          var owner = new OrganizationMember
+          {
+            UserId = user.Id,
+            CompanyId = companyEntity.Id,
+            IsOwner = true
+          };
+
+          var ownerEntity = _context.OrganizationMembers.Add(owner).Entity;;
+
+          await _context.SaveChangesAsync();  // Salva l'azienda
+
+          // Associa l'azienda all'utente
+          user.CompanyId = companyEntity.Id;
+          await _userManager.UpdateAsync(user);
+
+          // Commit della transazione dopo tutte le operazioni
+          await transaction.CommitAsync();
+
+          // Invia email di verifica
+#if DEBUG
+          origin = @"https://localhost:7227";
+#endif
+          SendVerificationEmail(user, origin);
+          // Invia notifica di benvenuto
+          await sendNotifcation(user);
+
+          return new AppResponse<object>().SetSuccessResponse(new { Name = user.UserName, Id = user.Id, Email = user.Email });
         }
         else
         {
-          return new AppResponse<object>().SetErrorResponse(GetRegisterErrors(result));
+          // In caso di errore non bisogna fare il commit
+          await transaction.RollbackAsync();
+          return new AppResponse<object>().SetErrorResponse("company", "I dati aziendali non sono validi");
         }
       }
       catch (Exception ex)
       {
+        // In caso di errore durante la transazione, esegui il rollback
+        await transaction.RollbackAsync();
         return new AppResponse<object>().SetErrorResponse("register", ex.Message);
       }
-
     }
+
 
     private async Task sendNotifcation(ApplicationUser newUser)
     {
@@ -111,7 +146,7 @@ namespace Services.UserGroup
       return errorDictionary;
     }
 
-    private string generateVerificationToken()
+    private string GenerateVerificationToken()
     {
       // token is a cryptographically strong random sequence of values
       var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
@@ -119,12 +154,12 @@ namespace Services.UserGroup
       // ensure token is unique by checking against db
       var tokenIsUnique = !_context.Users.Any(x => x.VerificationToken == token);
       if (!tokenIsUnique)
-        return generateVerificationToken();
+        return GenerateVerificationToken();
 
       return token;
     }
 
-    private void sendVerificationEmail(ApplicationUser account, string origin)
+    private void SendVerificationEmail(ApplicationUser account, string origin)
     {
       string message;
       if (!string.IsNullOrEmpty(origin))
@@ -288,52 +323,58 @@ namespace Services.UserGroup
       return token;
     }
 
-    public async Task<bool> UpdateProfileAsync(string userId, UpdateProfileDto dto)
-    {
-      var user = await _context.Users.FindAsync(userId);
-      if (user == null) return false;
-
-      // Update user fields
-      user.FirstName = dto.FirstName;
-      user.LastName = dto.LastName;
-      user.PhoneNumber = dto.PhoneNumber;
-      user.ComuneId = dto.ComuneId;
-      user.ProvinciaId = dto.ProvinciaId;
-
-      // Update company fields
-      user.RagioneSociale = dto.RagioneSociale;
-      user.PIVA = dto.PIVA;
-      user.CompanyTaxCode = dto.CompanyTaxCode;
-      user.CompanyComuneId = dto.CompanyComuneId;
-      user.CompanyProvinciaId = dto.CompanyProvinciaId;
-      user.SDICode = dto.SDICode;
-      user.PEC = dto.PEC;
-      user.SubRoleId = dto.SubRoleId;
-      _context.Users.Update(user);
-      await _context.SaveChangesAsync();
-      return true;
-    }
-
-
-
+   
+    /// <summary>
+    /// Checks if the user's profile is complete.
+    /// </summary>
+    /// <param name="userId">The ID of the user to check.</param>
+    /// <returns>True if the user's profile is complete; otherwise, false.</returns>
     public async Task<bool> IsProfileCompleteAsync(string userId)
     {
+      // Retrieve the user and their related data
       var user = await _context.Users
           .Include(u => u.Comune)
           .Include(u => u.Provincia)
           .FirstOrDefaultAsync(u => u.Id == userId);
 
+      // Check if the user's profile fields are complete
       return user != null &&
-             !string.IsNullOrEmpty(user.FirstName) &&
-             !string.IsNullOrEmpty(user.LastName) &&
-             !string.IsNullOrEmpty(user.PhoneNumber) &&
-             user.ComuneId.HasValue &&
-             user.ProvinciaId.HasValue &&
-             !string.IsNullOrEmpty(user.RagioneSociale) &&
-             user.CompanyComuneId.HasValue &&
-             user.CompanyProvinciaId.HasValue;
+             !string.IsNullOrEmpty(user.FirstName) && // First name must not be empty
+             !string.IsNullOrEmpty(user.LastName) &&  // Last name must not be empty
+             !string.IsNullOrEmpty(user.City) &&      // City must not be empty
+             !string.IsNullOrEmpty(user.Address) &&   // Address must not be empty
+             !string.IsNullOrEmpty(user.PhoneNumber) && // Phone number must not be empty
+             !string.IsNullOrEmpty(user.TaxCode) &&   // Tax code (CF) must not be empty
+             !string.IsNullOrEmpty(user.PostalCode) && // Postal code must not be empty
+             !string.IsNullOrEmpty(user.Country) &&   // Country must not be empty
+             user.ComuneId.HasValue &&               // Comune ID must be set
+             user.ProvinciaId.HasValue;              // Provincia ID must be set
     }
 
+    /// <summary>
+    /// Checks if the company's profile is complete.
+    /// </summary>
+    /// <param name="companyId">The ID of the company to check.</param>
+    /// <returns>True if the company's profile is complete; otherwise, false.</returns>
+    public async Task<bool> IsCompanyProfileCompleteAsync(int companyId)
+    {
+      // Retrieve the company and its related data
+      var company = await _context.Companies
+          .Include(c => c.Comune)
+          .Include(c => c.Provincia)
+          .FirstOrDefaultAsync(c => c.Id == companyId);
+
+      // Check if the company's profile fields are complete
+      return company != null &&
+             !string.IsNullOrEmpty(company.Name) &&          // Ragione Sociale
+             !string.IsNullOrEmpty(company.VatOrTaxCode) &&  // Partita IVA o Codice Fiscale
+             !string.IsNullOrEmpty(company.Address) &&       // Indirizzo
+             company.ComuneId.HasValue &&                   // Comune
+             company.ProvinciaId.HasValue &&                // Provincia
+             !string.IsNullOrEmpty(company.PostalCode) &&    // CAP
+             !string.IsNullOrEmpty(company.Country) &&       // Nazione
+             !string.IsNullOrEmpty(company.Email);           // Email aziendale
+    }
 
     /// <summary>
     /// Retrieves a user by their ID.
@@ -349,37 +390,7 @@ namespace Services.UserGroup
       return user;
     }
 
-    /// <summary>
-    /// Recupera i subroles filtrati in base al ruolo dell'utente.
-    /// </summary>
-    public async Task<List<SubRole>> GetFilteredSubRolesAsync(string userId)
-    {
-      var user = await _userManager.FindByIdAsync(userId);
-      if (user == null)
-      {
-        return new List<SubRole>();
-      }
-
-      var roles = await _userManager.GetRolesAsync(user); // Restituisce una lista di ruoli
-
-      if (roles == null || !roles.Any())
-      {
-        return new List<SubRole>();
-      }
-
-      var userRole = roles.First();
-
-      // Recupera i subroles correlati al ruolo corrente dalla tabella rolesubroles
-      var subRoles = await _context.RoleSubRoles
-          .Where(rsr => rsr.Role.Name == userRole) // Filtro basato sul ruolo
-          .Include(rsr => rsr.SubRole)            // Include la relazione SubRole
-          .Select(rsr => rsr.SubRole)             // Seleziona i subroles
-          .ToListAsync();
-
-      return subRoles;
-    }
-
-    public async Task<AppResponse<bool>> CreateUserAndAddToOrganizationAsync(string organizationId, string fullName, string email, string roleName)
+    public async Task<AppResponse<bool>> CreateUserAndAddToOrganizationAsync(int organizationId, string fullName, string email, string roleName)
     {
       using var transaction = await _context.Database.BeginTransactionAsync();
       try
@@ -423,7 +434,7 @@ namespace Services.UserGroup
         {
           UserId = user.Id,
           RoleId = organizationRole.Id,
-          OrganizationId = organizationId
+          CompanyId = organizationId
         };
         _context.OrganizationMembers.Add(member);
         await _context.SaveChangesAsync();
@@ -567,14 +578,11 @@ namespace Services.UserGroup
       if (currentUser == null)
         return new AppResponse<List<OrganizationRole>>().SetErrorResponse("user", "User not found.");
 
-      // Ottieni i ruoli Identity dell'utente
-      var userRoles = await _userManager.GetRolesAsync(currentUser);
-      if (!userRoles.Any())
-        return new AppResponse<List<OrganizationRole>>().SetErrorResponse("roles", "User has no roles.");
+      var userCompany = _context.Companies.Include(x => x.Figure).FirstOrDefault(x => x.Id == currentUser.CompanyId);
 
       // Trova i ruoli organizzativi mappati ai ruoli Identity
-      var organizationRoles = await _context.OrganizationRoleMappings
-          .Where(rm => userRoles.Contains(rm.IdentityRole.Name))
+      var organizationRoles = await _context.FigureOrganizationRoleMappings
+          .Where(rm => rm.FigureId == userCompany.FigureId)
           .Select(rm => rm.OrganizationRole)
           .Distinct()
           .ToListAsync();
@@ -582,72 +590,73 @@ namespace Services.UserGroup
       return new AppResponse<List<OrganizationRole>>().SetSuccessResponse(organizationRoles);
     }
 
-    public async Task<AppResponse<bool>> CreateNewOrganizationAsync(string userId)
+    public async Task<AppResponse<bool>> CreateNewOrganizationMemberAsync(string userId)
     {
       // Controlla se l'utente esiste
-      var user = await _userManager.FindByIdAsync(userId);
-      if (user == null)
-        return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
+      //var user = await _userManager.FindByIdAsync(userId);
+      //if (user == null)
+      //  return new AppResponse<bool>().SetErrorResponse("user", "User not found.");
 
-      // Verifica se il ruolo "Organization" esiste
-      var organizationRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == "Organization");
-      if (organizationRole == null)
-        return new AppResponse<bool>().SetErrorResponse("role", "Organization role not found.");
+      //// Verifica se il ruolo "Organization" esiste
+      //var organizationRole = await _context.OrganizationRoles.FirstOrDefaultAsync(r => r.Name == "Organization");
+      //if (organizationRole == null)
+      //  return new AppResponse<bool>().SetErrorResponse("role", "Organization role not found.");
 
-      // Controlla se l'utente è già un membro dell'organizzazione
-      var existingMember = await _context.OrganizationMembers
-          .FirstOrDefaultAsync(m => m.UserId == userId && m.RoleId == organizationRole.Id);
+      //// Controlla se l'utente è già un membro dell'organizzazione
+      //var existingMember = await _context.OrganizationMembers
+      //    .FirstOrDefaultAsync(m => m.UserId == userId && m.RoleId == organizationRole.Id);
 
-      if (existingMember != null)
-        return new AppResponse<bool>().SetErrorResponse("member", "User is already an organization member.");
+      //if (existingMember != null)
+      //  return new AppResponse<bool>().SetErrorResponse("member", "User is already an organization member.");
 
-      // Crea il nuovo OrganizationMember
-      var organizationMember = new OrganizationMember
-      {
-        UserId = user.Id,
-        RoleId = organizationRole.Id,
-        OrganizationId = user.Id // L'organizzazione punta all'utente stesso
-      };
+      //// Crea il nuovo OrganizationMember
+      //var organizationMember = new OrganizationMember
+      //{
+      //  UserId = user.Id,
+      //  RoleId = organizationRole.Id,
+      //  OrganizationId = -1 // TODO: L'organizzazione 
+      //};
 
-      _context.OrganizationMembers.Add(organizationMember);
-      await _context.SaveChangesAsync();
+      //_context.OrganizationMembers.Add(organizationMember);
+      //await _context.SaveChangesAsync();
 
       return new AppResponse<bool>().SetSuccessResponse(true);
     }
     public async Task<List<OrganizationStructureDto>> GetOrganizationStructure(string userId)
     {
-      // Recupera l'organizationMember dell'utente
-      var organizationMember = _context.OrganizationMembers
-          .Where(m => m.UserId == userId)
-          .FirstOrDefault();
+      //// Recupera l'organizationMember dell'utente
+      //var organizationMember = _context.OrganizationMembers
+      //    .Where(m => m.UserId == userId)
+      //    .FirstOrDefault();
 
-      if (organizationMember == null)
-        throw new Exception("Organization member not found.");
+      //if (organizationMember == null)
+      //  throw new Exception("Organization member not found.");
 
-      // Recupera l'utente principale dell'organizzazione
-      var organizationUser = await _userManager.FindByIdAsync(organizationMember.OrganizationId);
-      if (organizationUser == null)
-        throw new Exception("Organization not found.");
+      //// Recupera l'utente principale dell'organizzazione
+      //var compamny = _context.Companies.FirstOrDefault(c => c.Id == organizationMember.Id);
+      //if (compamny == null)
+      //  throw new Exception("compamny not found.");
 
-      // Recupera i ruoli associati all'utente dell'organizzazione
-      var organizationRoles = await _userManager.GetRolesAsync(organizationUser);
+      //// Recupera i ruoli associati all'utente dell'organizzazione
+      //var organizationFigures = await _userManager.GetRolesAsync(organizationUser);
 
-      // Recupera i ruoli validi dall'OrganizationRoleMapping
-      var validRoles = await _context.OrganizationRoleMappings
-          .Where(rm => organizationRoles.Contains(rm.IdentityRole.Name))
-          .Select(rm => rm.OrganizationRole)
-          .ToListAsync();
+      //// Recupera i ruoli validi dall'OrganizationRoleMapping
+      //var validRoles = await _context.FigureOrganizationRoleMappings
+      //    .Where(rm => organizationRoles.Contains(rm.Figure.Name))
+      //    .Select(rm => rm.OrganizationRole)
+      //    .ToListAsync();
 
-      // Recupera tutti i membri dell'organizzazione con i ruoli validi
-      var organizationMembers = await _context.OrganizationMembers
-          .Include(m => m.User)
-          .Include(m => m.Role)
-          .Where(m => m.OrganizationId == organizationMember.OrganizationId && validRoles.Contains(m.Role))
-          .ToListAsync();
+      //// Recupera tutti i membri dell'organizzazione con i ruoli validi
+      //var organizationMembers = await _context.OrganizationMembers
+      //    .Include(m => m.User)
+      //    .Include(m => m.Role)
+      //    .Where(m => m.OrganizationId == organizationMember.OrganizationId && validRoles.Contains(m.Role))
+      //    .ToListAsync();
 
-      // Prendi solo i ruoli radice per costruire l'albero
-      var rootRoles = validRoles.Where(r => r.ParentRoleId == null).ToList();
-      return BuildTree(rootRoles, organizationMembers, validRoles);
+      //// Prendi solo i ruoli radice per costruire l'albero
+      //var rootRoles = validRoles.Where(r => r.ParentRoleId == null).ToList();
+      //return BuildTree(rootRoles, organizationMembers, validRoles);
+      return null;
     }
 
     private List<OrganizationStructureDto> BuildTree(

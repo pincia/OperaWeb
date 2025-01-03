@@ -6,6 +6,6 @@
     public virtual ApplicationUser User { get; set; }
 
     public int SubRoleId { get; set; }
-    public virtual SubRole SubRole { get; set; }
+    public virtual SubFigure SubRole { get; set; }
   }
 }

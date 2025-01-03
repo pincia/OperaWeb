@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection.Emit;
+using OperaWeb.Server.DataClasses.Models;
 namespace OperaWeb.Server.DataClasses.Context.Configurations
 {
   public class NotificationConfiguration : IEntityTypeConfiguration<OrganizationMember>
@@ -19,9 +20,9 @@ namespace OperaWeb.Server.DataClasses.Context.Configurations
 
 
       // Relazione con OrganizationId - Restringe l'eliminazione
-      builder.HasOne(m => m.Organization)
+      builder.HasOne(m => m.Company)
             .WithMany()
-            .HasForeignKey(m => m.OrganizationId)
+            .HasForeignKey(m => m.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
 
       // Relazione con RoleId - Nessuna azione per sicurezza

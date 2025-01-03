@@ -119,7 +119,7 @@ namespace OperaWeb.Server.Controllers.Account
     /// <param name="updatedUser">Updated user information</param>
     /// <returns>ActionResult</returns>
     [HttpPost]
-    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto updatedUser)
+    public async Task<IActionResult> UpdateProfile([FromBody] UserProfileDto updatedUser)
     {
       var userId = User.FindFirstValue("Id");
       if (string.IsNullOrEmpty(userId))
@@ -138,22 +138,6 @@ namespace OperaWeb.Server.Controllers.Account
       {
         return BadRequest(new { message = ex.Message });
       }
-    }
-    /// <summary>
-    /// Recupera i sottoruoli in base al ruolo corrente dell'utente.
-    /// </summary>
-    [HttpGet]
-    public async Task<IActionResult> GetSubRoles()
-    {
-      // Ottieni l'ID del ruolo corrente dell'utente dai Claims
-      var userId = User.FindFirstValue("Id");
-      if (string.IsNullOrEmpty(userId))
-        return Unauthorized("User ID not found");
-
-      // Ottieni i subroles filtrati tramite UserService
-      var subRoles = await _userService.GetFilteredSubRolesAsync(userId);
-
-      return Ok(subRoles);
     }
 
     [Authorize]

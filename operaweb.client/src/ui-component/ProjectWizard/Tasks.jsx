@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { Button, Box, Typography, Snackbar, Alert } from '@mui/material';
+import { Box, Typography, Snackbar, Alert } from '@mui/material';
 import TaskTreeView from './TaskTreeView';
 import TaskDetailsDialog from './TaskDetailsDialog';
 import EntryDetailsDialog from './EntryDetailsDialog';
 import EntryList from './EntryList';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import AnimateButton from 'ui-component/extended/AnimateButton';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
 
-const validationSchema = yup.object({});
-
-export default function TasksForm({ handleNext, handleBack, setErrorIndex, projectData, setProjectData }) {
+export default function TasksForm({ projectData, setProjectData, onValidationChange }) {
     const [task, setTask] = useState({
         id: null,
         description: '',
@@ -22,17 +15,6 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
         hasEntry: false
     });
 
-    const formik = useFormik({
-        initialValues: {
-            searchQuery: '',
-        },
-        enableReinitialize: true,
-        validationSchema,
-        onSubmit: () => {
-            setProjectData(projectData); // Salva lo stato dei soggetti prima di andare avanti
-            handleNext();
-        },
-    });
     const [entry, setEntry] = useState({
         id: null,
         description: '',
@@ -42,7 +24,7 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
     });
 
     const [tasks, setTasks] = useState(projectData.jobs || [
-        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false, level: 1},
+        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false, level: 1 },
         { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false, level: 1 },
         { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false, level: 1 },
     ]);
@@ -52,7 +34,6 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
     const [expanded, setExpanded] = useState([]);
     const [selectedTaskEntries, setSelectedTaskEntries] = useState([]);
-
 
     const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
 
@@ -105,35 +86,47 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
         return Math.floor(Date.now() + Math.random() * 10000); // Genera un ID univoco
     };
 
+    useEffect(() => {
+        setProjectData((prev) => {
+            if (JSON.stringify(prev.jobs) !== JSON.stringify(tasks)) {
+                return { ...prev, jobs: tasks };
+            }
+            return prev;
+        });
+    }, [tasks, setProjectData]);
 
+
+    useEffect(() => {
+        // Valida sempre come "true" (nessuna validazione attiva per ora)
+        onValidationChange(true);
+    }, [onValidationChange]);
 
     return (
-        <><Box sx={{ padding: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-            <Box sx={{ flex: 4}}>
-            <TaskTreeView
-                tasks={tasks}
-                setTasks={setTasks}
-                expanded={expanded}
-                setExpanded={setExpanded}
-                handleOpen={handleOpen}
-                handleEntryOpen={handleEntryOpen}
-                setSnackbar={setSnackbar}
-                setTask={setTask}
-                setSelectedTaskEntries={setSelectedTaskEntries}
-                defaultTaskIds={defaultTaskIds}
-            />
+        <Box sx={{ padding: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
+            <Box sx={{ flex: 4 }}>
+                <TaskTreeView
+                    tasks={tasks}
+                    setTasks={setTasks}
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    handleOpen={handleOpen}
+                    handleEntryOpen={handleEntryOpen}
+                    setSnackbar={setSnackbar}
+                    setTask={setTask}
+                    setSelectedTaskEntries={setSelectedTaskEntries}
+                    defaultTaskIds={defaultTaskIds}
+                />
             </Box>
             <Box sx={{ flex: 4 }}>
                 <EntryList
                     selectedTaskEntries={selectedTaskEntries}
                     setTasks={setTasks}
-                    tasks={tasks}
+                    setProjectData={setProjectData}
                     setSnackbar={setSnackbar}
                     taskId={task.id}
                     setSelectedTaskEntries={setSelectedTaskEntries}
                     snackbar={snackbar}
                 />
-
             </Box>
 
             <TaskDetailsDialog
@@ -165,19 +158,5 @@ export default function TasksForm({ handleNext, handleBack, setErrorIndex, proje
                 </Alert>
             </Snackbar>
         </Box>
-            <form onSubmit={formik.handleSubmit}>
-                <Grid item xs={12}>
-                    <Stack direction="row" justifyContent="space-between">
-                        <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
-                            Back
-                        </Button>
-                        <AnimateButton>
-                            <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }} onClick={() => setErrorIndex(1)}>
-                                Next
-                            </Button>
-                        </AnimateButton>
-                    </Stack>
-                </Grid>
-            </form></>
     );
 }

@@ -23,7 +23,7 @@ namespace Services.UserGroup
     {
       _logger.LogInformation("[UserLoginAsync] START for Email: {Email}", request.Email);
 
-      // Trova l'utente per email
+      // Find the user by email
       var user = await _userManager.FindByEmailAsync(request.Email);
       if (user == null)
       {
@@ -31,7 +31,7 @@ namespace Services.UserGroup
         return new AppResponse<UserLoginResponse>().SetErrorResponse("email", "Email not found");
       }
 
-      // Controlla la password
+      // Check the password
       var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true);
       if (result.Succeeded)
       {
@@ -39,45 +39,32 @@ namespace Services.UserGroup
         {
           _logger.LogInformation("[UserLoginAsync] User ID: {UserId} must change password.", user.Id);
 
-          // Restituisci una risposta con il flag MustChangePassword
+          // Return a response with the MustChangePassword flag
           return new AppResponse<UserLoginResponse>().SetErrorResponse("change_password", "Password must be changed.");
         }
 
-        // Genera il token di accesso e refresh
+        // Generate the access and refresh tokens
         var token = await GenerateUserToken(user);
         _logger.LogInformation("[UserLoginAsync] Login successful for User ID: {UserId}", user.Id);
 
+        // Check if user profile is complete
         var profileComplete = await IsProfileCompleteAsync(user.Id);
-
         if (!profileComplete)
         {
-          var notification = _context.Notifications.Where(n => n.User.Id == user.Id && n.Type == NotificationType.ProfileIncomplete).FirstOrDefault();
+          await HandleIncompleteProfileNotificationAsync(user.Id, NotificationType.ProfileIncomplete, "Profilo da completare", "Ti preghiamo di completare i dati anagrafici del profilo utente. Clicca qui.", "/user/profile/");
+        }
 
-          //se la notifica esite già ed è passato più di un giorno la ricreo
-          if (notification != null && notification.IsRead && notification.CreatedAt.AddDays(1) < DateTime.Now)
+        // Check if company profile is complete
+        if (user.CompanyId.HasValue)
+        {
+          var companyProfileComplete = await IsCompanyProfileCompleteAsync(user.CompanyId.Value);
+          if (!companyProfileComplete)
           {
-            await _notificationService.CreateNotificationAsync(
-          user.Id,
-          "Profilo da completare",
-          "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
-          NotificationType.ProfileIncomplete,
-          "/user/profile/"
-      );
-          }
-
-          else if(notification == null)
-          {
-            await _notificationService.CreateNotificationAsync(
-         user.Id,
-         "Profilo da completare",
-         "Ti preghiamo di completare i dati anagrafici del profilo. Clicca qui.",
-         NotificationType.ProfileIncomplete,
-         "/user/profile/"
-     );
+            await HandleIncompleteProfileNotificationAsync(user.Id, NotificationType.CompanyProfileIncomplete, "Profilo aziendale da completare", "Ti preghiamo di completare i dati del profilo aziendale. Clicca qui.", "/user/profile/");
           }
         }
 
-        // Log accesso riuscito
+        // Log successful login
         await _accessLogService.LogAccessAsync(user.UserName, "LOGIN", success: true, user.Id);
 
         return new AppResponse<UserLoginResponse>().SetSuccessResponse(token);
@@ -92,6 +79,33 @@ namespace Services.UserGroup
         return new AppResponse<UserLoginResponse>().SetErrorResponse("password", errorMessage);
       }
     }
+
+    private async Task HandleIncompleteProfileNotificationAsync(string id, object companyProfileIncomplete, string v1, string v2, string v3)
+    {
+      throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Handles incomplete profile notifications.
+    /// </summary>
+    private async Task HandleIncompleteProfileNotificationAsync(string userId, NotificationType type, string title, string message, string link)
+    {
+      var notification = _context.Notifications
+          .Where(n => n.User.Id == userId && n.Type == type)
+          .FirstOrDefault();
+
+      if (notification != null && notification.IsRead && notification.CreatedAt.AddDays(1) < DateTime.Now)
+      {
+        // Recreate the notification if it exists and was read more than a day ago
+        await _notificationService.CreateNotificationAsync(userId, title, message, type, link);
+      }
+      else if (notification == null)
+      {
+        // Create a new notification if it doesn't exist
+        await _notificationService.CreateNotificationAsync(userId, title, message, type, link);
+      }
+    }
+
 
     public async Task<AppResponse<UserDTO>> Me(string userId)
     {

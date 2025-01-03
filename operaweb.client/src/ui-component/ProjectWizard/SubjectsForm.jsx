@@ -39,7 +39,7 @@ import * as yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import { store } from 'store';
 const validationSchema = yup.object({});
-export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext, handleBack, setErrorIndex, projectData, setProjectData }) {
+export default function SubjectsForm({ projectData, setProjectData, onValidationChange }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [openRoleDialog, setOpenRoleDialog] = useState(false);
     const [searchDialogOpen, setSearchDialogOpen] = useState(false);
@@ -93,15 +93,19 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
 
 
     const formik = useFormik({
-        initialValues: {
-            searchQuery: '',
-        },
-        enableReinitialize: true,
-        validationSchema,
-        onSubmit: () => {
-            handleNext();
-        },
+        initialValues: {},
+        validationSchema: yup.object().shape({}), // Nessuna validazione aggiuntiva per ora
+        validateOnMount: true,
+        onSubmit: () => { },
     });
+
+    useEffect(() => {
+        // Controlla se ci sono soggetti nella tabella
+        const isValid = subjects.length > 0;
+        onValidationChange(isValid);
+    }, [subjects, onValidationChange]);
+
+
     const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
 
 
@@ -266,7 +270,7 @@ export default function SubjectsForm({ subjectsData, setSubjectsData, handleNext
         },
     ];
 
-return (<>
+return (
     <Box
         sx={{
             minHeight: '400px',
@@ -488,27 +492,5 @@ return (<>
             </Alert>
         </Snackbar>
     </Box>
-    <form onSubmit={formik.handleSubmit}>
-        <Grid item xs={12}>
-            <Stack direction="row" justifyContent="space-between">
-                <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
-                    Back
-                </Button>
-                <AnimateButton>
-                    <Button
-                        variant="contained"
-                        type="submit"
-                        sx={{ my: 3, ml: 1 }}
-                        onClick={() => {
-                            formik.handleSubmit();
-                            setErrorIndex(1);
-                        }}
-                    >
-                        Next
-                    </Button>
-                </AnimateButton>
-            </Stack>
-        </Grid>
-    </form></>
 );
 }

@@ -34,7 +34,7 @@ import EditableCell from './EditableCell'
 export default function EntryList({
     selectedTaskEntries,
     setTasks,
-    tasks,
+    setProjectData
     setSnackbar,
     taskId,
     setSelectedTaskEntries,
@@ -83,6 +83,7 @@ export default function EntryList({
             });
         };
 
+       
         setTasks((prevTasks) => {
             const updatedTasks = removeEntryFromHierarchy(prevTasks, taskId, entryId);
             const updatedTask = findTask(updatedTasks, taskId);
@@ -175,11 +176,19 @@ export default function EntryList({
                 }
                 return task;
             });
+
+            // Aggiorna projectData
+            setProjectData((prevData) => ({
+                ...prevData,
+                tasks: [...updatedTasks], // Aggiorna i dati del progetto
+            }));
+
             const updatedTask = findTask(updatedTasks, taskId);
             if (updatedTask) setSelectedTaskEntries(updatedTask.entries || []);
             return updatedTasks;
         });
     };
+
 
     const handleMenuOpen = (event, task) => {
         setMenuAnchor(event.currentTarget); // Imposta l'ancora per il menu delle voci

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Controllers.Account;
 using OperaWeb.Server.DataClasses.Models.User;
-
 namespace Services.UserGroup
 {
   public partial class UserService
@@ -61,34 +60,84 @@ namespace Services.UserGroup
     }
 
     /// <summary>
-    /// Recupera il profilo dell'utente corrente.
+    /// Retrieves the profile of a user by their ID.
     /// </summary>
-    public async Task<UpdateProfileDto> GetProfileAsync(string userId)
+    /// <param name="userId">The ID of the user to retrieve.</param>
+    /// <returns>A <see cref="UserProfileDto"/> containing the user's profile information.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the user is not found.</exception>
+    public async Task<UserProfileDto> GetProfileAsync(string userId)
     {
+      // Attempt to find the user by their ID
       var user = await _userManager.FindByIdAsync(userId);
       if (user == null)
       {
+        // Throw an exception if the user does not exist
         throw new KeyNotFoundException("User not found");
       }
 
-      // Popola il DTO con i dati dell'utente
-      return new UpdateProfileDto
+      var userRole = await  _userManager.GetRolesAsync(user);
+      var organizationMember = _context.OrganizationMembers.FirstOrDefault(x => x.UserId == user.Id);
+
+      // Map the user entity to the UserProfileDto
+      return new UserProfileDto
       {
         FirstName = user.FirstName,
         LastName = user.LastName,
-        PhoneNumber = user.PhoneNumber,
-        ComuneId = user.ComuneId ?? 0,
-        ProvinciaId = user.ProvinciaId ?? 0,
-        RagioneSociale = user.RagioneSociale,
-        PIVA = user.PIVA,
-        CompanyTaxCode = user.CompanyTaxCode,
-        CompanyComuneId = user.CompanyComuneId ?? 0,
-        CompanyProvinciaId = user.CompanyProvinciaId ?? 0,
-        SDICode = user.SDICode,
-        PEC = user.PEC,
-        SubRoleId = user.SubRoleId ?? 0
+        FullName = user.FullName,
+        PhoneNumber = user.PhoneNumber ?? string.Empty,
+        Email = user.Email,
+        AlternateEmail = user.AlternateEmail ?? string.Empty,
+        Address = user.Address ?? string.Empty,
+        City = user.City ?? string.Empty,
+        PostalCode = user.PostalCode ?? string.Empty,
+        Country = user.Country ?? string.Empty,
+        CF = user.TaxCode ?? string.Empty,
+        ProvinceId =user.ProvinciaId ?? -1,
+        CityId = user.ComuneId ?? -1,
+        OrganizationRoleId = organizationMember?.RoleId ?? -1
       };
     }
+
+    /// <summary>
+    /// Updates the profile of a user.
+    /// </summary>
+    /// <param name="userId">The ID of the user to update.</param>
+    /// <param name="dto">The data transfer object containing updated user information.</param>
+    /// <returns>True if the update was successful; otherwise, false.</returns>
+    public async Task<bool> UpdateProfileAsync(string userId, UserProfileDto dto)
+    {
+      // Retrieve the user
+      var user = await _context.Users.FindAsync(userId);
+      if (user == null) return false;
+
+      // Update user fields
+      user.FirstName = dto.FirstName;
+      user.LastName = dto.LastName;
+      user.FullName = $"{dto.FirstName} {dto.LastName}";
+      user.PhoneNumber = dto.PhoneNumber;
+      user.AlternateEmail = dto.AlternateEmail;
+      user.Address = dto.Address;
+      user.City = dto.City;
+      user.PostalCode = dto.PostalCode;
+      user.Country = dto.Country;
+      user.TaxCode = dto.CF;
+      user.ProvinciaId = dto.ProvinceId;
+      user.ComuneId = dto.CityId;
+      user.TaxCode = dto.CF;
+      // Save changes to the database
+      _context.Users.Update(user);
+
+      var organizationMember = _context.OrganizationMembers.FirstOrDefault(x => x.UserId == user.Id);
+
+      if (organizationMember != null)
+      {
+        organizationMember.RoleId = dto.OrganizationRoleId;
+        _context.Update(organizationMember);
+      }
+      await _context.SaveChangesAsync();
+      return true;
+    }
+
 
   }
 }

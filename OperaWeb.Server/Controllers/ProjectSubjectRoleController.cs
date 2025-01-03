@@ -5,15 +5,19 @@ using OperaWeb.Server.DataClasses.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using OperaWeb.Server.DataClasses.Models.User;
 
 [Route("api/[controller]")]
 [ApiController]
 public class ProjectSubjectRoleController : ControllerBase
 {
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly OperaWebDbContext _context;
   private readonly RoleManager<IdentityRole> _roleManager;
-  public ProjectSubjectRoleController(OperaWebDbContext context, RoleManager<IdentityRole> roleManager)
+  public ProjectSubjectRoleController(OperaWebDbContext context, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
   {
+    _userManager = userManager;
     _context = context;
     _roleManager = roleManager;
   }
@@ -22,21 +26,31 @@ public class ProjectSubjectRoleController : ControllerBase
   [HttpGet]
   public async Task<ActionResult<IEnumerable<ProjectSubjectRole>>> GetProjectSubjectRoles()
   {
-    return await _context.SubjectRoles.ToListAsync();
+    return await _context.ProjectSubjectRoles.ToListAsync();
   }
 
-  // GET: api/SubRole/UserSubRoles/{userId}
-  [HttpGet("role-project-roles/{roleName}")]
-  public async Task<IActionResult> GetUserSubRoles(string roleName)
+  [HttpGet("figure-project-roles/{roleName}")]
+  public async Task<ActionResult<IEnumerable<ProjectSubjectRole>>> GetUserSubRoles(string roleName)
   {
-    var role = await _roleManager.FindByNameAsync(roleName);
+    var userId = User.FindFirstValue("Id");
 
-    if (role == null)
-      return NotFound("Ruolo non trovato.");
+    var user = await _userManager.FindByIdAsync(userId);
 
-    var subRoles = await _context.RoleProjectRoles
-        .Include(ur => ur.ProjectRole).Where(r=>r.Role.Name == roleName)
-        .Select(ur => ur.ProjectRole)
+    if (user == null)
+    {
+      return new List<ProjectSubjectRole>();
+    }
+
+    if (user.CompanyId == null || user.CompanyId <= 0)
+    {
+      return new List<ProjectSubjectRole>();
+    }
+
+    var userCompany = _context.Companies.Include(x => x.Figure).FirstOrDefault(x => x.Id == user.CompanyId);
+
+    var subRoles = await _context.FigureProjectSubjectRoles
+        .Include(ur => ur.ProjectSubjectRole).Where(r=>r.Figure.Name == userCompany.Figure.Name)
+        .Select(ur => ur.ProjectSubjectRole)
         .ToListAsync();
 
     return Ok(subRoles);

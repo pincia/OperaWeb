@@ -12,7 +12,6 @@ export async function getOrganizationStructure() {
     }
 }
 
-
 // ⬇️ Aggiunge un nuovo membro all'organizzazione
 export async function addMember(payload) {
     return await axios.post('/api/organization/add-member', payload);
@@ -29,11 +28,22 @@ export async function removeMember(memberId) {
 }
 
 // ⬇️ Recupera i ruoli disponibili per aggiungere un nuovo membro
-export async function getAvailableRoles() {
+export async function getOrganizationAvailableRoles() {
     try {
         const response = await axios.get('/api/organization/available-roles');
         return response.data;
     } catch (error) {
         return error.response?.data || error.message;
+    }
+}
+
+// ⬇️ Recupera i membri dell'organizzazione corrente
+export async function getUserOrganizationMembers() {
+    try {
+        const response = await axios.get('/api/organization/user-organization-members');
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch organization members:', error);
+        throw error;
     }
 }

@@ -14,8 +14,22 @@ import {
     Stack
 } from '@mui/material';
 import AnimateButton from 'ui-component/extended/AnimateButton';
+import * as yup from 'yup';
+import { useFormik } from 'formik';
 
-export default function ConfigurationsForm({ handleBack, handleNext, projectData, setProjectData }) {
+const validationSchema = yup.object({
+    partiUguali: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    lunghezza: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    larghezza: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    hPeso: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    quantita: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    prezzi: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    speseGenerali: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    utileImpresa: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    metodo: yup.number().required('Seleziona un metodo'),
+    applicataA: yup.number().required('Seleziona un valore applicabile'),
+});
+export default function ConfigurationsForm({ projectData, setProjectData, onValidationChange }) {
     const [localConfigurations, setLocalConfigurations] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
     const [selectedMetodoIndex, setSelectedMetodoIndex] = useState({});
@@ -32,6 +46,7 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                     hPeso: projectData.configurations.numeri?.hPeso || 0,
                     quantita: projectData.configurations.numeri?.quantita || 0,
                     prezzi: projectData.configurations.numeri?.prezzi || 0,
+                    importo: projectData.configurations.numeri?.importo || 0,
                     prezziTotale: projectData.configurations.numeri?.prezziTotale || 0,
                     convPrezzi: projectData.configurations.numeri?.convPrezzi || 0,
                     convPrezziTotale: projectData.configurations.numeri?.convPrezziTotale || 0,
@@ -73,26 +88,49 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
         }
     }, [projectData.configurations]);
 
+    const formik = useFormik({
+        initialValues: {
+            partiUguali: projectData.configurations?.numeri?.partiUguali || 0,
+            importo: projectData.configurations?.numeri?.importo || 0,
+            lunghezza: projectData.configurations?.numeri?.lunghezza || 0,
+            larghezza: projectData.configurations?.numeri?.larghezza || 0,
+            hPeso: projectData.configurations?.numeri?.hPeso || 0,
+            quantita: projectData.configurations?.numeri?.quantita || 0,
+            prezzi: projectData.configurations?.numeri?.prezzi || 0,
+            speseGenerali: projectData.configurations?.analisi?.speseGenerali || 0,
+            utileImpresa: projectData.configurations?.analisi?.utileImpresa || 0,
+            metodo: projectData.configurations?.analisi?.metodo || 0,
+            applicataA: projectData.configurations?.analisi?.applicataA || 0,
+            aliquote: projectData.configurations?.numeri?.aliquote || 0,
+            valuta: projectData.configurations?.numeri?.valuta || "Euro"
+        },
+        validationSchema,
+        onSubmit: (values) => {
+            setProjectData((prev) => ({
+                ...prev,
+                configurations: {
+                    numeri: {
+                        ...prev.configurations?.numeri,
+                        ...values,
+                    },
+                    analisi: {
+                        ...prev.configurations?.analisi,
+                        speseGenerali: values.speseGenerali,
+                        utileImpresa: values.utileImpresa,
+                        metodo: values.metodo,
+                        applicataA: values.applicataA,
+                    },
+                },
+            }));
+        },
+    });
 
-    const handleFieldNumeriChange = (key, value) => {
-        setLocalConfigurations((prev) => ({
-            ...prev,
-            numeri: {
-                ...prev.numeri,
-                [key]: value === '' ? '' : parseFloat(value) // Permette di sovrascrivere 0 con un altro valore
-            }
-        }));
-    };
+    useEffect(() => {
+        // Imposta la validazione nel componente padre
+        onValidationChange(formik.isValid);
+    }, [formik.isValid, formik.errors, onValidationChange]);
 
-    const handleFieldAnalisiChange = (key, value) => {
-        setLocalConfigurations((prev) => ({
-            ...prev,
-            analisi: {
-                ...prev.analisi,
-                [key]: value === '' ? '' : parseFloat(value) // Permette di sovrascrivere 0 con un altro valore
-            }
-        }));
-    };
+
 
     const handleCurrencyChange = (event) => {
         setLocalConfigurations((prev) => ({
@@ -127,6 +165,11 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
         }));
     };
 
+    useEffect(() => {
+        onValidationChange(formik.isValid);
+    }, [formik.isValid, formik.errors, onValidationChange]);
+
+
     const handleSubmit = () => {
         setProjectData((prev) => ({
             ...prev,
@@ -143,7 +186,6 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                 }
             }
         }));
-        handleNext();
     };
 
 
@@ -162,133 +204,106 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
     }
 
     return (
-        <>
-            <Box sx={{ padding: 4 }}>
-                <Grid container spacing={3}>
-                    {/* Grid 70% */}
-                    <Grid item xs={12} md={8} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
-                        <Typography variant="h3" gutterBottom>
-                            Configurazioni Avanzate
-                        </Typography>
-                        <Typography variant="body2" gutterBottom>
-                            Configura i parametri numerici e seleziona la valuta.
-                        </Typography>
-                        <Grid container spacing={2} marginTop={2}>
-                            {/* Column 1 */}
-                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography variant="h4" gutterBottom align="center">
-                                  Fattori
-                                </Typography>
-                                <FormLabel sx={{ minWidth: '150px' }}>N.P.U</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.partiUguali || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('partiUguali', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                                <FormLabel sx={{ minWidth: '150px' }}>Lunghezza</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.lunghezza || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('lunghezza', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                                <FormLabel sx={{ minWidth: '150px' }}>Larghezza</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.larghezza || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('larghezza', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                                <FormLabel sx={{ minWidth: '150px' }}>Altezza/Peso</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.hPeso || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('hPeso', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                            </Grid>
+        <Box sx={{ padding: 4 }}>
+            <Grid container spacing={3}>
+                {/* Configurazioni Avanzate - Numeri */}
+                <Grid item xs={12} md={8} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                    <Typography variant="h3" gutterBottom>
+                        Configurazioni Avanzate
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                        Configura i parametri numerici e seleziona la valuta.
+                    </Typography>
+                    <Grid container spacing={2} marginTop={2}>
+                        {/* Fattori */}
+                        <Grid item xs={12} md={4}>
+                            {['partiUguali', 'lunghezza', 'larghezza', 'hPeso'].map((field) => (
+                                <FormControl fullWidth sx={{ marginBottom: 2 }} key={field}>
+                                    <FormLabel>{field}</FormLabel>
+                                    <TextField
+                                        type="number"
+                                        name={field}
+                                        value={formik.values[field]}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        error={formik.touched[field] && Boolean(formik.errors[field])}
+                                        helperText={formik.touched[field] && formik.errors[field]}
+                                        variant="outlined"
+                                    />
+                                </FormControl>
+                            ))}
+                        </Grid>
 
-                            {/* Column 2 */}
-                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography variant="h4" gutterBottom align="center">
-                                    Valorizzatori
-                                </Typography>
-                                <FormLabel sx={{ minWidth: '150px' }}>Prodotto/q.ta</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.quantita || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('quantita', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                                <FormLabel sx={{ minWidth: '150px' }}>Prezzo</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.prezzi || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('prezzi', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                                <FormLabel sx={{ minWidth: '150px' }}>Imoorto</FormLabel>
-                                <TextField
-                                    type="number"
-                                    value={localConfigurations.numeri.importo || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('importo', parseInt(e.target.value, 10) || 0)}
-                                    variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
-                                />
-                            </Grid>
+                        {/* Valorizzatori */}
+                        <Grid item xs={12} md={4}>
+                            {['quantita', 'prezzi', 'importo'].map((field) => (
+                                <FormControl fullWidth sx={{ marginBottom: 2 }} key={field}>
+                                    <FormLabel>{field}</FormLabel>
+                                    <TextField
+                                        type="number"
+                                        name={field}
+                                        value={formik.values[field]}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        error={formik.touched[field] && Boolean(formik.errors[field])}
+                                        helperText={formik.touched[field] && formik.errors[field]}
+                                        variant="outlined"
+                                    />
+                                </FormControl>
+                            ))}
+                        </Grid>
 
-                            {/* Column 3 */}
-                            <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography variant="h4" gutterBottom align="center">
-                                    Altro
-                                </Typography>
-                                <FormLabel sx={{ minWidth: '150px' }}>Aliquota</FormLabel>
+                        {/* Altro */}
+                        <Grid item xs={12} md={4}>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Aliquota</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.numeri.aliquote || ''} 
-                                    onChange={(e) => handleFieldNumeriChange('aliquote', parseInt(e.target.value, 10) || 0)}
+                                    name="aliquote"
+                                    value={formik.values.aliquote}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.aliquote && Boolean(formik.errors.aliquote)}
+                                    helperText={formik.touched.aliquote && formik.errors.aliquote}
                                     variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
                                 />
-                                    <FormLabel sx={{ minWidth: '150px' }}>Valuta</FormLabel>
-                                    <Select
-                                        value={localConfigurations.Valuta || 'EUR'}
-                                    onChange={handleCurrencyChange}
-                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
-                                    >
-                                        <MenuItem value="EUR">Euro</MenuItem>
-                                    </Select>
-                            </Grid>
+                            </FormControl>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Valuta</FormLabel>
+                                <Select
+                                    name="valuta"
+                                    value={formik.values.valuta}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.valuta && Boolean(formik.errors.valuta)}
+                                    variant="outlined"
+                                >
+                                    <MenuItem value="Euro">Euro</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Grid>
                     </Grid>
+                </Grid>
 
-                    {/* Grid 30% */}
-                    <Grid item xs={12} md={4} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
-                        <Typography variant="h3" gutterBottom>
-                            Configurazioni Analisi
-                        </Typography>
-                        <Typography variant="body2" gutterBottom>
-                            Parametri per il calcolo delle analisi e dei prezzi.
-                        </Typography>
-                        <Grid container spacing={2} marginTop={2}>
-                            {/* Column 1 */}
-                            <Grid item xs={12} md={12} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography variant="h4" gutterBottom align="center">
-                                    Calcolo
-                                </Typography>
-                                <FormLabel sx={{ minWidth: '150px' }}>Metodo</FormLabel>
+                {/* Configurazioni Analisi */}
+                <Grid item xs={12} md={4} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                    <Typography variant="h3" gutterBottom>
+                        Configurazioni Analisi
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                        Parametri per il calcolo delle analisi e dei prezzi.
+                    </Typography>
+                    <Grid container spacing={2} marginTop={2}>
+                        <Grid item xs={12}>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Metodo</FormLabel>
                                 <Select
-                                    labelId="dropdown-label-metodo"
-                                    value={selectedMetodoIndex}
-                                    onChange={handleChangeMetodo}
-                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
+                                    name="metodo"
+                                    value={formik.values.metodo}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.metodo && Boolean(formik.errors.metodo)}
+                                    variant="outlined"
                                 >
                                     {metodoOptions.map((option, index) => (
                                         <MenuItem key={index} value={index}>
@@ -296,28 +311,42 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                         </MenuItem>
                                     ))}
                                 </Select>
-                                <FormLabel sx={{ minWidth: '150px' }}>Spese Generali</FormLabel>
+                            </FormControl>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Spese Generali</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.analisi.speseGenerali || ''} 
-                                    onChange={(e) => handleFieldAnalisiChange('speseGenerali', parseInt(e.target.value, 10) || 0)}
+                                    name="speseGenerali"
+                                    value={formik.values.speseGenerali}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.speseGenerali && Boolean(formik.errors.speseGenerali)}
+                                    helperText={formik.touched.speseGenerali && formik.errors.speseGenerali}
                                     variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
                                 />
-                                <FormLabel sx={{ minWidth: '150px' }}>Utile Impresa</FormLabel>
+                            </FormControl>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Utile Impresa</FormLabel>
                                 <TextField
                                     type="number"
-                                    value={localConfigurations.analisi.utileImpresa || ''} 
-                                    onChange={(e) => handleFieldAnalisiChange('utileImpresa', parseInt(e.target.value, 10) || 0)}
+                                    name="utileImpresa"
+                                    value={formik.values.utileImpresa}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.utileImpresa && Boolean(formik.errors.utileImpresa)}
+                                    helperText={formik.touched.utileImpresa && formik.errors.utileImpresa}
                                     variant="outlined"
-                                    sx={{ marginBottom: 2, width: '150px' }}
                                 />
-                                <FormLabel sx={{ minWidth: '150px' }}>Applicata A</FormLabel>
+                            </FormControl>
+                            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                                <FormLabel>Applicata A</FormLabel>
                                 <Select
-                                    labelId="dropdown-label-applicataA"
-                                    value={selectedApplicataAIndex}
-                                    onChange={handleChangeApplicataA}
-                                    sx={{ marginBottom: 2, width: '150px', minWidth: '150px' }}
+                                    name="applicataA"
+                                    value={formik.values.applicataA}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.applicataA && Boolean(formik.errors.applicataA)}
+                                    variant="outlined"
                                 >
                                     {applicataAOptions.map((option, index) => (
                                         <MenuItem key={index} value={index}>
@@ -325,27 +354,12 @@ export default function ConfigurationsForm({ handleBack, handleNext, projectData
                                         </MenuItem>
                                     ))}
                                 </Select>
-                            </Grid>
+                            </FormControl>
                         </Grid>
                     </Grid>
                 </Grid>
-            </Box>
-            <Grid item xs={12}>
-                <Stack direction="row" justifyContent="space-between">
-                    <Button onClick={handleBack} sx={{ my: 3, ml: 1 }}>
-                        Back
-                    </Button>
-                    <AnimateButton>
-                        <Button
-                            variant="contained"
-                            sx={{ my: 3, ml: 1 }}
-                            onClick={handleSubmit}
-                        >
-                            Next
-                        </Button>
-                    </AnimateButton>
-                </Stack>
             </Grid>
-        </>
+        </Box>
     );
+
 }

@@ -10,18 +10,20 @@ namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
+    public virtual DbSet<Figure> Figures { get; set; }
+    public virtual DbSet<Company> Companies { get; set; }
     public virtual DbSet<Economics> Economics { get; set; }
-    public virtual DbSet<SubRole> SubRoles { get; set; }
-    public DbSet<AccessLog> AccessLogs { get; set; }
-    public DbSet<OrganizationRole> OrganizationRoles { get; set; }
-    public DbSet<OrganizationMember> OrganizationMembers { get; set; }
+    public virtual DbSet<SubFigure> SubFigures { get; set; }
+    public virtual DbSet<AccessLog> AccessLogs { get; set; }
+    public virtual DbSet<OrganizationRole> OrganizationRoles { get; set; }
+    public virtual DbSet<OrganizationMember> OrganizationMembers { get; set; }
     public virtual DbSet<Comune> Comuni { get; set; }
     public virtual DbSet<Provincia> Province { get; set; }
     public virtual DbSet<UserProjectAccess> UserProjectAccess { get; set; }
     public virtual DbSet<UserSubRole> UserSubRoles { get; set; }
-    public virtual DbSet<RoleSubRole> RoleSubRoles { get; set; }
+    public virtual DbSet<FigureSubFigure> FigureSubFigures { get; set; }
     public virtual DbSet<ProjectSubjectRole> ProjectSubjectRoles { get; set; }
-    public virtual DbSet<RoleProjectSubjectRole> RoleProjectRoles { get; set; }
+    public virtual DbSet<FigureProjectSubjectRole> FigureProjectSubjectRoles { get; set; }
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<Categoria> Categorie { get; set; }
     public virtual DbSet<SubCategoria> SubCategorie { get; set; }
@@ -37,8 +39,7 @@ namespace OperaWeb.Server.DataClasses.Context
     public virtual DbSet<Soa> Soas { get; set; }
     public virtual DbSet<SoaClassification> SoaClassifications { get; set; }
     public virtual DbSet<Models.ProjectTask> ProjectTasks { get; set; }
-    public virtual DbSet<ProjectSubjectRole> SubjectRoles { get; set; }
-    public DbSet<IdentityRoleOrganizationRoleMapping> OrganizationRoleMappings { get; set; }
+    public DbSet<FigureOrganizationRoleMapping> FigureOrganizationRoleMappings { get; set; }
 
     public OperaWebDbContext(DbContextOptions<OperaWebDbContext> options) : base(options)
     {
@@ -51,5 +52,6 @@ namespace OperaWeb.Server.DataClasses.Context
       // Estensioni Fluent API per configurazioni
       modelBuilder.ApplyConfigurationsFromAssembly(typeof(OperaWebDbContext).Assembly);
     }
+
   }
 }

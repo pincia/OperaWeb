@@ -93,15 +93,17 @@ export const JWTProvider = ({ children }) => {
         return response;
     };
 
-    const register = async (email, password, firstName, lastName, role) => {
-        const id = chance.bb_pin();
+    const register = async (email, password, firstName, lastName, figure, companyName, vatOrTaxCode) => {
+        const id = chance.bb_pin(); // Genera un ID unico (modifica se necessario)
         const response = await axios.post('/api/user/register', {
             id,
             email,
             password,
             firstName,
             lastName,
-            role
+            figure,
+            companyName, 
+            vatOrTaxCode 
         });
 
         if (response.data.isSucceed) {
@@ -118,6 +120,7 @@ export const JWTProvider = ({ children }) => {
             throw new Error(JSON.stringify(Object.values(response.data.messages)));
         }
     };
+
 
     const logout = async  () => {
         const response = await axios.post('/api/user/logout');

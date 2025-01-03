@@ -19,7 +19,7 @@ const ProjectWizard = Loadable(lazy(() => import('ui-component/ProjectWizard')))
 const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/Progetto')));
 
 //origanization
-const OrganizationPage = Loadable(lazy(() => import('views/pages/organigramma')));
+const OrganizationPage = Loadable(lazy(() => import('views/pages/organization')));
 
 //user
 const ProfilePage = Loadable(lazy(() => import('views/pages/profile')));
