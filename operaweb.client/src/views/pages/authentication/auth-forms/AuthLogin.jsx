@@ -25,7 +25,7 @@ import { Formik } from 'formik';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import useAuth from 'hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
-
+import { useDispatch } from 'store';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -34,7 +34,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 
 const JWTLogin = ({ loginProp, ...others }) => {
     const theme = useTheme();
-
+    const dispatch = useDispatch();
     const { login } = useAuth();
     const navigate = useNavigate();
     const [checked, setChecked] = React.useState(true);
@@ -64,11 +64,12 @@ const JWTLogin = ({ loginProp, ...others }) => {
                         try {
                             const response = await login(values.email, values.password); // API di login
 
-                            if (!response.data.isSucceed && response.data.messages['change_password']) {
+                            if (response.data.data?.userMustChangePassword) {
                                 // Reindirizza alla pagina di cambio password
-                                    console.log("Reindirizzamento al cambio password...");
-                                    navigate('/change-password', { state: { email: values.email } });
-                          
+                                console.log("Reindirizzamento al cambio password...");
+                                navigate('/change-password', {
+                                    state: { email: values.email, accessToken: response.data.AccessToken }
+                                });
                             } else if (response.data.isSucceed) {
                                 // Login riuscito
                                 // setUser(response.data);
@@ -77,19 +78,29 @@ const JWTLogin = ({ loginProp, ...others }) => {
                                 setError(Object.entries(response.data.messages)
                                     .map(([k, v]) => (`'${v}'`))
                                     .join(' '));
+
+                                dispatch(openSnackbar({
+                                    open: true,
+                                    message: 'Login failed.',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                }));
                             }
                             setStatus({ success: true });
                             setSubmitting(false);
                         } catch (error) {
-                            openSnackbar({
+                            dispatch(openSnackbar({
                                 open: true,
-                                message: 'Login failed.',
+                                message: 'Login failed.' ,
                                 variant: 'alert',
                                 alert: {
                                     color: 'error'
                                 },
                                 close: false
-                            })
+                            }));
                             setSubmitting(false);
                         }
                     

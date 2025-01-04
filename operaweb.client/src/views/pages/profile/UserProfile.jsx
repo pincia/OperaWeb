@@ -91,7 +91,6 @@ const UserProfile = () => {
                 validationSchema={Yup.object().shape({
                     firstName: Yup.string().required('Il nome è obbligatorio'),
                     lastName: Yup.string().required('Il cognome è obbligatorio'),
-                    fullName: Yup.string().required('Il nome completo è obbligatorio'),
                     phoneNumber: Yup.string().required('Il numero di telefono è obbligatorio'),
                     alternateEmail: Yup.string().email('Email non valida').nullable(),
                     address: Yup.string().nullable(),

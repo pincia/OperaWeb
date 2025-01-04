@@ -1,4 +1,6 @@
-﻿namespace OperaWeb.Server.Models.DTO
+﻿using OperaWeb.SharedClasses.Enums;
+
+namespace OperaWeb.Server.Models.DTO
 {
   /// <summary>
   /// Data Transfer Object per i membri di un'organizzazione.
@@ -11,9 +13,15 @@
     public int Id { get; set; }
 
     /// <summary>
-    /// Nome completo del membro.
+    /// Nome
     /// </summary>
-    public string FullName { get; set; }
+    public string Name { get; set; }
+
+
+    /// <summary>
+    /// Cognome
+    /// </summary>
+    public string LastName { get; set; }
 
     /// <summary>
     /// Indirizzo email del membro.
@@ -34,6 +42,11 @@
     /// Indica se il membro è il proprietario dell'organizzazione.
     /// </summary>
     public bool IsOwner { get; set; }
+
+    /// <summary>
+    /// Stato del membro all'interno dell'organizzazione (es. Pending, Active, Inactive).
+    /// </summary>
+    public MemberStatus Status { get; set; }
   }
 
 }

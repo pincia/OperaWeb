@@ -20,9 +20,9 @@ export const isCompanyProfileComplete = async (companyId) => {
  * @param {number} companyId - ID dell'azienda.
  * @returns {object} Dettagli del profilo aziendale.
  */
-export const getCompanyProfile = async (companyId) => {
+export const getCompanyProfile = async () => {
     try {
-        const response = await axios.get(`/api/company/user-company-profile`);
+        const response = await axios.get(`/api/Company/user-company-profile/`);
         return response.data;
     } catch (error) {
         console.error('Error fetching company profile:', error);

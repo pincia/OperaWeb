@@ -6,7 +6,8 @@ import { TextField, Grid, MenuItem, Button, Snackbar, Alert, Typography, FormLab
 import { Formik, Field, Form } from 'formik';
 import { openSnackbar } from 'store/slices/snackbar';
 import * as Yup from 'yup';
-import { useDispatch } from 'store';
+import { store } from 'store'
+import { useDispatch, useSelector } from 'store';
 const CompanyProfile = ({ companyId }) => {
     const [formData, setFormData] = useState({
         name: '',
@@ -35,6 +36,9 @@ const CompanyProfile = ({ companyId }) => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [loading, setLoading] = useState(true); // Loader state
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.account.user); // Stato utente da Redux
+    const [roles, setRoles] = useState(user?.roles || []); // Ruoli utente
+    const isEditable = roles.includes('admin') || roles.includes('organizationOwner'); // Verifica ruoli per abilitare/disabilitare i campi
     // Load initial company data
     useEffect(() => {
         const fetchCompanyData = async () => {
@@ -188,6 +192,7 @@ const CompanyProfile = ({ companyId }) => {
                                         onChange={handleChange}
                                         error={touched.name && Boolean(errors.name)}
                                         helperText={touched.name && errors.name}
+                                        disabled={!isEditable}
                                     />
                                 </Grid>
                                 {/* Figure */}
@@ -210,6 +215,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <Field
                                         name="vatOrTaxCode"
                                         as={TextField}
+                                        disabled={!isEditable}
                                         fullWidth
                                         value={values.vatOrTaxCode}
                                         onChange={handleChange}
@@ -224,6 +230,7 @@ const CompanyProfile = ({ companyId }) => {
                                         <FormLabel>Classificazione Figura</FormLabel>
                                         <TextField
                                             select
+                                            disabled={!isEditable}
                                             fullWidth
                                             name="figureClassificationId"
                                             value={values.figureClassificationId}
@@ -244,6 +251,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <Field
                                         name="phoneNumber"
                                         as={TextField}
+                                        disabled={!isEditable}
                                         fullWidth
                                         value={values.phoneNumber}
                                         onChange={handleChange}
@@ -258,6 +266,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <Field
                                         name="email"
                                         as={TextField}
+                                        disabled={!isEditable}
                                         fullWidth
                                         value={values.email}
                                         onChange={handleChange}
@@ -272,6 +281,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <Field
                                         name="address"
                                         as={TextField}
+                                        disabled={!isEditable}
                                         fullWidth
                                         value={values.address}
                                         onChange={handleChange}
@@ -289,6 +299,7 @@ const CompanyProfile = ({ companyId }) => {
                                             fullWidth
                                             name="provinceId"
                                             value={values.provinceId}
+                                            disabled={!isEditable}
                                             onChange={handleChange}
                                         >
                                             {provinces.map((province) => (
@@ -307,6 +318,7 @@ const CompanyProfile = ({ companyId }) => {
                                         <TextField
                                             select
                                             fullWidth
+                                            disabled={!isEditable}
                                             name="cityId"
                                             value={values.cityId}
                                             onChange={handleChange}
@@ -328,6 +340,7 @@ const CompanyProfile = ({ companyId }) => {
                                         as={TextField}
                                         fullWidth
                                         value={values.postalCode}
+                                        disabled={!isEditable}
                                         onChange={handleChange}
                                         error={touched.postalCode && Boolean(errors.postalCode)}
                                         helperText={touched.postalCode && errors.postalCode}
@@ -340,6 +353,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <Field
                                         name="country"
                                         as={TextField}
+                                        disabled={!isEditable}
                                         fullWidth
                                         value={values.country}
                                         onChange={handleChange}
@@ -353,6 +367,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <FormLabel>Sito Web</FormLabel>
                                     <Field
                                         name="website"
+                                        disabled={!isEditable}
                                         as={TextField}
                                         fullWidth
                                         value={values.website}
@@ -365,6 +380,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <FormLabel>Codice SDI</FormLabel>
                                     <Field
                                         name="sdiCode"
+                                        disabled={!isEditable}
                                         as={TextField}
                                         fullWidth
                                         value={values.sdiCode}
@@ -377,6 +393,7 @@ const CompanyProfile = ({ companyId }) => {
                                     <FormLabel>PEC</FormLabel>
                                     <Field
                                         name="pec"
+                                        disabled={!isEditable}
                                         as={TextField}
                                         fullWidth
                                         value={values.pec}
@@ -384,11 +401,13 @@ const CompanyProfile = ({ companyId }) => {
                                     />
                                 </Grid>
                             </Grid>
+                          
                             <Box display="flex" justifyContent="flex-end" style={{ marginTop: '24px' }}>
-                                <Button type="submit" variant="contained" color="primary">
-                                    Save Changes
-                                </Button>
-                            </Box>
+                                {isEditable && (
+                                    <Button type="submit" variant="contained" color="primary">
+                                        Save Changes
+                                    </Button>)}
+                                </Box>
                         </Form>);
                 }}
             </Formik>

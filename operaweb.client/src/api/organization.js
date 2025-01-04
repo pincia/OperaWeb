@@ -38,9 +38,9 @@ export async function getOrganizationAvailableRoles() {
 }
 
 // ⬇️ Recupera i membri dell'organizzazione corrente
-export async function getUserOrganizationMembers() {
+export async function getUserOrganizationDetails() {
     try {
-        const response = await axios.get('/api/organization/user-organization-members');
+        const response = await axios.get('/api/organization/user-organization-details');
         return response.data;
     } catch (error) {
         console.error('Failed to fetch organization members:', error);

@@ -37,7 +37,7 @@ const JWTRegister = ({ ...others }) => {
     const navigate = useNavigate();
     const scriptedRef = useScriptRef();
     const dispatch = useDispatch();
-
+    const [errror, setError] = useState(null);
     const [showPassword, setShowPassword] = React.useState(false);
     const [figures, setfigures] = useState([]);
     const { register } = useAuth();
@@ -119,7 +119,19 @@ const JWTRegister = ({ ...others }) => {
                         );
                         navigate('/check-mail-confirmation', { replace: true });
                     } catch (err) {
-                        console.error(err);
+                        setError(Object.entries(response.data.messages)
+                            .map(([k, v]) => (`'${v}'`))
+                            .join(' '));
+
+                        dispatch(openSnackbar({
+                            open: true,
+                            message: 'Registrazione flalita ->' +error,
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        }));
                         setStatus({ success: false });
                         setErrors({ submit: err.message });
                         setSubmitting(false);

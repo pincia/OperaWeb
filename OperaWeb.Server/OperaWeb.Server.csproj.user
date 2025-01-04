@@ -2,6 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ActiveDebugProfile>https</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\PINFED\OperaWeb\OperaWeb\OperaWeb.Server\Properties\PublishProfiles\OperaWebServer20241203190934 - Web Deploy1.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\PINFED\OperaWeb\OperaWeb\OperaWeb.Server\Properties\PublishProfiles\OperaWebServer20241203190934 - Web Deploy2.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

@@ -31,38 +31,36 @@ namespace OperaWeb.Server.Controllers
     public async Task<IActionResult> GetUserCompanyProfile()
     {
       var userId = User.FindFirstValue("Id");
-      var user = await _userService.GetUserByIdAsync(userId);
-      var company = await _context.Companies
-          .Include(c => c.Figure)
-          .Include(c => c.SubFigure)
-          .Include(c => c.Comune)
-          .Include(c => c.Provincia)
-          .Include(c => c.OrganizationMembers)
-          .FirstOrDefaultAsync(c => c.OrganizationMembers.Any(m => m.UserId == userId));
+      var organizationMember = _context.OrganizationMembers.Include(member => member.Company).Include(m=>m.Company.SubFigure).Include(m => m.Company.Figure).FirstOrDefault(o => o.UserId == userId);
 
-      if (company == null)
+      if (organizationMember == null)
+      {
+        return NotFound("organizationMember not found.");
+      }
+
+      if (organizationMember.Company == null)
       {
         return NotFound("Company not found.");
       }
 
       var dto = new CompanyProfileDto
       {
-        Name = company.Name,
-        VatOrTaxCode = company.VatOrTaxCode,
-        Address = company.Address,
-        CityId = company.ComuneId,
-        ProvinceId = company.ProvinciaId,
-        PostalCode = company.PostalCode,
-        Country = company.Country,
-        PhoneNumber = company.PhoneNumber,
-        Email = company.Email,
-        Website = company.Website,
-        SDICode = company.SDICode,
-        PEC = company.PEC,
-        FigureClassificationId = company.SubFigureId ?? -1,
-        FigureClassification = company.SubFigure?.Name ?? "",
-        Figure = company.Figure.Name,
-        FigureId = company.FigureId,
+        Name = organizationMember.Company.Name,
+        VatOrTaxCode = organizationMember.Company.VatOrTaxCode,
+        Address = organizationMember.Company.Address,
+        CityId = organizationMember.Company.ComuneId,
+        ProvinceId = organizationMember.Company.ProvinciaId,
+        PostalCode = organizationMember.Company.PostalCode,
+        Country = organizationMember.Company.Country,
+        PhoneNumber = organizationMember.Company.PhoneNumber,
+        Email = organizationMember.Company.Email,
+        Website = organizationMember.Company.Website,
+        SDICode = organizationMember.Company.SDICode,
+        PEC = organizationMember.Company.PEC,
+        FigureClassificationId = organizationMember.Company.SubFigureId ?? -1,
+        FigureClassification = organizationMember.Company.SubFigure?.Name ?? "",
+        Figure = organizationMember.Company.Figure.Name,
+        FigureId = organizationMember.Company.FigureId,
       };
 
       return Ok(dto);
@@ -77,21 +75,12 @@ namespace OperaWeb.Server.Controllers
     public async Task<IActionResult> UpdateCompanyProfile([FromBody] CompanyProfileDto dto)
     {
       var userId = User.FindFirstValue("Id");
-      var user = await _userService.GetUserByIdAsync(userId);
-      var company = await _context.Companies
-          .Include(c => c.Figure)
-          .Include(c => c.SubFigure)
-          .Include(c => c.Comune)
-          .Include(c => c.Provincia)
-          .Include(c => c.OrganizationMembers)
-          .FirstOrDefaultAsync(c => c.OrganizationMembers.Any(m => m.UserId == userId));
+      var organizationMember = _context.OrganizationMembers.Include(member => member.Company).FirstOrDefault(o => o.UserId == userId);
 
-      if (company == null)
+      if (organizationMember == null)
       {
-        return NotFound("Company not found.");
+        return NotFound("organizationMember not found.");
       }
-
-      var organizationMember = _context.OrganizationMembers.FirstOrDefault(x => x.UserId == userId);
 
       // Assicura che l'utente abbia accesso solo alla propria azienda
       if (!User.IsInRole("Admin") && organizationMember != null && !organizationMember.IsOwner)
@@ -100,23 +89,23 @@ namespace OperaWeb.Server.Controllers
       }
 
       // Aggiorna i campi dell'azienda
-      company.Name = dto.Name;
-      company.VatOrTaxCode = dto.VatOrTaxCode;
-      company.Address = dto.Address;
-      company.ComuneId = dto.CityId;
-      company.ProvinciaId = dto.ProvinceId;
-      company.PostalCode = dto.PostalCode;
-      company.Country = dto.Country;
-      company.PhoneNumber = dto.PhoneNumber;
-      company.Email = dto.Email;
-      company.Website = dto.Website;
-      company.SDICode = dto.SDICode;
-      company.PEC = dto.PEC;
-      company.FigureId = dto.FigureId;
+      organizationMember.Company.Name = dto.Name;
+      organizationMember.Company.VatOrTaxCode = dto.VatOrTaxCode;
+      organizationMember.Company.Address = dto.Address;
+      organizationMember.Company.ComuneId = dto.CityId;
+      organizationMember.Company.ProvinciaId = dto.ProvinceId;
+      organizationMember.Company.PostalCode = dto.PostalCode;
+      organizationMember.Company.Country = dto.Country;
+      organizationMember.Company.PhoneNumber = dto.PhoneNumber;
+      organizationMember.Company.Email = dto.Email;
+      organizationMember.Company.Website = dto.Website;
+      organizationMember.Company.SDICode = dto.SDICode;
+      organizationMember.Company.PEC = dto.PEC;
+      organizationMember.Company.FigureId = dto.FigureId;
 
       //update subfigure
 
-      if (company.SubFigure == null)
+      if (organizationMember.Company.SubFigure == null)
       {
         if (dto.FigureClassificationId > 0)
         {
@@ -127,13 +116,13 @@ namespace OperaWeb.Server.Controllers
             return BadRequest("Figure classification not found!");
           }
 
-          company.SubFigure = dbSubFigure;
+          organizationMember.Company.SubFigure = dbSubFigure;
         }
       }
 
 
 
-      _context.Companies.Update(company);
+      _context.Companies.Update(organizationMember.Company);
       await _context.SaveChangesAsync();
 
       return NoContent(); // Status 204 per aggiornamento riuscito

@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // reducer - state management
 import { LOGIN, LOGOUT, REGISTER } from 'store/actions';
 import accountReducer from 'store/accountReducer';
-import { store } from 'store';
+import { store, dispatch } from 'store';
 // project imports
 import Loader from 'ui-component/Loader';
 import axios from 'utils/axios';
@@ -43,7 +43,6 @@ const setSession = (serviceToken) => {
 const JWTContext = createContext(null);
 
 export const JWTProvider = ({ children }) => {
-    const dispatch = useDispatch();
     const state = useSelector((state) => state.account); // Usa lo stato Redux
 
     useEffect(() => {
@@ -145,6 +144,7 @@ export const JWTProvider = ({ children }) => {
         try {
             // Assicurati che l'endpoint corrisponda al controller
             const response = await axios.post('/api/user/ChangePassword/change-password', data);
+            setSession(null);
             return response.data; // Ritorna i dati di successo
         } catch (error) {
             // Stampa l'intero errore per debugging

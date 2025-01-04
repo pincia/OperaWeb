@@ -8,8 +8,11 @@ import AuthWrapper1 from '../AuthWrapper1'; // Wrapper della pagina
 import Logo from 'ui-component/Logo';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import useAuth from 'hooks/useAuth';
+import { useDispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const ChangePasswordForm = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const { changePassword } = useAuth();
@@ -27,11 +30,27 @@ const ChangePasswordForm = () => {
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
             await changePassword(values.oldPassword,values.newPassword);
-            setSnackbar({ open: true, message: 'Password changed successfully!', severity: 'success' });
+            dispatch(openSnackbar({
+                open: true,
+                message: 'Password aggiornata con successo!',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            }));
             resetForm();
             navigate('/login'); // Reindirizza al login
         } catch (error) {
-            setSnackbar({ open: true, message: error.message, severity: 'error' });
+            dispatch(openSnackbar({
+                open: true,
+                message: error.message,
+                variant: 'alert',
+                alert: {
+                    color: 'error'
+                },
+                close: false
+            }));
         } finally {
             setSubmitting(false);
         }

@@ -7,7 +7,9 @@ using OperaWeb.Server.DataClasses;
 using OperaWeb.Server.DataClasses.Context;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO;
+using OperaWeb.Server.Models.DTO.OperaWeb.Server.Models.DTO;
 using Services.UserGroup;
+using System.ComponentModel.Design;
 using System.Security.Claims;
 
 namespace OperaWeb.Server.Controllers
@@ -29,14 +31,22 @@ namespace OperaWeb.Server.Controllers
     /// <summary>
     /// Aggiunta di un nuovo membro all'organigramma
     /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
+    /// <param name="request">Oggetto che contiene i dettagli del membro da aggiungere</param>
+    /// <returns>Risultato dell'operazione</returns>
     [HttpPost("add-member")]
     public async Task<IActionResult> AddMember([FromBody] AddMemberRequest request)
     {
       try
       {
-        var response = await _userService.CreateUserAndAddToOrganizationAsync(request.OrganizationId, request.FullName, request.Email, request.RoleName);
+        // Chiama il servizio con Name e LastName separati
+        var response = await _userService.CreateUserAndAddToOrganizationAsync(
+            request.OrganizationId,
+            request.Name,         
+            request.LastName,   
+            request.Email,
+            request.RoleName
+        );
+
         if (!response.IsSucceed)
           return BadRequest(response);
 
@@ -127,52 +137,61 @@ namespace OperaWeb.Server.Controllers
       }
     }
     /// <summary>
-    /// Ottiene tutti i membri di un'organizzazione dell'utente loggato
+    /// Ottiene i dettagli dell'organizzazione dell'utente loggato, inclusi i membri.
     /// </summary>
-    /// <returns>Elenco dei membri dell'organizzazione.</returns>
-    [HttpGet("user-organization-members")]
-    public async Task<IActionResult> GetOrganizationMembers()
+    /// <returns>Dettagli dell'organizzazione e elenco dei membri.</returns>
+    [HttpGet("user-organization-details")]
+    public async Task<IActionResult> GetOrganizationDetails()
     {
       try
       {
         var userId = User.FindFirstValue("Id");
-        var companies = _context.Companies.Include(c => c.OrganizationMembers).ToList();
+        var organizationMember = await _context.OrganizationMembers
+            .Include(o => o.Company)
+            .FirstOrDefaultAsync(o => o.UserId == userId);
 
-       var company = companies.FirstOrDefault(c => c.OrganizationMembers.Any(m => m.UserId == userId));
-
-
-        if (company == null)
+        if (organizationMember == null)
         {
-          return NotFound("Company not found.");
+          return NotFound("OrganizationMember not found.");
         }
-        // Recupera i membri dell'organizzazione
+
         var members = await _context.OrganizationMembers
-            .Include(m => m.User)
-            .Where(m => m.CompanyId == company.Id)
+            .Include(member => member.Company)
+            .Include(member => member.Role)
+            .Include(member => member.User)
+            .Where(member => member.CompanyId == organizationMember.CompanyId)
             .ToListAsync();
 
         if (!members.Any())
           return NotFound(new { message = "No members found for this organization." });
 
-        // Mappa i membri al DTO
-        var memberDtos = members.Select(member => new OrganizationMemberDto
+        // Crea il DTO dell'organizzazione
+        var organizationDto = new OrganizationDto
         {
-          Id = member.Id,
-          FullName = $"{member.User.FirstName} {member.User.LastName}",
-          Email = member.User.Email,
-          PhoneNumber = member.User.PhoneNumber,
-          RoleName = member.Role?.Name,
-          IsOwner = member.IsOwner
-        }).ToList();
+          OrganizationId = organizationMember.Company.Id,
+          OrganizationName = organizationMember.Company.Name,
+          Members = members.Select(member => new OrganizationMemberDto
+          {
+            Id = member.Id,
+            Name = member.User.FirstName,
+            LastName = member.User.LastName,
+            Email = member.User.Email,
+            PhoneNumber = member.User.PhoneNumber,
+            RoleName = member.Role?.Name,
+            IsOwner = member.IsOwner,
+            Status = member.Status // Assumendo che Status sia una proprietà del membro
+          }).ToList()
+        };
 
-        return Ok(memberDtos);
+        return Ok(organizationDto);
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "An error occurred while retrieving organization members.");
+        _logger.LogError(ex, "An error occurred while retrieving organization details.");
         return StatusCode(500, new { message = ex.Message });
       }
     }
+
     /// <summary>
     /// Ottiene tutti i membri di un'organizzazione.
     /// </summary>
@@ -196,7 +215,8 @@ namespace OperaWeb.Server.Controllers
         var memberDtos = members.Select(member => new OrganizationMemberDto
         {
           Id = member.Id,
-          FullName = $"{member.User.FirstName} {member.User.LastName}",
+          Name = member.User.FirstName,
+          LastName = member.User.LastName,
           Email = member.User.Email,
           PhoneNumber = member.User.PhoneNumber,
           RoleName = member.Role?.Name,

@@ -34,7 +34,7 @@ import EditableCell from './EditableCell'
 export default function EntryList({
     selectedTaskEntries,
     setTasks,
-    setProjectData
+    setProjectData,
     setSnackbar,
     taskId,
     setSelectedTaskEntries,

@@ -8,6 +8,7 @@ using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.SharedClasses.Enums;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using Azure.Core;
 
 namespace Services.UserGroup
 {
@@ -21,6 +22,11 @@ namespace Services.UserGroup
 
       try
       {
+
+        var existingCompany =  _context.Companies.Any(c => c.VatOrTaxCode == request.VatOrTaxCode);
+        if (existingCompany)
+          return new AppResponse<object>().SetErrorResponse("CF/PIVA esistenti", "L'azienda è già registrata.");
+
         // Verifica che il ruolo esista e sia consentito
         var figure= _context.Figures.FirstOrDefault(x=> x.Name ==request.Figure);
         if (figure == null)
@@ -390,7 +396,7 @@ namespace Services.UserGroup
       return user;
     }
 
-    public async Task<AppResponse<bool>> CreateUserAndAddToOrganizationAsync(int organizationId, string fullName, string email, string roleName)
+    public async Task<AppResponse<bool>> CreateUserAndAddToOrganizationAsync(int organizationId, string name, string lastName, string email, string roleName)
     {
       using var transaction = await _context.Database.BeginTransactionAsync();
       try
@@ -408,7 +414,9 @@ namespace Services.UserGroup
         {
           UserName = email,
           Email = email,
-          FullName = fullName,
+          FirstName = name,
+          LastName= lastName,
+          CompanyId = organizationId,
           MustChangePassword = true
         };
 
@@ -441,7 +449,7 @@ namespace Services.UserGroup
 
         // Invia l'email con la password temporanea
         await _emailService.SendEmailAsync(user.Email, "Welcome to OperaWeb",
-            $"Hello {fullName},\n\nYour account has been created.\nTemporary Password: {temporaryPassword}");
+            $"Hello {name},\n\nYour account has been created.\nTemporary Password: {temporaryPassword}");
 
         await transaction.CommitAsync();
         return new AppResponse<bool>().SetSuccessResponse(true);
@@ -578,11 +586,14 @@ namespace Services.UserGroup
       if (currentUser == null)
         return new AppResponse<List<OrganizationRole>>().SetErrorResponse("user", "User not found.");
 
-      var userCompany = _context.Companies.Include(x => x.Figure).FirstOrDefault(x => x.Id == currentUser.CompanyId);
+      var organizationMember = await _context.OrganizationMembers
+            .Include(o => o.Company)
+            .FirstOrDefaultAsync(o => o.UserId == userId);
+
 
       // Trova i ruoli organizzativi mappati ai ruoli Identity
       var organizationRoles = await _context.FigureOrganizationRoleMappings
-          .Where(rm => rm.FigureId == userCompany.FigureId)
+          .Where(rm => rm.FigureId == organizationMember.Company.FigureId)
           .Select(rm => rm.OrganizationRole)
           .Distinct()
           .ToListAsync();

@@ -106,10 +106,5 @@ namespace OperaWeb.Server.DataClasses.Models
     /// Relationship with the SubFigure.
     /// </summary>
     public virtual SubFigure? SubFigure { get; set; }
-
-    /// <summary>
-    /// Organization Members
-    /// </summary>
-    public ICollection<OrganizationMember> OrganizationMembers { get; set; }
   }
 }
