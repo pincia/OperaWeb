@@ -34,7 +34,7 @@ const RecentTemplates = () => {
                     <TemplateCard imagePath={generico} name="Template Generico" description="Crea Progetto generico" />
                 </Grid>
                 <Grid item xs={12} lg={3} onClick={handleOpenImport}>
-                    <TemplateCard imagePath={xpwe} name="Import da .XPWE" description="Importa progetto da file .xpwe" />
+                    <TemplateCard imagePath={xpwe} name="Import da XPWE" description="Importa progetto da file xpwe" />
                 </Grid>
                 <Grid item xs={12} lg={3}>
                     <TemplateCard

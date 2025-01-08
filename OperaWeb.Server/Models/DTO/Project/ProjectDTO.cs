@@ -17,12 +17,14 @@ namespace OperaWeb.Server.Models.DTO.Project
     public bool Public { get; set; }
     public string? GIG { get; set; }
     public string? CUP { get; set; }
+    public string CompleteAddress { get; set; }
+    public decimal Latitude { get; set; }
+    public decimal Longitude { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
     public string? UserID { get; set; }
     public int? SoaCategoryId { get; set; }
     public int? SoaClassificationID { get; set; }
-
     // Lista dei lavori associati al progetto
     public List<JobDTO>? Jobs { get; set; }
 

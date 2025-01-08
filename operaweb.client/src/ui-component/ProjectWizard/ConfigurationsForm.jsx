@@ -207,7 +207,7 @@ export default function ConfigurationsForm({ projectData, setProjectData, onVali
         <Box sx={{ padding: 4 }}>
             <Grid container spacing={3}>
                 {/* Configurazioni Avanzate - Numeri */}
-                <Grid item xs={12} md={8} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                <Grid item xs={12} md={8} sx={{  borderRadius: '4px', padding: 2 }}>
                     <Typography variant="h3" gutterBottom>
                         Configurazioni Avanzate
                     </Typography>
@@ -286,7 +286,7 @@ export default function ConfigurationsForm({ projectData, setProjectData, onVali
                 </Grid>
 
                 {/* Configurazioni Analisi */}
-                <Grid item xs={12} md={4} sx={{ border: '1px solid #ddd', borderRadius: '4px', padding: 2 }}>
+                <Grid item xs={12} md={4} sx={{ borderRadius: '4px', padding: 2 }}>
                     <Typography variant="h3" gutterBottom>
                         Configurazioni Analisi
                     </Typography>

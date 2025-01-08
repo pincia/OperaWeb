@@ -55,7 +55,10 @@ namespace OperaWeb.Server.Models.Mapper
               Metodo = model.Analisi.Metodo,
               ApplicataA = model.Analisi.ApplicataA
             } : new ConfigAnalisiDTO(),
-          }
+          },
+          Latitude = model.Latitude,
+          Longitude = model.Longitude,
+          CompleteAddress = model.CompleteAddress
         };
 
         if (!excludeTasks)
@@ -235,6 +238,9 @@ namespace OperaWeb.Server.Models.Mapper
         project.Province = dto.Province;
         project.CreationDate = dto.CreationDate;
         project.LastUpdateDate = dto.LastUpdateDate;
+        project.Latitude = dto.Latitude;
+        project.Longitude = dto.Longitude;
+        project.CompleteAddress = dto.CompleteAddress;
         if (dto.SoaCategoryId > 0)
         {
           project.SoaCategoryId = dto.SoaCategoryId ?? 0;

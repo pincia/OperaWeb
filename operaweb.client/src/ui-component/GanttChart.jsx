@@ -1,13 +1,59 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle, useState } from 'react';
 import gantt from 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Box, Typography, Button } from '@mui/material';
 import _ from 'lodash';
+import { saveProject } from 'api/projects';
+import MainCard from 'ui-component/cards/MainCard';
 
-const GanttChart = forwardRef(({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd }, ref) => {
-    const ganttContainer = useRef();
+const GanttChart = forwardRef(({ projectData }, ref) => {
+    const ganttContainer = useRef(null); // Ref per il container del Gantt
+    const [tasks, setTasks] = useState({ data: [], links: [] }); // Stato ini
+    // Gestione delle funzioni di modifica dei task
+    const handleTaskUpdate = (updatedTask) => {
+        setTasks((prevState) => {
+            const updatedData = prevState.data.map((task) =>
+                task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+            );
+            return { ...prevState, data: updatedData };
+        });
+    };
+    useEffect(() => {
+        if (projectData?.tasks && projectData?.links) {
+            setTasks({
+                data: projectData.tasks,
+                links: projectData.links,
+            });
+        }
+    }, [projectData]);
+    const handleTaskDelete = (taskId) => {
+        setTasks((prevState) => ({
+            ...prevState,
+            data: prevState.data.filter((task) => task.id !== taskId),
+        }));
+    };
 
+    const handleTaskAdd = (newTask) => {
+        setTasks((prevState) => ({
+            ...prevState,
+            data: [...prevState.data, newTask],
+        }));
+    };
+
+    // Funzione per salvare le modifiche
+    const handleSaveChanges = async () => {
+        try {
+            await saveProject(projectData.id, { ...projectData, tasks: tasks.data });
+            alert('Modifiche salvate con successo!');
+        } catch (error) {
+            console.error('Errore durante il salvataggio:', error);
+            alert('Errore durante il salvataggio.');
+        }
+    };
+
+    // Funzione per esportare in PDF
     useImperativeHandle(ref, () => ({
         exportToPDF: async () => {
             const element = ganttContainer.current;
@@ -21,6 +67,7 @@ const GanttChart = forwardRef(({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd },
         },
     }));
 
+    // Configurazione del Gantt
     useEffect(() => {
         gantt.config.scale_unit = 'day';
         gantt.config.date_scale = '%d %M';
@@ -28,15 +75,15 @@ const GanttChart = forwardRef(({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd },
         gantt.config.row_height = 30;
 
         gantt.attachEvent('onAfterTaskAdd', (id, task) => {
-            onTaskAdd(task);
+            handleTaskAdd(task);
         });
 
         gantt.attachEvent('onAfterTaskUpdate', (id, task) => {
-            onTaskUpdate(task);
+            handleTaskUpdate(task);
         });
 
-        gantt.attachEvent('onAfterTaskDelete', (id, task) => {
-            onTaskDelete(id);
+        gantt.attachEvent('onAfterTaskDelete', (id) => {
+            handleTaskDelete(id);
         });
 
         gantt.init(ganttContainer.current);
@@ -44,36 +91,43 @@ const GanttChart = forwardRef(({ tasks, onTaskUpdate, onTaskDelete, onTaskAdd },
         return () => {
             gantt.clearAll();
         };
-    }, [onTaskUpdate, onTaskDelete, onTaskAdd]);
+    }, []); // Effetto per l'inizializzazione del Gantt
 
+    // Aggiornamento dei dati del Gantt
     useEffect(() => {
-        // Salva lo stato dei task espansi/collassati
-        const expandedState = gantt.serialize().data.map((task) => ({
-            id: task.id,
-            open: task.open || false,
-        }));
-
         if (Array.isArray(tasks.data) && tasks.data.length > 0) {
-            const clonedTasks = _.cloneDeep(tasks.data);
-
-            const formattedTasks = clonedTasks.map((task) => ({
+            const formattedTasks = tasks.data.map((task) => ({
                 id: task.id,
                 text: task.text,
                 start_date: new Date(task.startDate).toISOString().split('T')[0],
-                duration: task.duration || 1, // Default duration to 1
+                duration: task.duration || 1,
                 progress: task.progress || 0,
                 parent: task.parentId || 0,
-                open: expandedState.find((t) => t.id === task.id)?.open || false,
+                open: task.open || false,
             }));
 
             gantt.clearAll();
-            gantt.parse({ data: formattedTasks });
-        } else {
-            console.warn("Nessun task disponibile o tasks non è un array");
+            gantt.parse({ data: formattedTasks, links: tasks.links });
         }
     }, [tasks]);
 
-    return <div ref={ganttContainer} style={{ width: '100%', height: '500px' }}></div>;
+    return (
+        <MainCard sx={{ mb: 2, marginBottom: 3 }}>
+            <Box mb={2}>     
+                <Box mb={2}>   
+                    <div ref={ganttContainer} style={{ width: '100%', height: '500px' }}></div>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <Button variant="contained" onClick={handleSaveChanges}>
+                        Salva Modifiche
+                    </Button>
+                    <Button variant="outlined" onClick={() => ref.current?.exportToPDF()}>
+                        Stampa Cronoprogramma
+                    </Button>
+                </Box>
+            </Box>
+        </MainCard>
+    );
 });
 
 export default GanttChart;

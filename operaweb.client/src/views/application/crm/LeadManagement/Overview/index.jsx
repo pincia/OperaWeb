@@ -23,10 +23,10 @@ const Overview = () => {
     }, []);
 
     return (
-        <Grid container spacing={gridSpacing}>
-            <Grid item xs={12}>
+        <Grid container spacing={gridSpacing}>  <Grid item xs={12}>
                 <LeadSummary isLoading={isLoading} />
             </Grid>
+          
             <Grid item xs={12}>
                 <LeadCards isLoading={isLoading} />
             </Grid>

@@ -38,7 +38,7 @@ const CompanyProfile = ({ companyId }) => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.account.user); // Stato utente da Redux
     const [roles, setRoles] = useState(user?.roles || []); // Ruoli utente
-    const isEditable = roles.includes('admin') || roles.includes('organizationOwner'); // Verifica ruoli per abilitare/disabilitare i campi
+    const isEditable = roles.includes('Admin') || roles.includes('OrganizationOwner'); // Verifica ruoli per abilitare/disabilitare i campi
     // Load initial company data
     useEffect(() => {
         const fetchCompanyData = async () => {

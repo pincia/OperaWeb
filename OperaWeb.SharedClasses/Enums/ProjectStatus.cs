@@ -11,19 +11,19 @@
     Created,
 
     /// <summary>
-    /// Progetto in corso.
+    /// Progetto in corso (avviato).
     /// </summary>
     InProgress,
-
-    /// <summary>
-    /// Progetto completato con successo.
-    /// </summary>
-    Completed,
 
     /// <summary>
     /// Progetto sospeso temporaneamente.
     /// </summary>
     Suspended,
+
+    /// <summary>
+    /// Progetto completato con successo.
+    /// </summary>
+    Completed,
 
     /// <summary>
     /// Progetto annullato.

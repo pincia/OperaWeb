@@ -4,16 +4,10 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useState, useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
-import usePlacesAutocomplete from 'use-places-autocomplete';
+import usePlacesAutocomplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { getSoaClassifications, getSoas } from 'api/projects';
 
-const validationSchema = yup.object({
-    //city: yup.string().required('La città è obbligatoria'),
-    //province: yup.string().required('La provincia è obbligatoria'),
-    //works: yup.string().required('I lavori sono obbligatori'),
-    //object: yup.string().required("L'oggetto è obbligatorio"),
-    //location: yup.string().required('La località è obbligatoria'),
-});
+const validationSchema = yup.object({});
 
 const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
     const {
@@ -24,18 +18,51 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
     const [soaOptions, setSoaOptions] = useState([]);
     const [soaClassificationsOptions, setSoaClassificationsOptions] = useState([]);
 
+    const handleSelect = async (completeAddress) => {
+        setValue(completeAddress, false);
+        try {
+            const results = await getGeocode({ address: completeAddress });
+            const { lat, lng } = await getLatLng(results[0]);
+
+            // Aggiorna Formik
+            formik.setFieldValue('completeAddress', completeAddress, false);
+            formik.setFieldValue('latitude', lat, false);
+            formik.setFieldValue('longitude', lng, false);
+
+            // Aggiorna il progetto
+            if (
+                projectData.completeAddress !== completeAddress ||
+                projectData.latitude !== lat ||
+                projectData.longitude !== lng
+            ) {
+                setProjectData((prev) => ({
+                    ...prev,
+                    completeAddress,
+                    latitude: lat,
+                    longitude: lng,
+                }));
+            }
+        } catch (error) {
+            console.error('Errore nel recupero delle coordinate:', error);
+        }
+    };
+
     const formik = useFormik({
         initialValues: {
             city: projectData.city || '',
             province: projectData.province || '',
             works: projectData.works || '',
             object: projectData.object || '',
-            location: projectData.location || '',
+            completeAddress: projectData.completeAddress || '',
+            latitude: projectData.latitude || '',
+            longitude: projectData.longitude || '',
             selectedSoa: projectData.selectedSoa || null,
+            GIG: projectData.GIG || null,
+            CUG: projectData.CUG || null,
             selectedSoaClassification: projectData.selectedSoaClassification || null,
-            isPublic: projectData.public || false,
+            isPublic: projectData.isPublic || false,
         },
-        enableReinitialize: true,
+        enableReinitialize: true, // Permetti il reset solo quando projectData cambia
         validationSchema,
         validateOnMount: true,
         onSubmit: (values) => {
@@ -45,6 +72,19 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
             }));
         },
     });
+
+    useEffect(() => {
+        const isDifferent = Object.keys(formik.values).some(
+            (key) => formik.values[key] !== projectData[key]
+        );
+
+        if (isDifferent) {
+            setProjectData((prev) => ({
+                ...prev,
+                ...formik.values,
+            }));
+        }
+    }, [formik.values, setProjectData, projectData]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -61,25 +101,13 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
         fetchData();
     }, []);
 
-    // Sincronizza i dati con il genitore ogni volta che cambiano
-    useEffect(() => {
-        setProjectData((prev) => ({
-            ...prev,
-            ...formik.values,
-        }));
-    }, [formik.values, setProjectData]);
-
-    // Aggiorna lo stato di validazione nel componente padre
     useEffect(() => {
         const isValid = formik.isValid && Object.keys(formik.errors).length === 0;
         onValidationChange(isValid);
     }, [formik.isValid, formik.errors, onValidationChange]);
 
     return (
-        <Box sx={{ padding: 2 }}>
-            <Typography variant="h5" gutterBottom>
-                <FormattedMessage id="projectGeneralData" />
-            </Typography>
+        <Box sx={{ padding: 2, marginTop: 3 }}>
             <form onSubmit={formik.handleSubmit}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
@@ -139,24 +167,26 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                             id="location"
                             freeSolo
                             options={status === 'OK' ? data.map((suggestion) => suggestion.description) : []}
-                            value={formik.values.location}
+                            value={formik.values.completeAddress || ''} // Usa sempre una stringa predefinita
                             onChange={(event, newValue) => {
-                                formik.setFieldValue('location', newValue);
+                                formik.setFieldValue('completeAddress', newValue || ''); // Evita valori non definiti
+                                handleSelect(newValue); // Recupera le coordinate automaticamente
                             }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
                                     label={<FormattedMessage id="locationLabel" />}
                                     onChange={(e) => {
-                                        formik.handleChange(e);
-                                        setValue(e.target.value); // Aggiorna il suggerimento
+                                        formik.setFieldValue('completeAddress', e.target.value); // Aggiorna Formik
+                                        setValue(e.target.value); // Aggiorna i suggerimenti
                                     }}
-                                    error={formik.touched.location && Boolean(formik.errors.location)}
-                                    helperText={formik.touched.location && formik.errors.location}
+                                    error={formik.touched.completeAddress && Boolean(formik.errors.completeAddress)}
+                                    helperText={formik.touched.completeAddress && formik.errors.completeAddress}
                                     fullWidth
                                 />
                             )}
                         />
+
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Autocomplete
@@ -182,6 +212,30 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                             )}
                         />
                     </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            id="GIG"
+                            name="GIG"
+                            label={<FormattedMessage id="GIG" />}
+                            value={formik.values.GIG}
+                            onChange={formik.handleChange}
+                            error={formik.touched.GIG && Boolean(formik.errors.GIG)}
+                            helperText={formik.touched.GIG && formik.errors.GIG}
+                            onBlur={formik.handleBlur}
+                            fullWidth
+                        /></Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            id="CUG"
+                            name="CUG"
+                            label={<FormattedMessage id="CUG" />}
+                            value={formik.values.CUG}
+                            onChange={formik.handleChange}
+                            error={formik.touched.CUG && Boolean(formik.errors.CUG)}
+                            helperText={formik.touched.CUG && formik.errors.CUG}
+                            onBlur={formik.handleBlur}
+                            fullWidth
+                        /></Grid>
                     <Grid item xs={12}>
                         <FormControlLabel
                             control={

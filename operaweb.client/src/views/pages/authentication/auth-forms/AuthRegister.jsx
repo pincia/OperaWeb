@@ -119,13 +119,9 @@ const JWTRegister = ({ ...others }) => {
                         );
                         navigate('/check-mail-confirmation', { replace: true });
                     } catch (err) {
-                        setError(Object.entries(response.data.messages)
-                            .map(([k, v]) => (`'${v}'`))
-                            .join(' '));
-
                         dispatch(openSnackbar({
                             open: true,
-                            message: 'Registrazione flalita ->' +error,
+                            message: 'Registrazione flalita ->' + err,
                             variant: 'alert',
                             alert: {
                                 color: 'error'

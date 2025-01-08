@@ -36,8 +36,8 @@ const Templates = () => {
                 <Grid item xs={12} lg={4} onClick={handleOpenImport}>
                     <TemplateCard
                         imagePath={xpwe}
-                        name="Import da .XPWE"
-                        description="Importa progetto da file .xpwe"
+                        name="Import da XPWE"
+                        description="Importa progetto da file xpwe"
                         width="350px"
                         height="350px"
                         imageWidth={200}

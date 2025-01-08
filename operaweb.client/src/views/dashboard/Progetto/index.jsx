@@ -1,34 +1,34 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import CircularProgress from '@mui/material/CircularProgress';
+import React, { useEffect, useState } from 'react';
+import { Tabs, Tab, Box, CircularProgress, Grid, Typography } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTheme } from '@mui/material/styles';
+import { ThemeMode } from 'config';
 import { setCurrentProject } from 'store/slices/project';
+import { getProject } from 'api/projects';
+import ProjectOverview from './ProjectOverview';
+import ProjectSummary from './ProjectSummary';
 import GanttChart from 'ui-component/GanttChart';
-import GeneralForm from 'ui-component/ProjectWizard/GeneralForm';
-import ConfigurationsForm from 'ui-component/ProjectWizard/ConfigurationsForm';
-import SubjectsForm from 'ui-component/ProjectWizard/SubjectsForm';
-import TasksForm from 'ui-component/ProjectWizard/Tasks';
-import EconomicsForm from 'ui-component/ProjectWizard/EconomicsForm';
-import { getProject, saveProject } from 'api/projects';
-import { gridSpacing } from 'store/constant';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+
+function a11yProps(index) {
+    return {
+        id: `dashboard-tab-${index}`,
+        'aria-controls': `dashboard-tabpanel-${index}`,
+    };
+}
 
 const ProjectDashboard = () => {
     const [isLoading, setLoading] = useState(true);
     const [projectData, setProjectData] = useState(null);
-    const [tasks, setTasks] = useState({
-        data: [],
-        links: [],
-    });
     const [activeTab, setActiveTab] = useState(0);
-    const ganttRef = useRef(null);
 
-    const currentProjectId = 28;//useSelector((state) => state.project.currentProjectId);
+    const theme = useTheme();
+    const currentProjectId = useSelector((state) => state.project.currentProjectId);
     const dispatch = useDispatch();
+
+    const handleChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -37,13 +37,6 @@ const ProjectDashboard = () => {
                 const response = await getProject(currentProjectId);
                 dispatch(setCurrentProject(response.data));
                 setProjectData(response.data);
-
-                if (response.data.tasks) {
-                    setTasks({
-                        data: response.data.tasks,
-                        links: response.data.links || [],
-                    });
-                }
             } catch (error) {
                 console.error('Errore durante il recupero del progetto:', error);
             } finally {
@@ -53,43 +46,6 @@ const ProjectDashboard = () => {
 
         fetchProjectData();
     }, [currentProjectId, dispatch]);
-
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-    };
-
-    const handleTaskUpdate = (updatedTask) => {
-        setTasks((prevState) => {
-            const updatedData = prevState.data.map((task) =>
-                task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-            );
-            return { ...prevState, data: updatedData };
-        });
-    };
-
-    const handleTaskDelete = (taskId) => {
-        setTasks((prevState) => {
-            const updatedData = prevState.data.filter((task) => task.id !== taskId);
-            return { ...prevState, data: updatedData };
-        });
-    };
-
-    const handleTaskAdd = (newTask) => {
-        setTasks((prevState) => ({
-            ...prevState,
-            data: [...prevState.data, newTask],
-        }));
-    };
-
-    const handleSaveChanges = async () => {
-        try {
-            await saveProject(projectData.id, { ...projectData, tasks: tasks.data });
-            alert('Modifiche salvate con successo!');
-        } catch (error) {
-            console.error('Errore durante il salvataggio:', error);
-            alert('Errore durante il salvataggio.');
-        }
-    };
 
     if (isLoading) {
         return (
@@ -107,82 +63,56 @@ const ProjectDashboard = () => {
     }
 
     return (
-        <Grid container spacing={gridSpacing}>
-            {/* Informazioni Generali */}
-            <Grid item xs={12}>
-                <Box mb={2}>
-                    <Typography variant="h4">{projectData?.name}</Typography>
-                    <Typography variant="body1">{projectData?.description}</Typography>
-                    <Typography variant="body2">Stato: {projectData?.status}</Typography>
-                </Box>
-            </Grid>
-
-            {/* Statistiche */}
-            <Grid item xs={12}>
-                <Box mb={2}>
-                    <Typography variant="h6">Statistiche</Typography>
-                    <Typography variant="body2">
-                        Task Completati: {tasks.data.filter((task) => task.completed).length}/{tasks.data.length}
-                    </Typography>
-                </Box>
-            </Grid>
-
-            {/* Gantt delle Lavorazioni */}
-            <Grid item xs={12}>
-                <Box mb={2}>
-                    <Typography variant="h6">Cronoprogramma</Typography>
-                    <div style={{ marginBottom: '1rem' }}>
-                        <Button onClick={handleSaveChanges} variant="contained" style={{ marginRight: '10px' }}>
-                            Salva Modifiche
-                        </Button>
-                        <Button onClick={() => ganttRef.current?.exportToPDF()} variant="outlined">
-                            Stampa Cronoprogramma
-                        </Button>
-                    </div>
-                    <GanttChart
-                        ref={ganttRef}
-                        tasks={tasks}
-                        onTaskUpdate={handleTaskUpdate}
-                        onTaskDelete={handleTaskDelete}
-                        onTaskAdd={handleTaskAdd}
-                    />
-                </Box>
-            </Grid>
-
-            {/* Scheda Dettagli con Tabs */}
+        <Grid container spacing={3}>
             <Grid item xs={12}>
                 <Box>
-                    <Tabs value={activeTab} onChange={handleTabChange} aria-label="tabs">
-                        <Tab label="Generali" />
-                        <Tab label="Configurazioni" />
-                        <Tab label="Soggetti" />
-                        <Tab label="Lavorazioni" />
-                        <Tab label="Quadro Economico" />
+                    {/* Tabs */}
+                    <Tabs
+                        sx={{
+                            '& .MuiTab-root': {
+                                minHeight: 'auto',
+                                py: 1.5,
+                                px: 1.5,
+                                mr: 2,
+                                color: theme.palette.mode === ThemeMode.DARK ? 'grey.600' : 'grey.900',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                            },
+                            '& .Mui-selected': {
+                                color: theme.palette.primary.main,
+                            },
+                            '& .MuiTab-wrapper > svg': {
+                                mr: 1,
+                            },
+                        }}
+                        value={activeTab}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        textColor="primary"
+                    >
+                        <Tab
+                            label="Panoramica"
+                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            {...a11yProps(0)}
+                        />
+                        <Tab
+                            label="Dettagli"
+                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            {...a11yProps(1)}
+                        />
+                        <Tab
+                            label="Cronoprogramma"
+                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            {...a11yProps(2)}
+                        />
                     </Tabs>
-                    <Box mt={2}>
-                        {activeTab === 0 && (
-                            <GeneralForm projectData={projectData} setProjectData={setProjectData} />
-                        )}
-                        {activeTab === 1 && (
-                            <ConfigurationsForm projectData={projectData} setProjectData={setProjectData} />
-                        )}
-                        {activeTab === 2 && (
-                            <SubjectsForm
-                                subjectsData={projectData.subjects}
-                                setSubjectsData={(data) =>
-                                    setProjectData((prev) => ({ ...prev, subjects: data }))
-                                }
-                            />
-                        )}
-                        {activeTab === 3 && (
-                            <TasksForm
-                                tasksData={projectData.tasks}
-                                setTasksData={(data) => setProjectData((prev) => ({ ...prev, tasks: data }))}
-                            />
-                        )}
-                        {activeTab === 4 && (
-                            <EconomicsForm projectData={projectData} setProjectData={setProjectData} />
-                        )}
+
+                    {/* Tab Content */}
+                    <Box sx={{ mt: 3 }}>
+                        {activeTab === 0 && <ProjectOverview projectData={projectData} isLoading={isLoading} />}
+                        {activeTab === 1 && <ProjectSummary projectData={projectData} isLoading={isLoading} />}
+                        {activeTab === 2 && <GanttChart projectData={projectData} />}
                     </Box>
                 </Box>
             </Grid>
