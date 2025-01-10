@@ -19,7 +19,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public decimal TotalAmount { get; set; }
     public string? Notes { get; set; }
     public bool Public { get; set; }
-    public string CompleteAddress { get; set; }
+    public string? CompleteAddress { get; set; }
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
     public bool Deleted { get; set; }

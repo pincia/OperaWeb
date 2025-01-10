@@ -36,7 +36,7 @@ import { getProjectSubjectRoles } from 'api/subjects';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { store } from 'store';
 const validationSchema = yup.object({});
 export default function SubjectsForm({ projectData, setProjectData, onValidationChange }) {
@@ -47,7 +47,7 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
     const [searchResults, setSearchResults] = useState([]);
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [selectedRole, setSelectedRole] = useState('');
-    const [selectedType, setSelectedType] = useState('committente'); // Default: committente
+    const [figureType, setFigureType] = useState('committente'); // Default: committente
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
     const [subjects, setSubjects] = useState(projectData.subjects || []);
     const [inviteSubject, setInviteSubject] = useState({ name: '', email: '' });
@@ -81,15 +81,15 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
 
     useEffect(() => {
         if (openRoleDialog) {
-            fetchRoles(user?.roles?.[0] );
+            fetchRoles(user?.company?.figure );
         }
     }, [user, openRoleDialog]);
 
     useEffect(() => {
         if (openDialog) {
-            fetchRoles(selectedType);
+            fetchRoles(figureType);
         }
-    }, [openDialog, selectedType]);
+    }, [openDialog, figureType]);
 
 
     const formik = useFormik({
@@ -161,7 +161,7 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
     };
 
     const handleAddSubject = () => {
-        if (!selectedSubject || !selectedRole || !selectedType) {
+        if (!selectedSubject || !selectedRole || !figureType) {
             setSnackbar({
                 open: true,
                 message: 'Seleziona un soggetto, un ruolo e un tipo prima di procedere.',
@@ -177,9 +177,8 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
             email: selectedSubject.email,
             cfPiva: selectedSubject.cfPiva,
             subjectRole: selectedRole,
-            type: selectedType,
-            status: selectedSubject.status,
-              isRemovable: false, // Aggiunge un flag per indicare che questo soggetto non può essere rimosso
+            type: figureType,
+            status: selectedSubject.status
         };
 
         const updatedSubjects = [...subjects, newSubject];
@@ -226,8 +225,7 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
             cfPiva: '', // Puoi aggiungere altre informazioni utente qui se necessarie
             subjectRole: selectedRole,
             type: 'utente',
-            status: 'confirmed',
-            isRemovable: false, // Aggiunge un flag per indicare che questo soggetto non può essere rimosso
+            status: 'confirmed'
         };
 
         const updatedSubjects = [...subjects, newSubject];
@@ -255,9 +253,6 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
             flex: 0.5,
             sortable: false,
             renderCell: (params) => {
-                if (params.row.email === user.username) {
-                    return null; // Nascondi il pulsante se la riga rappresenta l'utente corrente
-                }
                 return (
                     <Button
                         color="secondary"
@@ -304,7 +299,7 @@ return (
             rowsPerPageOptions={[5]}
         />
 
-        {/* Dialog per selezione ruolo */}
+        {/* Dialog per selezione del proporio ruolo */}
         <Dialog open={openRoleDialog} onClose={() => { }} maxWidth="sm" fullWidth>
             <DialogTitle>Seleziona il tuo Ruolo all'interno del progetto</DialogTitle>
             <DialogContent>
@@ -330,7 +325,7 @@ return (
             </DialogActions>
         </Dialog>
 
-
+        {/* Dialog per aggiunta altro soggetto */}
         <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
             <DialogTitle>Aggiungi Soggetto</DialogTitle>
             <DialogContent>
@@ -339,11 +334,11 @@ return (
                     <Grid item xs={12} md={6}>
 
                         <FormControl component="fieldset" sx={{ mb: 2 }}>
-                            <FormLabel component="legend">Tipo</FormLabel>
+                            <FormLabel component="legend">Figura</FormLabel>
                             <RadioGroup
                                 row
-                                value={selectedType}
-                                onChange={(e) => setSelectedType(e.target.value)}
+                                value={figureType}
+                                onChange={(e) => setFigureType(e.target.value)}
                                 disabled={!selectedSubject}
                             >
                                 <FormControlLabel value="committente" control={<Radio />} label="Committente" />

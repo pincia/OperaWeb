@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.Controllers.Account;
 using OperaWeb.Server.DataClasses.Models.User;
+using Microsoft.EntityFrameworkCore;
 namespace Services.UserGroup
 {
   public partial class UserService
@@ -56,7 +57,27 @@ namespace Services.UserGroup
       var refreshToken = await _userManager.GenerateUserTokenAsync(user, "APP", "RefreshToken");
       await _userManager.SetAuthenticationTokenAsync(user, "APP", "RefreshToken", refreshToken);
       var userRoles = await _userManager.GetRolesAsync(user);
-      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList() } };
+      var organizationMember = _context.OrganizationMembers.Include(member => member.Company).Include(m => m.Company.SubFigure).Include(m => m.Company.Figure).FirstOrDefault(o => o.UserId == user.Id);
+      var company = new CompanyProfileDto
+      {
+        Name = organizationMember.Company.Name,
+        VatOrTaxCode = organizationMember.Company.VatOrTaxCode,
+        Address = organizationMember.Company.Address,
+        CityId = organizationMember.Company.ComuneId,
+        ProvinceId = organizationMember.Company.ProvinciaId,
+        PostalCode = organizationMember.Company.PostalCode,
+        Country = organizationMember.Company.Country,
+        PhoneNumber = organizationMember.Company.PhoneNumber,
+        Email = organizationMember.Company.Email,
+        Website = organizationMember.Company.Website,
+        SDICode = organizationMember.Company.SDICode,
+        PEC = organizationMember.Company.PEC,
+        FigureClassificationId = organizationMember.Company.SubFigureId ?? -1,
+        FigureClassification = organizationMember.Company.SubFigure?.Name ?? "",
+        Figure = organizationMember.Company.Figure.Name,
+        FigureId = organizationMember.Company.FigureId,
+      };
+      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company} };
     }
 
     /// <summary>

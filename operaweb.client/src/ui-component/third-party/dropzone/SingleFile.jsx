@@ -26,7 +26,7 @@ const DropzoneWrapper = styled('div')(({ theme }) => ({
 
 // ==============================|| UPLOAD - SINGLE FILE ||============================== //
 
-const SingleFileUpload = ({ error, file, setFieldValue, sx }) => {
+const SingleFileUpload = ({ error, file, setFieldValue, onFileRemove, sx }) => {
     const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
         accept: { '.xpwe': [] }, // Accetta solo file .xpwe
         multiple: false, // Singolo file
@@ -47,6 +47,9 @@ const SingleFileUpload = ({ error, file, setFieldValue, sx }) => {
     // Rimuovi il file
     const onRemove = () => {
         setFieldValue('file', null);
+        if (onFileRemove) {
+            onFileRemove(); // Callback per il reset dello stato nel componente padre
+        }
     };
 
     return (
@@ -77,7 +80,7 @@ const SingleFileUpload = ({ error, file, setFieldValue, sx }) => {
                 <FilesPreview
                     files={[file]} // Singolo file come array
                     showList={false}
-                    onRemove={onRemove}
+                    onRemove={onRemove} // Chiama `onRemove` quando il file viene eliminato
                 />
             )}
         </Box>
@@ -88,6 +91,7 @@ SingleFileUpload.propTypes = {
     setFieldValue: PropTypes.func.isRequired, // `setFieldValue` è obbligatorio
     file: PropTypes.object, // Un singolo file (non array)
     error: PropTypes.string,
+    onFileRemove: PropTypes.func, // Prop opzionale per gestire la rimozione del file
     sx: PropTypes.object
 };
 

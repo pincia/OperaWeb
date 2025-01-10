@@ -18,8 +18,8 @@ namespace OperaWeb.Server.Models.DTO.Project
     public string? GIG { get; set; }
     public string? CUP { get; set; }
     public string CompleteAddress { get; set; }
-    public decimal Latitude { get; set; }
-    public decimal Longitude { get; set; }
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
     public string? UserID { get; set; }

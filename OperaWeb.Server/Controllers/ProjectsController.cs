@@ -183,9 +183,14 @@ namespace OperaWeb.Server.Controllers
         // Avvia il metodo di importazione
         var importResult = await _projectService.ImportNewProject(file, userId, connectionId);
 
-   
-        return Ok(importResult);
-
+        if (importResult.IsSuccess)
+        {
+          return Ok(importResult);
+        }
+        else
+        {
+          return StatusCode(500, importResult);
+        }
       }
       catch (Exception ex)
       {
@@ -206,5 +211,28 @@ namespace OperaWeb.Server.Controllers
 
       return Ok(new { message = "Successfully retrieved recent projects", data =recentProjects});
     }
+
+    [HttpPost]
+    [Route("check-file-xpwe")]
+    public async Task<IActionResult> CheckFileXPWE([FromForm] IFormFile file)
+    {
+      if (file == null || file.Length == 0)
+      {
+        return BadRequest(new { message = "File is required" });
+      }
+
+      try
+      {
+        // Chiama il servizio per eseguire i controlli sul file
+        var checkResults = await _projectService.CheckXPWEFile(file);
+
+        return Ok(new { message = "File checks completed", data = checkResults });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = "An error occurred while checking the file", error = ex.Message });
+      }
+    }
+
   }
 }

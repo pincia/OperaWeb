@@ -129,3 +129,33 @@ export async function createProject(projectData) {
         throw error;
     }
 }
+
+/**
+ * Esegue controlli mirati sul file XPWE prima dell'importazione
+ * @param {File} file - Il file XPWE da verificare
+ * @returns {Promise<Array>} - La lista di controlli eseguiti e i loro risultati
+ * @throws {Error} - Se la richiesta all'API fallisce
+ */
+export const checkXPWEFile = async (file) => {
+    try {
+        if (!file) {
+            throw new Error('È necessario fornire un file per eseguire i controlli.');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+
+        const response = await axios.post('/api/projects/check-file-xpwe', formData, config);
+
+        return response.data.data; // La risposta contiene i risultati dei controlli
+    } catch (error) {
+        console.error('Errore durante i controlli sul file XPWE:', error);
+        throw error; // Propaga l'errore per gestirlo nel componente chiamante
+    }
+};

@@ -50,9 +50,9 @@ export const fetchSubjects = async (query) => {
 };
 
 
-export async function getProjectSubjectRoles(roleName) {
+export async function getProjectSubjectRoles(figureName) {
     try {
-        const response = await axios.get('api/ProjectSubjectRole/figure-project-roles/'+roleName);
+        const response = await axios.get('api/ProjectSubjectRole/figure-clasifications/' + figureName);
         return response.data;
     } catch (error) {
         console.error('Errore nel recupero dei ruoli:', error);

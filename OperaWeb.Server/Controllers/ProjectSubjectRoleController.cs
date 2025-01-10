@@ -29,30 +29,14 @@ public class ProjectSubjectRoleController : ControllerBase
     return await _context.ProjectSubjectRoles.ToListAsync();
   }
 
-  [HttpGet("figure-project-roles/{roleName}")]
-  public async Task<ActionResult<IEnumerable<ProjectSubjectRole>>> GetUserSubRoles(string roleName)
+  [HttpGet("figure-clasifications/{figureName}")]
+  public async Task<ActionResult<IEnumerable<ProjectSubjectRole>>> GetFigureProjectRoles(string figureName)
   {
-    var userId = User.FindFirstValue("Id");
-
-    var user = await _userManager.FindByIdAsync(userId);
-
-    if (user == null)
-    {
-      return new List<ProjectSubjectRole>();
-    }
-
-    if (user.CompanyId == null || user.CompanyId <= 0)
-    {
-      return new List<ProjectSubjectRole>();
-    }
-
-    var userCompany = _context.Companies.Include(x => x.Figure).FirstOrDefault(x => x.Id == user.CompanyId);
-
-    var subRoles = await _context.FigureProjectSubjectRoles
-        .Include(ur => ur.ProjectSubjectRole).Where(r=>r.Figure.Name == userCompany.Figure.Name)
+    var figureClassifications = await _context.FigureProjectSubjectRoles
+        .Include(ur => ur.ProjectSubjectRole).Where(r=>r.Figure.Name == figureName.ToLower())
         .Select(ur => ur.ProjectSubjectRole)
         .ToListAsync();
 
-    return Ok(subRoles);
+    return Ok(figureClassifications);
   }
 }

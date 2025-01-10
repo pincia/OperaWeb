@@ -16,6 +16,10 @@ using OperaWeb.Server.Models.DTO;
 using OperaWeb.Server.DataClasses.Models.User;
 using Services.UserGroup;
 using OperaWeb.SharedClasses.Enums;
+using OperaWeb.Server.Models.XPVE;
+using System.Xml.Serialization;
+using OperaWeb.SharedClasses.Helpers;
+using System.Linq.Expressions;
 
 namespace OperaWeb.Server.Services
 {
@@ -61,7 +65,7 @@ namespace OperaWeb.Server.Services
       // Restituisci l'ID del nuovo progetto
       return project.ID;
     }
-    
+
 
     /// <inheritdoc/>
     public async Task DeleteProjectAsync(int id)
@@ -88,14 +92,14 @@ namespace OperaWeb.Server.Services
     /// <inheritdoc/>
     public async Task<ProjectsListDTO> GetAllProjects(string userId)
     {
-      var myProjects = _context.Projects.Include(p=>p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
+      var myProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
       //TODO: INVOLVED PROJECTS
-     // var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
+      // var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
 
-    
+
       return new ProjectsListDTO()
       {
-        MyProjects = myProjects.Select( project =>_mapper.Map<ProjectHeaderDTO>(project)).ToList(),
+        MyProjects = myProjects.Select(project => _mapper.Map<ProjectHeaderDTO>(project)).ToList(),
         InvolvedProjects = new List<ProjectHeaderDTO>()
       };
     }
@@ -110,7 +114,7 @@ namespace OperaWeb.Server.Services
         ID = t.ID,
         Descrizione = t.Descrizione,
         ImagePath = t.ImagePath,
-        JsonTemplate = t.JsonTemplate,  
+        JsonTemplate = t.JsonTemplate,
       }).ToList();
     }
 
@@ -119,17 +123,17 @@ namespace OperaWeb.Server.Services
     {
       try
       {
-        var project =  _context.Projects.Include(p => p.Categorie)
+        var project = _context.Projects.Include(p => p.Categorie)
             .Include(p => p.DatiGenerali)
           .FirstOrDefault(p => p.ID == id && p.User.Id == userId);
-       
+
         if (project == null)
         {
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
-        
-        var vociComputo = _context.VociComputo.Include(v=>v.Misure).Where(e => e.ProjectID == id);
+
+        var vociComputo = _context.VociComputo.Include(v => v.Misure).Where(e => e.ProjectID == id);
         var categorie = _context.Categorie.Where(e => e.ProjectID == id);
         var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == id);
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
@@ -187,7 +191,7 @@ namespace OperaWeb.Server.Services
     public async Task<List<ProjectHeaderDTO>> GetRecentProjectsAsync(string userId)
     {
       var recentProjects = await _context.UserProjectAccess
-          .Where(rp => rp.UserId == userId)
+          .Where(rp => rp.UserId == userId && !rp.Project.Deleted)
           .OrderByDescending(rp => rp.LastAccessed)
           .Take(5)
           .Select(rp => rp.Project)
@@ -264,7 +268,7 @@ namespace OperaWeb.Server.Services
             sb.Append(await reader.ReadLineAsync());
           }
 
-          res = await  _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
+          res = await _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
           {
             User = user,
             CreationDate = DateTime.Now,
@@ -282,7 +286,7 @@ namespace OperaWeb.Server.Services
         {
           System.IO.File.Delete(fileName);
         }
-        return new ImportResult() { IsSuccess = false, Messages = {ex.Message} };
+        return new ImportResult() { IsSuccess = false, Messages = { ex.Message } };
       }
     }
 
@@ -290,7 +294,9 @@ namespace OperaWeb.Server.Services
     public async Task<ProjectDTO> UpdateProjectAsync(ProjectDTO projectDto)
     {
       var existingProject = await _context.Projects.Include(p => p.Categorie)
+      .Include(p => p.Analisi)
       .Include(p => p.DatiGenerali)
+      .Include(p => p.ConfigNumeri)
             .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
 
       if (existingProject == null)
@@ -309,7 +315,6 @@ namespace OperaWeb.Server.Services
       existingProject.SuperCategorie = superCategorie.ToList();
       existingProject.ElencoPrezzi = elencoPrezzi.ToList();
 
-   
 
       // Mappatura dal DTO all'entità
       existingProject = ProjectMapper.ToProject(projectDto, existingProject);
@@ -323,6 +328,79 @@ namespace OperaWeb.Server.Services
       return _mapper.Map<ProjectDTO>(existingProject);
     }
 
+    /// <summary>
+    /// XPWE file checks
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    public async Task<FileCheckResponseDTO> CheckXPWEFile(IFormFile file)
+    {
+      var result = new FileCheckResponseDTO() { CanBeImported = true, Checks = new List<FileCheckDTO>() };
+      PweDocumento importedPwe = null;
 
+      var wellFormattedXmlCheck = new FileCheckDTO
+      {
+        Name = "Formattazione File",
+        Message = "Il file XML è correttamente formattato"
+      };
+
+      try
+      {
+        using var reader = new StreamReader(file.OpenReadStream());
+        var xmlString = await reader.ReadToEndAsync();
+
+        using (var stringReader = new StringReader(StringHelper.RemoveInvalidXmlChars(xmlString)))
+        {
+          var serializer = new XmlSerializer(typeof(PweDocumento));
+          importedPwe = (PweDocumento)serializer.Deserialize(stringReader);
+        }
+
+        wellFormattedXmlCheck.Succeeded = true;
+      }
+      catch (Exception ex)
+      {
+        wellFormattedXmlCheck.Message = "Errore di formattazione";
+        wellFormattedXmlCheck.Succeeded = false;
+        result.CanBeImported = false;
+        return result;
+      }
+      finally
+      {
+        result.Checks.Add(wellFormattedXmlCheck);
+      }
+
+      try
+      {
+        var incidenzaManodoperaCheck = new FileCheckDTO
+        {
+          Name = "Check incidenza manodopera",
+        };
+
+        if (importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != null)
+        {
+          incidenzaManodoperaCheck.Succeeded = true;
+          incidenzaManodoperaCheck.Message = "Incidenza manodopera presente";
+        }
+        else
+        {
+          incidenzaManodoperaCheck.Succeeded = false;
+          incidenzaManodoperaCheck.Message = "Tag di incidenza manodopera non presente.\r\nSarà necessario inserire un avlore di incidenza medio nella successiva configurazione del progetto.";
+        }
+        result.Checks.Add(incidenzaManodoperaCheck);
+
+        return result;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Errore durante il controllo dell'incidenza manodopera");
+        result.Checks.Add(new FileCheckDTO
+        {
+          Name = "Check Incidenza Manodopera",
+          Succeeded = false,
+          Message = $"Errore durante il controllo dell'incidenza manodopera: {ex.Message}"
+        });
+        return result;
+      }
+    }
   }
 }

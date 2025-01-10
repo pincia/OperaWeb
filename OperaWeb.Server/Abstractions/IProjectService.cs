@@ -2,6 +2,7 @@
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Templates;
 using Task = System.Threading.Tasks.Task;
+using OperaWeb.Server.Models.DTO;
 
 namespace OperaWeb.Server.Abstractions
 {
@@ -80,5 +81,12 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="projectId"></param>
     /// <returns></returns>
     Task UpdateRecentProjectAsync(string userId, int projectId);
+
+    /// <summary>
+    /// Esegue controlli mirati sul file XPWE.
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    Task<FileCheckResponseDTO> CheckXPWEFile(IFormFile file);
   }
 }

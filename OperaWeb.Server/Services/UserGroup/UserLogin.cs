@@ -136,7 +136,28 @@ namespace Services.UserGroup
       else
       {
         var userRoles = await _userManager.GetRolesAsync(user);
-        var userDTO = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList() };
+        var organizationMember = _context.OrganizationMembers.Include(member => member.Company).Include(m => m.Company.SubFigure).Include(m => m.Company.Figure).FirstOrDefault(o => o.UserId == userId);
+        var company = new CompanyProfileDto
+        {
+          Name = organizationMember.Company.Name,
+          VatOrTaxCode = organizationMember.Company.VatOrTaxCode,
+          Address = organizationMember.Company.Address,
+          CityId = organizationMember.Company.ComuneId,
+          ProvinceId = organizationMember.Company.ProvinciaId,
+          PostalCode = organizationMember.Company.PostalCode,
+          Country = organizationMember.Company.Country,
+          PhoneNumber = organizationMember.Company.PhoneNumber,
+          Email = organizationMember.Company.Email,
+          Website = organizationMember.Company.Website,
+          SDICode = organizationMember.Company.SDICode,
+          PEC = organizationMember.Company.PEC,
+          FigureClassificationId = organizationMember.Company.SubFigureId ?? -1,
+          FigureClassification = organizationMember.Company.SubFigure?.Name ?? "",
+          Figure = organizationMember.Company.Figure.Name,
+          FigureId = organizationMember.Company.FigureId,
+        };
+
+        var userDTO = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company };
 
         return new AppResponse<UserDTO>().SetSuccessResponse(userDTO);
       }

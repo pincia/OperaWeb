@@ -48,5 +48,6 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; }
+    public decimal? Manodopera { get; set; }
   }
 }

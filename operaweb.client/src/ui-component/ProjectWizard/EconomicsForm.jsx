@@ -20,7 +20,10 @@ const validationSchema = yup.object({
     LumpSumWorks: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
     SafetyCosts: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
     LaborCosts: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
-    AuctionVariationPercentage: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
+    AuctionVariationPercentage: yup
+        .string()
+        .matches(/^-?\d*\.?\d+$/, 'Inserisci un numero valido')
+        .required('Campo obbligatorio'),
     AvailableSums: yup.number().min(0, 'Il valore minimo è 0').required('Campo obbligatorio'),
 });
 
@@ -210,7 +213,7 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
                         <EconomicsField label="Costi della Manodopera" name="LaborCosts" type="number" />
                     </Grid>
                     <Grid item xs={12} md={3}>
-                        <EconomicsField label="Variazione d'Asta del (%)" name="AuctionVariationPercentage" type="number" />
+                        <EconomicsField label="Variazione d'Asta del (%)" name="AuctionVariationPercentage" type="text" />
                     </Grid>
                     <Grid item xs={12} md={3}>
                         <EconomicsField label="Importo Variazione d'Asta" name="AuctionVariationAmount" readOnly />      

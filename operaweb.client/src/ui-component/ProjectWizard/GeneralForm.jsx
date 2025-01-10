@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Typography, Grid, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
+import { Box,  Grid, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useState, useEffect } from 'react';
@@ -54,8 +54,8 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
             works: projectData.works || '',
             object: projectData.object || '',
             completeAddress: projectData.completeAddress || '',
-            latitude: projectData.latitude || '',
-            longitude: projectData.longitude || '',
+            latitude: projectData.latitude || null,
+            longitude: projectData.longitude || null,
             selectedSoa: projectData.selectedSoa || null,
             GIG: projectData.GIG || null,
             CUG: projectData.CUG || null,

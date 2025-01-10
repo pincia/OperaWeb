@@ -46,6 +46,7 @@
 
         private int idField;
 
+        private int? manodoperaField;
         /// <remarks/>
         public int TipoEP
         {
@@ -203,15 +204,15 @@
         }
 
         /// <remarks/>
-        public int IDSpCap
+        public int? Manodopera
         {
             get
             {
-                return iDSpCapField;
+                return manodoperaField;
             }
             set
             {
-                iDSpCapField = value;
+              manodoperaField = value;
             }
         }
 

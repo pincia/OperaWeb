@@ -66,7 +66,7 @@ namespace OperaWeb.Server.Services.BLL
       {
         // Step 1: Deserializzazione del documento XML
         PweDocumento importedPwe;
-        using (var stringReader = new StringReader(RemoveInvalidXmlChars(xmlString)))
+        using (var stringReader = new StringReader(StringHelper.RemoveInvalidXmlChars(xmlString)))
         {
           var serializer = new XmlSerializer(typeof(PweDocumento));
           importedPwe = (PweDocumento)serializer.Deserialize(stringReader);
@@ -163,6 +163,7 @@ namespace OperaWeb.Server.Services.BLL
               DesEstesa = e.DesEstesa ?? "",
               UnMisura = e.UnMisura ?? "",
               Prezzo1 = e.Prezzo1,
+              Manodopera = e.Manodopera,
               Data = DateTime.ParseExact(e.Data, "dd/MM/yyyy", null),
               Project = importedProject.Entity
             }).ToList();
@@ -215,6 +216,9 @@ namespace OperaWeb.Server.Services.BLL
         foreach (var voce in importedPwe.PweMisurazioni.PweVociComputo)
         {
           if (!categoryLookup.ContainsKey(voce.IDCat)) continue;
+          var exsitsSubCategory = subCategoryLookup.TryGetValue(voce.IDSbCat, out SubCategoria subCategory);
+          var exsitsSuperCategory = superCategoryLookup.TryGetValue(voce.IDSpCat, out SuperCategoria superCategory);
+          var exsitsCategory = categoryLookup.TryGetValue(voce.IDCat, out Categoria category);
 
           var voceComputo = new VoceComputo
           {
@@ -224,9 +228,9 @@ namespace OperaWeb.Server.Services.BLL
             DataMis = DateTime.ParseExact(voce.DataMis, "dd/MM/yyyy", null),
             Flags = voce.Flags,
             Project = importedProject.Entity,
-            Categoria = categoryLookup[voce.IDCat],
-            SubCategoria = subCategoryLookup[voce.IDSbCat],
-            SuperCategoria = superCategoryLookup[voce.IDSpCat],
+            Categoria = exsitsCategory ? category : null,
+            SubCategoria = exsitsSubCategory ? subCategory : null,
+            SuperCategoria = exsitsSuperCategory ? superCategory : null,
           };
 
           foreach (var misura in voce.PweVCMisure)
@@ -382,13 +386,6 @@ namespace OperaWeb.Server.Services.BLL
       project.ProjectTasks = tasks;
     }
 
-
-
-    static string RemoveInvalidXmlChars(string text)
-    {
-      var validXmlChars = text.Where(ch => XmlConvert.IsXmlChar(ch)).ToArray();
-      return new string(validXmlChars);
-    }
 
 
     static bool IsValidXmlString(string text)
