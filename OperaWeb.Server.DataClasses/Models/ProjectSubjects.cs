@@ -16,6 +16,8 @@ public class ProjectSubject
   public string? Status { get; set; } = "Pending"; // Pending, Registered
   public string Type { get; set; }
 
+  public Invitation? Invitation { get; set; }
+  public int? InvitationId { get; set; }
 
   public int ProjectSubjectRoleId { get; set; }
   public ProjectSubjectRole ProjectSubjectRole { get; set; }
@@ -24,6 +26,7 @@ public class ProjectSubject
 
   public string? UserId { get; set; }
 
+  public string Company { get; set; }
   // Navigational Properties
   public Project Project { get; set; }
 

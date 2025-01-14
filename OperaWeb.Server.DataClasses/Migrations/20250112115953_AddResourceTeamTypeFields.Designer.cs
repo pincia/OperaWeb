@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112115953_AddResourceTeamTypeFields")]
+    partial class AddResourceTeamTypeFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -693,70 +696,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Figures", (string)null);
-                });
-
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Invitation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Cf")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime?>("DeclinedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("InvitedByUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RecipientEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("SentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvitedByUserId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Invitations");
                 });
 
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Misura", b =>
@@ -1510,18 +1449,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("InvitationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -1544,8 +1476,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InvitationId");
 
                     b.HasIndex("ProjectId");
 
@@ -1762,25 +1692,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Invitation", b =>
-                {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.User.ApplicationUser", "InvitedByUser")
-                        .WithMany()
-                        .HasForeignKey("InvitedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InvitedByUser");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.Misura", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.VoceComputo", "VoceComputo")
@@ -1854,7 +1765,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
             modelBuilder.Entity("OperaWeb.Server.DataClasses.Models.ProjectResourceTeamType", b =>
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
-                        .WithOne("ProjectResourceTeamType")
+                        .WithOne("ResourceTeamType")
                         .HasForeignKey("OperaWeb.Server.DataClasses.Models.ProjectResourceTeamType", "ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2047,10 +1958,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
             modelBuilder.Entity("ProjectSubject", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Invitation", "Invitation")
-                        .WithMany()
-                        .HasForeignKey("InvitationId");
-
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("ProjectSubjects")
                         .HasForeignKey("ProjectId")
@@ -2067,8 +1974,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Invitation");
 
                     b.Navigation("Project");
 
@@ -2100,12 +2005,12 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Navigation("ElencoPrezzi");
 
-                    b.Navigation("ProjectResourceTeamType")
-                        .IsRequired();
-
                     b.Navigation("ProjectSubjects");
 
                     b.Navigation("ProjectTasks");
+
+                    b.Navigation("ResourceTeamType")
+                        .IsRequired();
 
                     b.Navigation("SubCategorie");
 

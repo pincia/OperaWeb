@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import { Box,  Grid, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
+import { Box, Grid, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import usePlacesAutocomplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { getSoaClassifications, getSoas } from 'api/projects';
@@ -15,8 +15,9 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
         setValue,
     } = usePlacesAutocomplete({ debounce: 300 });
 
-    const [soaOptions, setSoaOptions] = useState([]);
+    const [soaCategoryOptions, setSoaOptions] = useState([]);
     const [soaClassificationsOptions, setSoaClassificationsOptions] = useState([]);
+    const previousProjectDataRef = useRef(projectData);
 
     const handleSelect = async (completeAddress) => {
         setValue(completeAddress, false);
@@ -24,24 +25,16 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
             const results = await getGeocode({ address: completeAddress });
             const { lat, lng } = await getLatLng(results[0]);
 
-            // Aggiorna Formik
             formik.setFieldValue('completeAddress', completeAddress, false);
             formik.setFieldValue('latitude', lat, false);
             formik.setFieldValue('longitude', lng, false);
 
-            // Aggiorna il progetto
-            if (
-                projectData.completeAddress !== completeAddress ||
-                projectData.latitude !== lat ||
-                projectData.longitude !== lng
-            ) {
-                setProjectData((prev) => ({
-                    ...prev,
-                    completeAddress,
-                    latitude: lat,
-                    longitude: lng,
-                }));
-            }
+            setProjectData((prev) => ({
+                ...prev,
+                completeAddress,
+                latitude: lat,
+                longitude: lng,
+            }));
         } catch (error) {
             console.error('Errore nel recupero delle coordinate:', error);
         }
@@ -56,35 +49,19 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
             completeAddress: projectData.completeAddress || '',
             latitude: projectData.latitude || null,
             longitude: projectData.longitude || null,
-            selectedSoa: projectData.selectedSoa || null,
-            GIG: projectData.GIG || null,
-            CUG: projectData.CUG || null,
-            selectedSoaClassification: projectData.selectedSoaClassification || null,
-            isPublic: projectData.isPublic || false,
+            gig: projectData.gig || '',
+            cup: projectData.cup || '',
+            soaClassificationId: projectData.soaClassificationId || null,
+            soaCategoryId: projectData.soaCategoryId || null,
+            public: projectData.public || false,
         },
-        enableReinitialize: true, // Permetti il reset solo quando projectData cambia
+        enableReinitialize: true,
         validationSchema,
         validateOnMount: true,
-        onSubmit: (values) => {
-            setProjectData((prev) => ({
-                ...prev,
-                ...values,
-            }));
+        onSubmit: () => {
+            // Gestione submit se necessario
         },
     });
-
-    useEffect(() => {
-        const isDifferent = Object.keys(formik.values).some(
-            (key) => formik.values[key] !== projectData[key]
-        );
-
-        if (isDifferent) {
-            setProjectData((prev) => ({
-                ...prev,
-                ...formik.values,
-            }));
-        }
-    }, [formik.values, setProjectData, projectData]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -102,9 +79,21 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
     }, []);
 
     useEffect(() => {
+        // Controlla se i valori effettivamente differiscono
+        const isDifferent = Object.keys(formik.values).some((key) => {
+            return formik.values[key] !== previousProjectDataRef.current[key];
+        });
+
+        if (isDifferent) {
+            setProjectData(formik.values);
+            previousProjectDataRef.current = formik.values; // Aggiorna il riferimento
+        }
+    }, [formik.values, setProjectData]);
+
+    useEffect(() => {
         const isValid = formik.isValid && Object.keys(formik.errors).length === 0;
         onValidationChange(isValid);
-    }, [formik.isValid, formik.errors, onValidationChange]);
+    }, [formik.values]);
 
     return (
         <Box sx={{ padding: 2, marginTop: 3 }}>
@@ -190,10 +179,16 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Autocomplete
-                            options={soaOptions}
+                            options={soaCategoryOptions}
                             getOptionLabel={(option) => option.description || ''}
-                            value={formik.values.selectedSoa}
-                            onChange={(event, newValue) => formik.setFieldValue('selectedSoa', newValue)}
+                            value={soaCategoryOptions.find(
+                                (option) => option.id === formik.values.soaCategoryId
+                            ) || null}
+                            onChange={(event, newValue) => {
+                                const id = newValue ? newValue.id : null;
+                                formik.setFieldValue('soaCategoryId', id);
+                                setProjectData((prev) => ({ ...prev, soaCategoryId: id }));
+                            }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona SOA" variant="outlined" />
                             )}
@@ -203,10 +198,14 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                         <Autocomplete
                             options={soaClassificationsOptions}
                             getOptionLabel={(option) => option.description || ''}
-                            value={formik.values.selectedSoaClassification}
-                            onChange={(event, newValue) =>
-                                formik.setFieldValue('selectedSoaClassification', newValue)
-                            }
+                            value={soaClassificationsOptions.find(
+                                (option) => option.id === formik.values.soaClassificationId
+                            ) || null}
+                            onChange={(event, newValue) => {
+                                const id = newValue ? newValue.id : null;
+                                formik.setFieldValue('soaClassificationId', id);
+                                setProjectData((prev) => ({ ...prev, soaClassificationId: id }));
+                            }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona Classificazione SOA" variant="outlined" />
                             )}
@@ -214,25 +213,25 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            id="GIG"
-                            name="GIG"
-                            label={<FormattedMessage id="GIG" />}
-                            value={formik.values.GIG}
+                            id="gig"
+                            name="gig"
+                            label={<FormattedMessage id="gig" />}
+                            value={formik.values.gig}
                             onChange={formik.handleChange}
-                            error={formik.touched.GIG && Boolean(formik.errors.GIG)}
-                            helperText={formik.touched.GIG && formik.errors.GIG}
+                            error={formik.touched.gig && Boolean(formik.errors.gig)}
+                            helperText={formik.touched.gig && formik.errors.gig}
                             onBlur={formik.handleBlur}
                             fullWidth
                         /></Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            id="CUG"
-                            name="CUG"
-                            label={<FormattedMessage id="CUG" />}
-                            value={formik.values.CUG}
+                            id="cup"
+                            name="cup"
+                            label={<FormattedMessage id="cup" />}
+                            value={formik.values.cup}
                             onChange={formik.handleChange}
-                            error={formik.touched.CUG && Boolean(formik.errors.CUG)}
-                            helperText={formik.touched.CUG && formik.errors.CUG}
+                            error={formik.touched.cup && Boolean(formik.errors.cup)}
+                            helperText={formik.touched.cup && formik.errors.cup}
                             onBlur={formik.handleBlur}
                             fullWidth
                         /></Grid>
@@ -241,8 +240,8 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                             control={
                                 <Checkbox
                                     color="secondary"
-                                    checked={formik.values.isPublic}
-                                    onChange={(e) => formik.setFieldValue('isPublic', e.target.checked)}
+                                    checked={formik.values.public}
+                                    onChange={(e) => formik.setFieldValue('public', e.target.checked)}
                                 />
                             }
                             label={<FormattedMessage id="publicLabel" />}

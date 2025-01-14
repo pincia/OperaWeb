@@ -7,7 +7,7 @@ namespace OperaWeb.Server.Models.DTO.Project
 {
   public class ProjectDTO
   {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string Object { get; set; }
     public string Province { get; set; }
     public string City { get; set; }
@@ -24,19 +24,15 @@ namespace OperaWeb.Server.Models.DTO.Project
     public DateTime LastUpdateDate { get; set; }
     public string? UserID { get; set; }
     public int? SoaCategoryId { get; set; }
-    public int? SoaClassificationID { get; set; }
-    // Lista dei lavori associati al progetto
+    public int? SoaClassificationId { get; set; }
     public List<JobDTO>? Jobs { get; set; }
 
-    // Lista dei soggetti associati al progetto
-    public List<SubjectDTO>? Subjects { get; set; } // Nuova proprietà aggiunta
+    public List<SubjectDTO>? Subjects { get; set; } 
 
     public List<ProjectTaskDTO>? Tasks { get; set; }
 
     public ConfigurationDTO? Configurations { get; set; }
 
     public EconomicsDTO? Economics { get; set; }
-
-
   }
 }

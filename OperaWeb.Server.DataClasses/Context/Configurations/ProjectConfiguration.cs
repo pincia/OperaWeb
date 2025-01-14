@@ -11,7 +11,12 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
     builder.HasMany(p => p.VociComputo)
            .WithOne(vc => vc.Project)
            .HasForeignKey(vc => vc.ProjectID)
-           .OnDelete(DeleteBehavior.Restrict); // Cambiato da Cascade a Restrict
+           .OnDelete(DeleteBehavior.Restrict); 
+
+    builder.HasOne(p => p.ProjectResourceTeamType)
+       .WithOne(r => r.Project)
+       .HasForeignKey<ProjectResourceTeamType>(r => r.ProjectId)
+       .OnDelete(DeleteBehavior.Restrict);
 
     builder.HasMany(p => p.ElencoPrezzi)
            .WithOne(ep => ep.Project)

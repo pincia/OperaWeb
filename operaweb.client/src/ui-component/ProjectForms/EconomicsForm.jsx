@@ -130,7 +130,7 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
 
     useEffect(() => {
         onValidationChange(formik.isValid);
-    }, [formik.isValid, onValidationChange]);
+    }, [formik.values]);
 
     const handleBlur = (e) => {
         const { name } = e.target;

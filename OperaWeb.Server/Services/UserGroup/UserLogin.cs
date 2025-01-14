@@ -157,7 +157,7 @@ namespace Services.UserGroup
           FigureId = organizationMember.Company.FigureId,
         };
 
-        var userDTO = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company };
+        var userDTO = new UserDTO() { Id = user.Id, Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company, Cf = user.TaxCode };
 
         return new AppResponse<UserDTO>().SetSuccessResponse(userDTO);
       }

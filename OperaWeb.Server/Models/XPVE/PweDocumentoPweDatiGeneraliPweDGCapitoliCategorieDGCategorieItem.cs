@@ -62,17 +62,17 @@
         }
 
         /// <remarks/>
-        public decimal Durata
-        {
-            get
-            {
-                return durataField;
-            }
-            set
-            {
-                durataField = value;
-            }
-        }
+        //public decimal Durata
+        //{
+        //    get
+        //    {
+        //        return durataField;
+        //    }
+        //    set
+        //    {
+        //        durataField = value;
+        //    }
+        //}
 
         /// <remarks/>
         public string CodFase

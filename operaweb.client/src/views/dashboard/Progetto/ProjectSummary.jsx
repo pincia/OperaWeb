@@ -1,30 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { openSnackbar } from 'store/slices/snackbar';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { Button, Tabs, Tab, Grid, Typography, Box, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
+import {
+    Button,
+    Tabs,
+    Tab,
+    Grid,
+    Typography,
+    Box,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    DialogContentText,
+    CircularProgress,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import GeneralForm from 'ui-component/ProjectWizard/GeneralForm';
-import ConfigurationsForm from 'ui-component/ProjectWizard/ConfigurationsForm';
-import SubjectsForm from 'ui-component/ProjectWizard/SubjectsForm';
-import TasksForm from 'ui-component/ProjectWizard/Tasks';
-import EconomicsForm from 'ui-component/ProjectWizard/EconomicsForm';
+import GeneralForm from 'ui-component/ProjectForms/GeneralForm';
+import ConfigurationsForm from 'ui-component/ProjectForms/ConfigurationsForm';
+import SubjectsForm from 'ui-component/ProjectForms/SubjectsForm';
+import TasksForm from 'ui-component/ProjectForms/Tasks';
+import EconomicsForm from 'ui-component/ProjectForms/EconomicsForm';
 import { saveProject } from 'api/projects';
 import { ThemeMode } from 'config';
-
+import { useDispatch } from 'react-redux';
 function a11yProps(index) {
     return {
         id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`
+        'aria-controls': `simple-tabpanel-${index}`,
     };
 }
 
-const ProjectSummary = ({ projectData, isLoading }) => {
+const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
     const theme = useTheme();
     const [activeTab, setActiveTab] = useState(0);
-    const [localProjectData, setLocalProjectData] = useState({ ...projectData }); // Copia locale dei dati
     const [isSaving, setIsSaving] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const dispatch = useDispatch();
 
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
@@ -33,21 +46,24 @@ const ProjectSummary = ({ projectData, isLoading }) => {
     const handleSaveProject = async () => {
         setIsSaving(true);
         try {
-            await saveProject(localProjectData.id, localProjectData); // Salva i dati aggiornati
-            alert('Progetto salvato con successo!');
+            await saveProject(projectData.id, projectData);
+            dispatch(openSnackbar({
+                open: true,
+                message: 'Progetto salvato con successo!',
+                variant: 'alert',
+                alert: { color: 'success' },
+            }));
         } catch (error) {
-            alert('Errore durante il salvataggio del progetto.');
+            dispatch(openSnackbar({
+                open: true,
+                message: 'Errore durante il salvataggio del progetto.',
+                variant: 'alert',
+                alert: { color: 'error' },
+            }));
         } finally {
             setIsSaving(false);
             setIsConfirmOpen(false);
         }
-    };
-
-    const updateProjectData = (updatedData) => {
-        setLocalProjectData((prevData) => ({
-            ...prevData,
-            ...updatedData
-        }));
     };
 
     return (
@@ -71,7 +87,7 @@ const ProjectSummary = ({ projectData, isLoading }) => {
                                     },
                                     '& a.Mui-selected': {
                                         color: 'primary.main',
-                                    }
+                                    },
                                 }}
                             >
                                 <Tab label="Dati Generali" {...a11yProps(0)} />
@@ -84,36 +100,36 @@ const ProjectSummary = ({ projectData, isLoading }) => {
                         <Grid item xs={12}>
                             {activeTab === 0 && (
                                 <GeneralForm
-                                    projectData={localProjectData}
-                                    setProjectData={updateProjectData}
+                                    projectData={projectData}
+                                    setProjectData={setProjectData}
                                     onValidationChange={(isValid) => console.log('Validazione Dati Generali:', isValid)}
                                 />
                             )}
                             {activeTab === 1 && (
                                 <ConfigurationsForm
-                                    projectData={localProjectData}
-                                    setProjectData={updateProjectData}
+                                    projectData={projectData}
+                                    setProjectData={setProjectData}
                                     onValidationChange={(isValid) => console.log('Validazione Configurazioni:', isValid)}
                                 />
                             )}
                             {activeTab === 2 && (
                                 <SubjectsForm
-                                    projectData={localProjectData}
-                                    setProjectData={updateProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Soggetti:', isValid)}
+                                    projectData={projectData}
+                                    setProjectData={setProjectData}
+                                    onValidationChange={(isValid) => console.log('Validazione Configurazioni:', isValid)}
                                 />
                             )}
                             {activeTab === 3 && (
                                 <TasksForm
-                                    projectData={localProjectData}
-                                    setProjectData={updateProjectData}
+                                    projectData={projectData}
+                                    setProjectData={setProjectData}
                                     onValidationChange={(isValid) => console.log('Validazione Lavorazioni:', isValid)}
                                 />
                             )}
                             {activeTab === 4 && (
                                 <EconomicsForm
-                                    projectData={localProjectData}
-                                    setProjectData={updateProjectData}
+                                    projectData={projectData}
+                                    setProjectData={setProjectData}
                                     onValidationChange={(isValid) => console.log('Validazione Quadro Economico:', isValid)}
                                 />
                             )}
@@ -127,16 +143,19 @@ const ProjectSummary = ({ projectData, isLoading }) => {
             <Dialog open={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
                 <DialogTitle>Conferma Salvataggio</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        Procedo con il salvataggio del progetto?
-                    </DialogContentText>
+                    <DialogContentText>Procedo con il salvataggio del progetto?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsConfirmOpen(false)} color="secondary">
                         Annulla
                     </Button>
-                    <Button onClick={handleSaveProject} color="primary">
-                        Conferma
+                    <Button
+                        onClick={handleSaveProject}
+                        color="primary"
+                        disabled={isSaving}
+                        startIcon={isSaving && <CircularProgress size={20} color="inherit" />}
+                    >
+                        {isSaving ? 'Salvataggio...' : 'Conferma'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -147,6 +166,7 @@ const ProjectSummary = ({ projectData, isLoading }) => {
 ProjectSummary.propTypes = {
     isLoading: PropTypes.bool,
     projectData: PropTypes.object.isRequired,
+    setProjectData: PropTypes.func.isRequired,
 };
 
 export default ProjectSummary;

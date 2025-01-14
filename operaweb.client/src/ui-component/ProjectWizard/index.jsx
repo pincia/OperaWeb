@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Stack, Step, StepLabel, Stepper, Typography, Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
+import { Button, Stack, Step, StepLabel, Stepper, Typography, Box, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, CircularProgress } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { openSnackbar } from 'store/slices/snackbar';
 import { setCurrentProjectId } from 'store/slices/project';
-import GeneralForm from './GeneralForm';
-import ConfigurationsForm from './ConfigurationsForm';
-import SubjectsForm from './SubjectsForm';
-import Tasks from './Tasks';
-import EconomicsForm from './EconomicsForm';
+import GeneralForm from 'ui-component/ProjectForms/GeneralForm';
+import ConfigurationsForm from 'ui-component/ProjectForms/ConfigurationsForm';
+import SubjectsForm from 'ui-component/ProjectForms/SubjectsForm';
+import Tasks from 'ui-component/ProjectForms/Tasks';
+import EconomicsForm from 'ui-component/ProjectForms/EconomicsForm';
 import { saveProject, createProject } from 'api/projects';
 import { useFormik } from 'formik';
 const steps = ['Generali', 'Configurazioni', 'Soggetti', 'Lavorazioni', 'Quadro economico'];
@@ -59,19 +59,19 @@ const ProjectWizard = () => {
             }
             dispatch(setCurrentProjectId(projectId));
             navigate('/project/');
-            openSnackbar({
+            dispatch(openSnackbar({
                 open: true,
                 message: 'Progetto salvato con successo!',
                 variant: 'alert',
                 alert: { color: 'success' },
-            });
+            }));
         } catch (error) {
-            openSnackbar({
+            dispatch(  openSnackbar({
                 open: true,
                 message: 'Errore durante il salvataggio del progetto.',
                 variant: 'alert',
                 alert: { color: 'error' },
-            });
+            }));
         } finally {
             setIsSaving(false);
             setIsConfirmOpen(false);
@@ -182,8 +182,13 @@ const ProjectWizard = () => {
                     <Button onClick={() => setIsConfirmOpen(false)} color="secondary">
                         Annulla
                     </Button>
-                    <Button onClick={handleSaveProject} color="primary">
-                        Conferma
+                    <Button
+                        onClick={handleSaveProject}
+                        color="primary"
+                        disabled={isSaving}
+                        startIcon={isSaving && <CircularProgress size={20} color="inherit" />}
+                    >
+                        {isSaving ? 'Salvataggio...' : 'Conferma'}
                     </Button>
                 </DialogActions>
             </Dialog>

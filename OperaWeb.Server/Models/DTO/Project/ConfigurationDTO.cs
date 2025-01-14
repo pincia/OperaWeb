@@ -4,5 +4,6 @@
   {
     public ConfigNumeriDTO Numeri { get; set; }
     public ConfigAnalisiDTO Analisi { get; set; }
+    public ResourceTeamTypeDTO ResourceTeamType { get; set; }
   }
 }

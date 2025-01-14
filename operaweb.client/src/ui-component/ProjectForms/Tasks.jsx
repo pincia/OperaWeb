@@ -24,9 +24,9 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
     });
 
     const [tasks, setTasks] = useState(projectData.jobs || [
-        { id: 1, description: 'LAVORI A MISURA', children: [], hasEntry: false, level: 1 },
-        { id: 2, description: 'LAVORI A CORPO', children: [], hasEntry: false, level: 1 },
-        { id: 3, description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false, level: 1 },
+        { id: "1", description: 'LAVORI A MISURA', children: [], hasEntry: false, level: 1 },
+        { id: "2", description: 'LAVORI A CORPO', children: [], hasEntry: false, level: 1 },
+        { id: "3", description: 'LAVORI IN ECONOMIA', children: [], hasEntry: false, level: 1 },
     ]);
 
     const [open, setOpen] = useState(false);
@@ -95,9 +95,9 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
         });
     }, [tasks, setProjectData]);
 
-
+    //TODO: Validare il form
     useEffect(() => {
-        // Valida sempre come "true" (nessuna validazione attiva per ora)
+        // Imposta il form come sempre valido
         onValidationChange(true);
     }, [onValidationChange]);
 

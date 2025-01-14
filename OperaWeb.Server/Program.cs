@@ -128,7 +128,7 @@ builder.Services.AddCors(options =>
   {
     policy.AllowAnyHeader()
           .AllowAnyMethod()
-          .WithOrigins("http://localhost:3000") // Permetti il frontend React
+          .WithOrigins("http://localhost:3000", "https://operawebserver20241203190934.azurewebsites.net") // Specifica i domini consentiti
           .AllowCredentials(); // Necessario per SignalR e autenticazione
   });
 });
@@ -163,11 +163,12 @@ app.Use(async (context, next) =>
   }
 });
 
-// Abilita SignalR
-app.MapHub<ImportHub>("/hubs/import");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Abilita SignalR
+app.MapHub<ImportHub>("/hubs/import");
 
 app.MapFallbackToFile("/index.html");
 app.MapControllers();

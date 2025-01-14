@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250113120626_AddInivitation")]
+    partial class AddInivitation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -705,11 +708,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Property<DateTime?>("AcceptedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Cf")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("DeclinedDate")
                         .HasColumnType("datetime2");
@@ -1510,18 +1508,11 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("InvitationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -1544,8 +1535,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InvitationId");
 
                     b.HasIndex("ProjectId");
 
@@ -2047,10 +2036,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
             modelBuilder.Entity("ProjectSubject", b =>
                 {
-                    b.HasOne("OperaWeb.Server.DataClasses.Models.Invitation", "Invitation")
-                        .WithMany()
-                        .HasForeignKey("InvitationId");
-
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("ProjectSubjects")
                         .HasForeignKey("ProjectId")
@@ -2067,8 +2052,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Invitation");
 
                     b.Navigation("Project");
 

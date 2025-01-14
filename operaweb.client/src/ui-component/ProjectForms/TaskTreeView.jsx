@@ -34,7 +34,7 @@ export default function TaskTreeView({
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [menuTask, setMenuTask] = useState(null);
 
-    const defaultTaskIds = [1, 2, 3]; // ID delle lavorazioni principali
+    const defaultTaskIds = ["1", "2", "3"]; // ID delle lavorazioni principali
 
     const findTask = (tasks, id) => {
         for (const task of tasks) {
@@ -193,8 +193,8 @@ export default function TaskTreeView({
                     sx={{
                         flex: 1,
                         display: 'flex',
-                        flexDirection: 'column', // Organizza il contenuto verticalmente
-                        width: '100%', // Adatta alla larghezza del contenitore
+                        flexDirection: 'column', 
+                        width: '100%',
                     }}
                 >
                     {renderTreeItems(tasks)}

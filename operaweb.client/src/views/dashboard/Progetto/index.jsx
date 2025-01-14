@@ -111,7 +111,7 @@ const ProjectDashboard = () => {
                     {/* Tab Content */}
                     <Box sx={{ mt: 3 }}>
                         {activeTab === 0 && <ProjectOverview projectData={projectData} isLoading={isLoading} />}
-                        {activeTab === 1 && <ProjectSummary projectData={projectData} isLoading={isLoading} />}
+                        {activeTab === 1 && <ProjectSummary projectData={projectData} setProjectData={setProjectData} isLoading={isLoading} />}
                         {activeTab === 2 && <GanttChart projectData={projectData} />}
                     </Box>
                 </Box>

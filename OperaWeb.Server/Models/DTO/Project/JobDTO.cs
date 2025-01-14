@@ -3,11 +3,11 @@
   public class JobDTO
   {
 
-    public int Id { get; set; }
+    public string Id { get; set; }
     public string Description { get; set; }
 
     public int OriginalId {  get; set; }
-    public int ParentId { get; set; }
+    public string? ParentId { get; set; }
     public int Level { get; set; }
     public List<EntryDTO>? Entries { get; set; }
     public List<JobDTO>? Children { get; set; }

@@ -10,6 +10,8 @@ namespace OperaWeb.Server.DataClasses.Context
 {
     public class OperaWebDbContext : IdentityDbContext<ApplicationUser>
   {
+    public virtual DbSet<Invitation> Invitations { get; set; }
+    public virtual DbSet <ProjectResourceTeamType> ResourceTeamTypes { get; set; }
     public virtual DbSet<Figure> Figures { get; set; }
     public virtual DbSet<Company> Companies { get; set; }
     public virtual DbSet<Economics> Economics { get; set; }

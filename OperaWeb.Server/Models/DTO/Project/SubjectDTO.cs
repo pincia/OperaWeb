@@ -2,13 +2,18 @@
 {
   public class SubjectDTO
   {
-    public int? SubjectId { get; set; } // Id univoco del soggetto
-    public string Name { get; set; } // Nome o ragione sociale del soggetto
-    public string? Email { get; set; } // Email del soggetto
-    public string? Status { get; set; } // Stato (ad esempio, "Invitato", "Registrato")
-    public DateTime CreatedAt { get; set; } // Data di creazione
-    public string? UserId { get; set; } // Riferimento all'utente registrato, se esiste
-    public string SubjectRole { get; set; }
-    public string Type { get; set; }
+    public string Name { get; set; }
+    public string FirstName { get; set; } 
+    public string LastName { get; set; }
+    public string? Email { get; set; } 
+    public string? Status { get; set; } 
+    public DateTime CreatedAt { get; set; } 
+    public string? UserId { get; set; } 
+    public string Role { get; set; }
+    public string? Cf { get; set; }
+    public string? CfPiva { get; set; }
+    public string? Company { get; set; }
+    public string? Figure { get; set; }
+    public bool Invite { get; set; }
   }
 }

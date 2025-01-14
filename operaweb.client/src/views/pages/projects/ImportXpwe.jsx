@@ -207,6 +207,11 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
 
                     {importResult && (
                         <Grid item xs={12}>
+                            <Typography variant="h6">Progetto Importato</Typography>
+                            <Typography variant="body2">Comune: {importResult.importedProject?.city}</Typography>
+                            <Typography variant="body2">Provincia: {importResult.importedProject?.province}</Typography>
+                            <Typography variant="body2">Lavori: {importResult.importedProject?.works}</Typography>
+                            <Divider sx={{ my: 2 }} />
                             <Typography variant="h6">Risultati dell'Import</Typography>
                             <Typography variant="body2">{importResult.message}</Typography>
                             <List>
@@ -215,12 +220,7 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
                                         <ListItemText primary={`${entity}: ${count}`} />
                                     </ListItem>
                                 ))}
-                            </List>
-                            <Divider sx={{ my: 2 }} />
-                            <Typography variant="h6">Progetto Importato</Typography>
-                            <Typography variant="body2">Comune: {importResult.importedProject?.city}</Typography>
-                            <Typography variant="body2">Provincia: {importResult.importedProject?.province}</Typography>
-                            <Typography variant="body2">Lavori: {importResult.importedProject?.works}</Typography>
+                            </List>                           
                         </Grid>
                     )}
                 </Grid>

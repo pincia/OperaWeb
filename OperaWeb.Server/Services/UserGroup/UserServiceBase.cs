@@ -77,7 +77,7 @@ namespace Services.UserGroup
         Figure = organizationMember.Company.Figure.Name,
         FigureId = organizationMember.Company.FigureId,
       };
-      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new UserDTO() { Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company} };
+      return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken, User = new UserDTO() { Id = user.Id, Cf = user.TaxCode, Username = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles.ToList(), Company = company} };
     }
 
     /// <summary>

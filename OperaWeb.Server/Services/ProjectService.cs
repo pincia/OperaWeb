@@ -20,6 +20,7 @@ using OperaWeb.Server.Models.XPVE;
 using System.Xml.Serialization;
 using OperaWeb.SharedClasses.Helpers;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace OperaWeb.Server.Services
 {
@@ -52,9 +53,7 @@ namespace OperaWeb.Server.Services
     {
       var user = await _userService.GetUserByIdAsync(userId);
       // Mappa i dati del DTO al modello del database
-      var project = ProjectMapper.ToProject(projectDto);
-
-      project.UserId = userId;
+      var project = ProjectMapper.ToProject(projectDto, userId);
       project.DatiGenerali.Committente = user.Company.Name ?? user.FirstName + user.LastName;
       project.CreationDate = DateTime.Now;
       project.LastUpdateDate = DateTime.Now;
@@ -140,6 +139,7 @@ namespace OperaWeb.Server.Services
         var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
         var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
         var configurazioni = _context.ConfigNumeri.FirstOrDefault(e => e.ProjectID == id);
+        var subjects = _context.ProjectSubjects.Include(s=>s.User).Include(u=>u.User.Company).Include(s=>s.ProjectSubjectRole).Where(e => e.ProjectId == id);
         project.VociComputo = vociComputo.ToList();
         project.Categorie = categorie.ToList();
         project.SubCategorie = subCategorie.ToList();
@@ -147,6 +147,7 @@ namespace OperaWeb.Server.Services
         project.ElencoPrezzi = elencoPrezzi.ToList();
         project.ProjectTasks = projectTasks.ToList();
         project.ConfigNumeri = configurazioni;
+        project.ProjectSubjects = subjects.ToList();
         await UpdateRecentProjectAsync(userId, id);
         return project;
       }
@@ -274,6 +275,7 @@ namespace OperaWeb.Server.Services
             CreationDate = DateTime.Now,
             LastUpdateDate = DateTime.Now,
             Status = ProjectStatus.Created,
+            ProjectResourceTeamType = new ProjectResourceTeamType()
           }, connectionId);
 
         }
@@ -297,6 +299,7 @@ namespace OperaWeb.Server.Services
       .Include(p => p.Analisi)
       .Include(p => p.DatiGenerali)
       .Include(p => p.ConfigNumeri)
+      .Include(p=>p.ProjectResourceTeamType)
             .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
 
       if (existingProject == null)
@@ -317,7 +320,7 @@ namespace OperaWeb.Server.Services
 
 
       // Mappatura dal DTO all'entità
-      existingProject = ProjectMapper.ToProject(projectDto, existingProject);
+      existingProject = ProjectMapper.ToProject(projectDto, existingProject.UserId, existingProject);
       existingProject.LastUpdateDate = DateTime.Now;
 
       // Aggiorna il database
@@ -352,6 +355,7 @@ namespace OperaWeb.Server.Services
         using (var stringReader = new StringReader(StringHelper.RemoveInvalidXmlChars(xmlString)))
         {
           var serializer = new XmlSerializer(typeof(PweDocumento));
+          _logger.LogDebug("CheckXPWEFile - Try to deserialize xml");
           importedPwe = (PweDocumento)serializer.Deserialize(stringReader);
         }
 
@@ -359,7 +363,8 @@ namespace OperaWeb.Server.Services
       }
       catch (Exception ex)
       {
-        wellFormattedXmlCheck.Message = "Errore di formattazione";
+        _logger.LogError(ex.Message);
+        wellFormattedXmlCheck.Message = "Errore di formattazione "+ ex.Message;
         wellFormattedXmlCheck.Succeeded = false;
         result.CanBeImported = false;
         return result;
