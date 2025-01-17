@@ -124,7 +124,13 @@ namespace OperaWeb.Server.Services
       {
         var project = _context.Projects.Include(p => p.Categorie)
             .Include(p => p.DatiGenerali)
-          .FirstOrDefault(p => p.ID == id && p.User.Id == userId);
+            .Include(p=>p.ProjectResourceTeamType)
+            .Include(p => p.ConfigNumeri)
+            .Include(p => p.Economics)
+            .Include(p => p.ElencoPrezzi)
+            .Include(p => p.ProjectTasks)
+            .Include(p => p.Analisi)
+            .FirstOrDefault(p => p.ID == id && p.User.Id == userId);
 
         if (project == null)
         {
@@ -138,15 +144,11 @@ namespace OperaWeb.Server.Services
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
         var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
         var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
-        var configurazioni = _context.ConfigNumeri.FirstOrDefault(e => e.ProjectID == id);
         var subjects = _context.ProjectSubjects.Include(s=>s.User).Include(u=>u.User.Company).Include(s=>s.ProjectSubjectRole).Where(e => e.ProjectId == id);
         project.VociComputo = vociComputo.ToList();
         project.Categorie = categorie.ToList();
         project.SubCategorie = subCategorie.ToList();
         project.SuperCategorie = superCategorie.ToList();
-        project.ElencoPrezzi = elencoPrezzi.ToList();
-        project.ProjectTasks = projectTasks.ToList();
-        project.ConfigNumeri = configurazioni;
         project.ProjectSubjects = subjects.ToList();
         await UpdateRecentProjectAsync(userId, id);
         return project;
@@ -299,8 +301,10 @@ namespace OperaWeb.Server.Services
       .Include(p => p.Analisi)
       .Include(p => p.DatiGenerali)
       .Include(p => p.ConfigNumeri)
+      .Include(p => p.ProjectSubjects).ThenInclude(p=>p.ProjectSubjectRole)
+      .Include(p => p.Economics)
       .Include(p=>p.ProjectResourceTeamType)
-            .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
+      .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
 
       if (existingProject == null)
       {
@@ -328,7 +332,7 @@ namespace OperaWeb.Server.Services
       await _context.SaveChangesAsync();
 
       // Ritorna il progetto aggiornato come DTO
-      return _mapper.Map<ProjectDTO>(existingProject);
+      return ProjectMapper.ToProjectDTO(existingProject);
     }
 
     /// <summary>

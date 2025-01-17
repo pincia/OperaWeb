@@ -191,5 +191,11 @@
   "work": "Opera",
   "publicLabel": "Pubblica il bando (Visibile in bacheca)",
   "total": "Totale",
-  "lastUpdateDate": "Ultimo aggiornamento"
+  "lastUpdateDate": "Ultimo aggiornamento",
+  "nuovo": "Nuovo",
+  "apri": "Apri",
+  "organization": "Organizzazione",
+  "cup": "CUP",
+  "gig": "GIG",
+  "locationLabel": "Localizzazione"
 }

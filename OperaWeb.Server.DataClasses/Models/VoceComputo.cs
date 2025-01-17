@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OperaWeb.SharedClasses.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,5 +30,6 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; } // Chiave esterna per Project
+    public JobTypes JobType { get; set; }
   }
 }

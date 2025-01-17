@@ -30,7 +30,12 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
     const [figureType, setFigureType] = useState('committente'); 
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
-    const [subjects, setSubjects] = useState(projectData.subjects || []);
+    const [subjects, setSubjects] = useState(
+        projectData.subjects?.map((subject) => ({
+            ...subject,
+            id: subject.userId || Date.now(),
+        })) || []
+    );
     const [inviteSubject, setInviteSubject] = useState({ name: '', email: '' });
     const user = useSelector((state) => state.account.user);
     const [roles, setRoles] = useState(user?.roles || {});
@@ -52,13 +57,6 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
     };
 
     useEffect(() => {
-        const userExists = subjects.some((subject) => subject.email === user.username);
-        if (!userExists) {
-            setOpenRoleDialog(true);
-        }
-    }, [subjects, user]);
-
-    useEffect(() => {
         if (openRoleDialog) {
             fetchRoles(user?.company?.figure );
         }
@@ -74,11 +72,11 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
 
     useEffect(() => {
         if (prevSubjectsRef.current !== subjects) {
-            const isValid = subjects.length > 0;
+            const isValid = subjects.length > 0 && subjects.some(item => item.email === user.username);
             onValidationChange(isValid);
             prevSubjectsRef.current = subjects; 
         }
-    }, [subjects, onValidationChange]);
+    }, [onValidationChange]);
 
     const handleOpenDialog = () => {
         setSelectedSubject(null);
@@ -92,7 +90,6 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
             id: subject.userId || Date.now(),
             userId: subject.userId,
             cf: subject.cf,
-            name: subject.name || `${user.firstName} ${user.lastName}`,
             email: subject.email,
             cfPiva: subject.cfPiva,
             role: subject.role,
@@ -100,8 +97,8 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
             figure: subject.figure,
             company: subject.company,
             status: subject.status,
-            firstName: subject.firstName || subject.name.split(' ')[0],
-            lastName: subject.lastName || subject.name.split(' ')[1],
+            firstName: subject.firstName,
+            lastName: subject.lastName,
             invite: subject.invite
         };
 
@@ -131,12 +128,11 @@ export default function SubjectsForm({ projectData, setProjectData, onValidation
 
     const handleConfirmRole = (role) => {
         const newSubject = {
-            id: user.id || Date.now(), // Usa l'ID utente se disponibile
+            id: user.id || Date.now(), 
             userId: user.id,
             cf: user.cf,
-            name: `${user.firstName} ${user.lastName}`,
             email: user.username,
-            cfPiva: user.company.vatOrTaxCode, // Puoi aggiungere altre informazioni utente qui se necessarie
+            cfPiva: user.company.vatOrTaxCode, 
             role: role,
             figure: user.company.figure,
             firstName: user.firstName,
@@ -177,15 +173,31 @@ return (
             Aggiungi Soggetti
         </Typography>
 
-        <Button
-            variant="contained"
-            startIcon={<AddCircleIcon />}
-            onClick={handleOpenDialog}
-            sx={{ mb: 2 }}
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                mb: 2,
+                width: '35%'
+            }}
         >
-            Aggiungi Soggetto
-        </Button>
+            <Button
+                variant="contained"
+                startIcon={<AddCircleIcon />}
+                onClick={handleOpenDialog}
+            >
+                Aggiungi Soggetto
+            </Button>
+            <Button
+                variant="contained"
+                onClick={() => setOpenRoleDialog(true)}
+                sx={{ display: subjects.some((subject) => subject.email === user.username) ? 'none' : 'block' }}
+            >
+                Seleziona il tuo ruolo
+            </Button>
 
+        </Box>
         <SubjectsTable subjects={subjects} onDelete={handleDeleteSubject} />
 
         <RoleSelectionDialog

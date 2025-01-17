@@ -78,7 +78,8 @@ namespace OperaWeb.Server.Models.Mapper
           CompleteAddress = model.CompleteAddress,
           Subjects = model.ProjectSubjects?.Select(subject => new SubjectDTO
           {
-            Name = subject.SubjectName,
+            FirstName = subject.FirstName,
+            LastName = subject.LastName,
             Email = subject.Email,
             Status = subject.Status,
             CreatedAt = subject.CreatedAt,
@@ -89,7 +90,7 @@ namespace OperaWeb.Server.Models.Mapper
             Company = subject.Company,
             Figure = subject.Type,
             Invite = subject.Invitation != null
-          }).ToList() ?? new List<SubjectDTO>() 
+          }).ToList() ?? new List<SubjectDTO>()
         };
 
         if (!excludeTasks)
@@ -288,6 +289,151 @@ namespace OperaWeb.Server.Models.Mapper
           ProjectId = dto.Id ?? 0
         }).ToList();
 
+        var superCategoryLookup = project.SuperCategorie?.ToDictionary(sc => sc.ID) ?? new Dictionary<int, SuperCategoria>();
+        var categoryLookup = project.Categorie?.ToDictionary(c => c.ID) ?? new Dictionary<int, Categoria>();
+        var subCategoryLookup = project.SubCategorie?.ToDictionary(sc => sc.ID) ?? new Dictionary<int, SubCategoria>();
+        var priceListLookup = project.ElencoPrezzi?.ToDictionary(ep => ep.ID) ?? new Dictionary<int, ElencoPrezzo>();
+        var vociComputoLookup = project.VociComputo?.ToDictionary(vc => vc.ID) ?? new Dictionary<int, VoceComputo>();
+
+        // Lavorazioni
+        foreach (var job in dto.Jobs[0].Children)
+        {
+          var superCategory = superCategoryLookup.GetValueOrDefault(job.OriginalId);
+
+          if (superCategory == null)
+          {
+            superCategory = new SuperCategoria
+                {
+                  ExternalID = -1,
+                  DesSintetica = job.Description,
+                  DesEstesa = "",
+                  DataInit = DateTime.Now,
+                  Durata = 0,
+                  CodFase = "",
+                  Percentuale = 0,
+                  Codice = "",
+                  ProjectID = project.ID
+                };
+
+            project.SuperCategorie.Add(superCategory);
+          }
+          else
+          {
+            superCategory.DesSintetica = job.Description;
+          }
+
+          foreach (var childJob in job.Children)
+          {
+            var category = categoryLookup.GetValueOrDefault(childJob.OriginalId);
+
+            if (category == null)
+            {
+              category = new Categoria
+              {
+                ExternalID = -1,
+                DesSintetica = childJob.Description,
+                DesEstesa = "",
+                DataInit = DateTime.Now,
+                Durata = 0,
+                CodFase = "",
+                Percentuale = 0,
+                Codice = "",
+                ProjectID = project.ID
+              };
+
+              project.Categorie.Add(category);
+            }
+            else
+            {
+              category.DesSintetica = childJob.Description;
+            }
+
+            foreach (var subChildJob in childJob.Children)
+            {
+              var subCategory = subCategoryLookup.GetValueOrDefault(subChildJob.OriginalId);
+
+              if (subCategory == null)
+              {
+                subCategory = new SubCategoria
+                {
+                  ExternalID = -1,
+                  DesSintetica = subChildJob.Description,
+                  DesEstesa = "",
+                  DataInit = DateTime.Now,
+                  Durata = 0, 
+                  CodFase = "",
+                  Percentuale = 0,
+                  Codice = "", 
+                  ProjectID = project.ID
+                };
+                project.SubCategorie.Add(subCategory);
+              }
+              else
+              {
+                subCategory.DesSintetica = subChildJob.Description;
+              }
+
+              foreach (var entry in subChildJob.Entries)
+              {
+                var priceList = priceListLookup.GetValueOrDefault(entry.Id);
+
+                if (priceList == null)
+                {
+                  priceList = new ElencoPrezzo
+                  {
+                    ID = entry.Id,
+                    UnMisura = entry.Unit,
+                    DesBreve = entry.Description,
+                    Tariffa = entry.Code,
+                    Prezzo1 = entry.Price
+                  };
+                  project.ElencoPrezzi.Add(priceList);
+                }
+                else
+                {
+                  priceList.UnMisura = entry.Unit;
+                  priceList.DesBreve = entry.Description;
+                  priceList.Tariffa = entry.Code;
+                  priceList.Prezzo1 = entry.Price;
+                }
+
+                var voceComputo = vociComputoLookup.GetValueOrDefault(entry.Id);
+                if (voceComputo == null)
+                {
+                  voceComputo = new VoceComputo
+                  {
+                    ID = entry.Id,
+                    ElencoPrezzoID = entry.Id,
+                    SuperCategoriaID = superCategory.ID,
+                    CategoriaID = category.ID,
+                    SubCategoriaID = subCategory.ID,
+                    Quantita = entry.Measurements.Sum(m => m.Quantita)
+                  };
+
+                  foreach (var measurement in entry.Measurements)
+                  {
+                    var newMeasurement = new Misura
+                    {
+                      ID = measurement.Id,
+                      Quantita = measurement.Quantita,
+                      Descrizione = measurement.Description,
+                      Lunghezza = measurement.Lunghezza,
+                      Larghezza = measurement.Larghezza,
+                      HPeso = measurement.HPeso
+                    };
+                    voceComputo.Misure.Add(newMeasurement);
+                  }
+                  project.VociComputo.Add(voceComputo);
+                }
+                else
+                {
+                  voceComputo.Quantita = entry.Measurements.Sum(m => m.Quantita);
+                }
+              }
+            }
+          }
+        }
+
 
         // Aggiorna o crea DatiGenerali
         if (dto.City != null || dto.Province != null || dto.Object != null)
@@ -304,6 +450,29 @@ namespace OperaWeb.Server.Models.Mapper
           project.DatiGenerali.ProjectID = project.ID;
           project.DatiGenerali.Impresa = "";
         }
+
+        //Economics
+        if (dto.Economics != null)
+        {
+          // Usa l'entità esistente se presente, altrimenti creane una nuova
+          if (project.Economics == null)
+          {
+            project.Economics = new Economics
+            {
+              ProjectId = project.ID
+            };
+          }
+
+          project.Economics.MeasuredWorks = dto.Economics.MeasuredWorks;
+          project.Economics.LumpSumWorks = dto.Economics.LumpSumWorks;
+          project.Economics.SafetyCosts = dto.Economics.SafetyCosts;
+          project.Economics.LaborCosts = dto.Economics.LaborCosts;
+          project.Economics.AuctionVariationPercentage = dto.Economics.AuctionVariationPercentage;
+          project.Economics.AvailableSums = dto.Economics.AvailableSums;
+          project.Economics.TotalProjectCalculationType = dto.Economics.TotalProjectCalculationType;
+          
+        }
+
         // Aggiorna ResourceTeamType se presente
         if (dto.Configurations?.ResourceTeamType != null)
         {
@@ -373,15 +542,13 @@ namespace OperaWeb.Server.Models.Mapper
         // Mappatura dei subjects
         if (dto.Subjects != null)
         {
-          // Rimuovi subjects che non esistono più nel DTO
-          var dtoSubjectEmails = dto.Subjects
-             .Where(s => !string.IsNullOrEmpty(s.Email))
-             .Select(s => s.Email)
-             .ToHashSet();
-
-          var existingSubjects = project.ProjectSubjects == null ? new List<ProjectSubject>() : project.ProjectSubjects.ToList();
-          existingSubjects.RemoveAll(ps => ps.Email != null && !dtoSubjectEmails.Contains(ps.Email));
-          project.ProjectSubjects = existingSubjects;
+          //remove subjects if canceled
+          if(project.ProjectSubjects != null && project.ProjectSubjects.Count > 0)
+          {
+            var deletedSubjects = project.ProjectSubjects.Where(ps => !dto.Subjects.Any(ds => ds.Email == ps.Email))
+           .ToList();
+            project.ProjectSubjects.ToList().RemoveAll(ps => deletedSubjects.Any(ds => ds.Email == ps.Email));
+          }
 
           // Aggiungi o aggiorna i subjects
           foreach (var dtoSubject in dto.Subjects)
@@ -393,7 +560,8 @@ namespace OperaWeb.Server.Models.Mapper
               // Aggiungi nuovo subject
               var newSubject = new ProjectSubject
               {
-                SubjectName = dtoSubject.Name,
+                FirstName = dtoSubject.LastName,
+                LastName = dtoSubject.LastName,
                 Email = dtoSubject.Email,
                 Status = dtoSubject.Status ?? "Pending",
                 Type = dtoSubject.Figure ?? "Default",
@@ -425,7 +593,8 @@ namespace OperaWeb.Server.Models.Mapper
             else
             {
               // Aggiorna subject esistente
-              existingSubject.SubjectName = dtoSubject.Name;
+              existingSubject.FirstName = dtoSubject.FirstName;
+              existingSubject.LastName = dtoSubject.LastName;
               existingSubject.Status = dtoSubject.Status ?? existingSubject.Status;
               existingSubject.Type = dtoSubject.Figure ?? existingSubject.Type;
               existingSubject.UserId = dtoSubject.UserId;

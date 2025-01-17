@@ -18,6 +18,7 @@ using OperaWeb.Server.Hubs;
 using AutoMapper;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.Models.Mapper;
+using OperaWeb.SharedClasses.Enums;
 
 namespace OperaWeb.Server.Services.BLL
 {
@@ -231,6 +232,7 @@ namespace OperaWeb.Server.Services.BLL
             Categoria = exsitsCategory ? category : null,
             SubCategoria = exsitsSubCategory ? subCategory : null,
             SuperCategoria = exsitsSuperCategory ? superCategory : null,
+            JobType = JobTypes.Misura
           };
 
           foreach (var misura in voce.PweVCMisure)

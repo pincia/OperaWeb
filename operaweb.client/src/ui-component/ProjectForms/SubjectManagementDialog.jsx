@@ -119,7 +119,8 @@ const SubjectManagementDialog = ({
     };
 
     const columns = [
-        { field: 'name', headerName: 'Nome', flex: 1, headerClassName: 'table-header' },
+        { field: 'firstName', headerName: 'Nome', flex: 1, headerClassName: 'table-header' },
+        { field: 'lastName', headerName: 'Cognome', flex: 1, headerClassName: 'table-header' },
         { field: 'email', headerName: 'Email', flex: 1 },
         { field: 'cf', headerName: 'CF', flex: 1 },
         { field: 'cfPiva', headerName: 'CF / PIVA (Azienda)', flex: 1 },

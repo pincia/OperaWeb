@@ -8,7 +8,6 @@ import {
     MenuItem,
     Select,
     FormControl,
-    InputLabel,
     Stack,
     FormLabel,
 } from '@mui/material';
@@ -39,13 +38,13 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
 
     const formik = useFormik({
         initialValues: {
-            MeasuredWorks: projectData.economics?.MeasuredWorks || 0,
-            LumpSumWorks: projectData.economics?.LumpSumWorks || 0,
-            SafetyCosts: projectData.economics?.SafetyCosts || 0,
-            LaborCosts: projectData.economics?.LaborCosts || 0,
-            AuctionVariationPercentage: projectData.economics?.AuctionVariationPercentage || 0,
-            AvailableSums: projectData.economics?.AvailableSums || 0,
-            TotalProjectCalculationType: projectData.economics?.TotalProjectCalculationType || 1,
+            MeasuredWorks: projectData?.economics?.measuredWorks ?? 0,
+            LumpSumWorks: projectData?.economics?.lumpSumWorks ?? 0,
+            SafetyCosts: projectData?.economics?.safetyCosts ?? 0,
+            LaborCosts: projectData?.economics?.laborCosts ?? 0,
+            AuctionVariationPercentage: projectData?.economics?.auctionVariationPercentage ?? 0,
+            AvailableSums: projectData?.economics?.availableSums ?? 0,
+            TotalProjectCalculationType: projectData?.economics?.totalProjectCalculationType ?? 1,
         },
         validationSchema,
         validateOnBlur: true,
@@ -54,7 +53,7 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
                 ...prev,
                 economics: {
                     ...values,
-                    ...calculatedFields, // Include i campi calcolati
+                    ...calculatedFields,
                 },
             }));
         },
@@ -118,15 +117,21 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
         formik.values.TotalProjectCalculationType,
     ]);
 
+    const previousValuesRef = useRef(formik.values);
+
     useEffect(() => {
-        setProjectData((prev) => ({
-            ...prev,
-            economics: {
-                ...formik.values,
-                ...calculatedFields,
-            },
-        }));
+        if (JSON.stringify(formik.values) !== JSON.stringify(previousValuesRef.current)) {
+            setProjectData((prev) => ({
+                ...prev,
+                economics: {
+                    ...formik.values,
+                    ...calculatedFields,
+                },
+            }));
+            previousValuesRef.current = formik.values; // Aggiorna i valori precedenti
+        }
     }, [formik.values, calculatedFields, setProjectData]);
+
 
     useEffect(() => {
         onValidationChange(formik.isValid);

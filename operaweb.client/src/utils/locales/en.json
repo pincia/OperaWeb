@@ -188,5 +188,11 @@
   "worksLabel": "Works *",
   "objectLabel": "Project *",
   "work": "Work",
-  "publicLabel":  "Pubblica il bando (Visibile in bacheca)"
+  "publicLabel": "Pubblica il bando (Visibile in bacheca)",
+  "nuovo": "New",
+  "apri": "Open",
+  "organization": "Organization",
+  "cup": "CUP",
+  "gig": "GIG",
+  "locationLabel": "Localization"
 }

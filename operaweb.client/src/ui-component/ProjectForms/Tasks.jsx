@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { Box, Typography, Snackbar, Alert } from '@mui/material';
+import { Box, Snackbar, Alert } from '@mui/material';
 import TaskTreeView from './TaskTreeView';
 import TaskDetailsDialog from './TaskDetailsDialog';
 import EntryDetailsDialog from './EntryDetailsDialog';
@@ -83,7 +83,7 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
     };
 
     const generateId = () => {
-        return Math.floor(Date.now() + Math.random() * 10000); // Genera un ID univoco
+        return Math.floor(Date.now() + Math.random() * 10000)+''; // Genera un ID univoco
     };
 
     useEffect(() => {

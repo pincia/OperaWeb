@@ -21,5 +21,6 @@
     public string Codice { get; set; }
 
     public int ProjectID { get; set; }
+    public int SubCategoriaID { get; set; }
   }
 }

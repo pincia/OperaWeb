@@ -35,8 +35,11 @@ const ProjectDashboard = () => {
             try {
                 setLoading(true);
                 const response = await getProject(currentProjectId);
-                dispatch(setCurrentProject(response.data));
-                setProjectData(response.data);
+
+                if (response?.data) {
+                    dispatch(setCurrentProject(response.data));
+                    setProjectData(response.data);
+                }
             } catch (error) {
                 console.error('Errore durante il recupero del progetto:', error);
             } finally {
@@ -46,6 +49,12 @@ const ProjectDashboard = () => {
 
         fetchProjectData();
     }, [currentProjectId, dispatch]);
+
+    useEffect(() => {
+        if (projectData && Object.keys(projectData).length === 0) {
+            setProjectData(initialProjectData); 
+        }
+    }, [projectData]);
 
     if (isLoading) {
         return (

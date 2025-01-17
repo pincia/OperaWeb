@@ -31,3 +31,5 @@ OperaWeb.Server/Properties
 .config
 
 appsettings.json
+
+*.env*

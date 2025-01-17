@@ -20,8 +20,8 @@ export default function RoleSelectionDialog({ open, onClose, onAddRole, roles })
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                     >
-                        {roles.map((role) => (
-                            <MenuItem key={role.id} value={role.name}>
+                        {roles.map((role, index) => (
+                            <MenuItem key={role.id || index} value={role.name}>
                                 {role.name}
                             </MenuItem>
                         ))}

@@ -85,7 +85,7 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
         });
 
         if (isDifferent) {
-            setProjectData(formik.values);
+            setProjectData((prev) => ({ ...prev, ...formik.values })); // Merged con projectData esistente
             previousProjectDataRef.current = formik.values; // Aggiorna il riferimento
         }
     }, [formik.values, setProjectData]);
@@ -187,7 +187,7 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                             onChange={(event, newValue) => {
                                 const id = newValue ? newValue.id : null;
                                 formik.setFieldValue('soaCategoryId', id);
-                                setProjectData((prev) => ({ ...prev, soaCategoryId: id }));
+                                setProjectData((prev) => ({ ...prev, soaCategoryId: id, ...formik.values }));
                             }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona SOA" variant="outlined" />
@@ -204,7 +204,7 @@ const GeneralForm = ({ projectData, setProjectData, onValidationChange }) => {
                             onChange={(event, newValue) => {
                                 const id = newValue ? newValue.id : null;
                                 formik.setFieldValue('soaClassificationId', id);
-                                setProjectData((prev) => ({ ...prev, soaClassificationId: id }));
+                                setProjectData((prev) => ({ ...prev, soaClassificationId: id, ...formik.values }));
                             }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Seleziona Classificazione SOA" variant="outlined" />

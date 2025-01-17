@@ -41,7 +41,8 @@ public class SubjectsController : ControllerBase
         .Select(u => new SearchSubjectDTO
         {
           UserId = u.User.Id,
-          Name = $"{u.User.FirstName} {u.User.LastName}",
+          FirstName =u.User.FirstName,
+          LastName = u.User.LastName,
           Email = u.User.Email,
           CfPiva = u.Company.VatOrTaxCode,
           Cf = u.User.TaxCode,

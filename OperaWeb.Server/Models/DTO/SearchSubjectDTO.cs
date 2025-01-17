@@ -10,7 +10,12 @@
     /// <summary>
     /// Nome del soggetto.
     /// </summary>
-    public string Name { get; set; }
+    public string FirstName { get; set; }
+
+    /// <summary>
+    /// Cognome del soggetto.
+    /// </summary>
+    public string LastName { get; set; }
 
     /// <summary>
     /// Email del soggetto.

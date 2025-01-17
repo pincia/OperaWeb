@@ -20,7 +20,7 @@ const generale = {
     children: [
         {
             id: 'home',
-            title: <FormattedMessage id="Home" />,
+            title: <FormattedMessage id="home" />,
             type: 'item',
             url: 'general/default',
             icon: icons.IconHome,
@@ -28,7 +28,7 @@ const generale = {
         },
         {
             id: 'nuovo',
-            title: <FormattedMessage id="Nuovo" />,
+            title: <FormattedMessage id="nuovo" />,
             type: 'item',
             url: 'templates',
             icon: icons.IconFileAnalytics,
@@ -36,7 +36,7 @@ const generale = {
         },
         {
             id: 'apri',
-            title: <FormattedMessage id="Apri" />,
+            title: <FormattedMessage id="apri" />,
             type: 'item',
             url: 'projects',
             icon: icons.IconFolder,

@@ -4,7 +4,8 @@ import { Button, Tooltip, IconButton } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 export default function SubjectsTable({ subjects, onDelete }) {
     const columns = [
-        { field: 'name', headerName: 'Soggetto', flex: 1 },
+        { field: 'firstName', headerName: 'Nome', flex: 1 },
+        { field: 'lastName', headerName: 'Cognome', flex: 1 },
         { field: 'cf', headerName: 'CF', flex: 1 },
         { field: 'email', headerName: 'Email', flex: 1 },
         { field: 'company', headerName: 'Azienda', flex: 1 },
@@ -16,7 +17,7 @@ export default function SubjectsTable({ subjects, onDelete }) {
             headerName: 'Azioni',
             flex: 0.5,
             renderCell: (params) => (
-                <Tooltip title="eliomina">
+                <Tooltip title="eliimina">
                     <IconButton color="primary" onClick={() => onDelete(params.row.id)}>
                         <DeleteOutlineOutlinedIcon />
                     </IconButton>

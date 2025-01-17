@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 const validationSchema = yup.object({
     speseGenerali: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
-    utileImpresa: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
+    utiliImpresa: yup.number().min(0, 'Valore minimo 0').required('Campo obbligatorio'),
     metodo: yup.string().required('Campo obbligatorio'),
     applicataA: yup.string().required('Campo obbligatorio'),
 });
@@ -14,7 +14,7 @@ export default function AnalysisConfigurationForm({ projectData, setProjectData,
     const formik = useFormik({
         initialValues: {
             speseGenerali: projectData?.configurations?.analisi?.speseGenerali || 0,
-            utileImpresa: projectData?.configurations?.analisi?.utileImpresa || 0,
+            utiliImpresa: projectData?.configurations?.analisi?.utiliImpresa || 0,
             metodo: projectData?.configurations?.analisi?.metodo || 0,
             applicataA: projectData?.configurations?.analisi?.applicataA || 0,
         },
@@ -40,7 +40,7 @@ export default function AnalysisConfigurationForm({ projectData, setProjectData,
                 analisi: {
                     ...prev.configurations?.analisi,
                     speseGenerali: formik.values.speseGenerali,
-                    utiliImpresa: formik.values.utileImpresa,
+                    utiliImpresa: formik.values.utiliImpresa,
                     metodo: formik.values.metodo,
                     applicataA: formik.values.applicataA,
                 },
@@ -48,7 +48,7 @@ export default function AnalysisConfigurationForm({ projectData, setProjectData,
         }));
     }, [
         formik.values.speseGenerali,
-        formik.values.utileImpresa,
+        formik.values.utiliImpresa,
         formik.values.metodo,
         formik.values.applicataA,
         setProjectData,
@@ -99,12 +99,12 @@ export default function AnalysisConfigurationForm({ projectData, setProjectData,
                         <FormLabel>Utile Impresa</FormLabel>
                         <TextField
                             type="number"
-                            name="utileImpresa"
-                            value={formik.values.utileImpresa}
+                            name="utiliImpresa"
+                            value={formik.values.utiliImpresa}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            error={formik.touched.utileImpresa && Boolean(formik.errors.utileImpresa)}
-                            helperText={formik.touched.utileImpresa && formik.errors.utileImpresa}
+                            error={formik.touched.utiliImpresa && Boolean(formik.errors.utiliImpresa)}
+                            helperText={formik.touched.utiliImpresa && formik.errors.utiliImpresa}
                             variant="outlined"
                         />
                     </FormControl>

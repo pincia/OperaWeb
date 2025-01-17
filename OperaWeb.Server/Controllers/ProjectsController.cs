@@ -61,7 +61,7 @@ namespace OperaWeb.Server.Controllers
           return NotFound($"Progetto con ID {id} non trovato.");
         }
 
-        return Ok(result); // Restituisce il progetto aggiornato
+        return Ok(result);
       }
       catch (Exception ex)
       {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { openSnackbar } from 'store/slices/snackbar';
 import PropTypes from 'prop-types';
 import {
     Button,
@@ -25,6 +24,8 @@ import EconomicsForm from 'ui-component/ProjectForms/EconomicsForm';
 import { saveProject } from 'api/projects';
 import { ThemeMode } from 'config';
 import { useDispatch } from 'react-redux';
+import { openSnackbar } from 'store/slices/snackbar';
+
 function a11yProps(index) {
     return {
         id: `simple-tab-${index}`,
@@ -37,6 +38,14 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [validationState, setValidationState] = useState({
+        generalForm: true,
+        configurationsForm: true,
+        subjectsForm: true,
+        tasksForm: true,
+        economicsForm: true,
+    });
+
     const dispatch = useDispatch();
 
     const handleTabChange = (event, newValue) => {
@@ -47,24 +56,30 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
         setIsSaving(true);
         try {
             await saveProject(projectData.id, projectData);
-            dispatch(openSnackbar({
-                open: true,
-                message: 'Progetto salvato con successo!',
-                variant: 'alert',
-                alert: { color: 'success' },
-            }));
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'Progetto salvato con successo!',
+                    variant: 'alert',
+                    alert: { color: 'success' },
+                })
+            );
         } catch (error) {
-            dispatch(openSnackbar({
-                open: true,
-                message: 'Errore durante il salvataggio del progetto.',
-                variant: 'alert',
-                alert: { color: 'error' },
-            }));
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'Errore durante il salvataggio del progetto.',
+                    variant: 'alert',
+                    alert: { color: 'error' },
+                })
+            );
         } finally {
             setIsSaving(false);
             setIsConfirmOpen(false);
         }
     };
+
+    const isFormValid = Object.values(validationState).every((isValid) => isValid);
 
     return (
         <>
@@ -102,42 +117,57 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                 <GeneralForm
                                     projectData={projectData}
                                     setProjectData={setProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Dati Generali:', isValid)}
+                                    onValidationChange={(isValid) =>
+                                        setValidationState((prev) => ({ ...prev, generalForm: isValid }))
+                                    }
                                 />
                             )}
                             {activeTab === 1 && (
                                 <ConfigurationsForm
                                     projectData={projectData}
                                     setProjectData={setProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Configurazioni:', isValid)}
+                                    onValidationChange={(isValid) =>
+                                        setValidationState((prev) => ({ ...prev, configurationsForm: isValid }))
+                                    }
                                 />
                             )}
                             {activeTab === 2 && (
                                 <SubjectsForm
                                     projectData={projectData}
                                     setProjectData={setProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Configurazioni:', isValid)}
+                                    onValidationChange={(isValid) =>
+                                        setValidationState((prev) => ({ ...prev, subjectsForm: isValid }))
+                                    }
                                 />
                             )}
                             {activeTab === 3 && (
                                 <TasksForm
                                     projectData={projectData}
                                     setProjectData={setProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Lavorazioni:', isValid)}
+                                    onValidationChange={(isValid) =>
+                                        setValidationState((prev) => ({ ...prev, tasksForm: isValid }))
+                                    }
                                 />
                             )}
                             {activeTab === 4 && (
                                 <EconomicsForm
                                     projectData={projectData}
                                     setProjectData={setProjectData}
-                                    onValidationChange={(isValid) => console.log('Validazione Quadro Economico:', isValid)}
+                                    onValidationChange={(isValid) =>
+                                        setValidationState((prev) => ({ ...prev, economicsForm: isValid }))
+                                    }
                                 />
                             )}
                         </Grid>
                     </Grid>
                 </Box>
             </MainCard>
-            <Button variant="contained" onClick={() => setIsConfirmOpen(true)} sx={{ my: 3, ml: 1 }}>
+            <Button
+                variant="contained"
+                onClick={() => setIsConfirmOpen(true)}
+                disabled={!isFormValid}
+                sx={{ my: 3, ml: 1 }}
+            >
                 Salva Dati Progetto
             </Button>
             <Dialog open={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
