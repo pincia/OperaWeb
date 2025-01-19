@@ -26,7 +26,7 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; }
-    //public virtual CapitoliCategoria CapitoliCategoria { get; set; }
-    //public int CapitoliCategoriaID { get; set; }
+    public Categoria? Categoria { get; set; }
+    public int? CategoriaId { get; set; }
   }
 }

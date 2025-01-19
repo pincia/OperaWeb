@@ -97,13 +97,13 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
 
     //TODO: Validare il form
     useEffect(() => {
-        // Imposta il form come sempre valido
+        /* Imposta il form come sempre valido*/
         onValidationChange(true);
     }, [onValidationChange]);
 
     return (
         <Box sx={{ padding: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-            <Box sx={{ flex: 4 }}>
+            <Box sx={{ flex: 3 }}>
                 <TaskTreeView
                     tasks={tasks}
                     setTasks={setTasks}
@@ -117,15 +117,17 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
                     defaultTaskIds={defaultTaskIds}
                 />
             </Box>
-            <Box sx={{ flex: 4 }}>
+            <Box sx={{ flex: 7 }}>
                 <EntryList
                     selectedTaskEntries={selectedTaskEntries}
+                    tasks={tasks}
                     setTasks={setTasks}
                     setProjectData={setProjectData}
                     setSnackbar={setSnackbar}
                     taskId={task.id}
                     setSelectedTaskEntries={setSelectedTaskEntries}
                     snackbar={snackbar}
+                    generateId={generateId}
                 />
             </Box>
 
@@ -150,6 +152,7 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
                 taskId={task.id}
                 setSnackbar={setSnackbar}
                 setSelectedTaskEntries={setSelectedTaskEntries}
+                generateId={generateId}
             />
 
             <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleSnackbarClose}>

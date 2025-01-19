@@ -44,7 +44,7 @@ namespace OperaWeb.API.Test
       var lines = File.ReadAllLines(_currentPath + "\\XPVE\\test.xpve");
       var xmlString =  String.Join("", lines.Skip(1));
 
-      _manager.ImportDataAsync(xmlString, newProject,"");
+      _manager.ImportProjectDataAsync(xmlString, newProject,"");
     }
   }
 }

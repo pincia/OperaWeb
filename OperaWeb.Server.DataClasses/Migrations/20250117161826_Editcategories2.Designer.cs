@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250117161826_Editcategories2")]
+    partial class Editcategories2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,7 +334,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SuperCategoriaId")
+                    b.Property<int>("SuperCategoriaId")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
@@ -1113,7 +1116,7 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int?>("CategoriaId")
+                    b.Property<int>("CategoriaId")
                         .HasColumnType("int");
 
                     b.Property<string>("CodFase")
@@ -1204,9 +1207,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ExternalID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("JobType")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Percentuale")
@@ -1468,9 +1468,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("JobType")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Prezzo")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
@@ -1698,7 +1695,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasOne("OperaWeb.Server.DataClasses.Models.SuperCategoria", "SuperCategoria")
                         .WithMany()
-                        .HasForeignKey("SuperCategoriaId");
+                        .HasForeignKey("SuperCategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
 
@@ -1913,7 +1912,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Categoria", "Categoria")
                         .WithMany()
-                        .HasForeignKey("CategoriaId");
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithMany("SubCategorie")

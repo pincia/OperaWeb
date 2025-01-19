@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using OperaWeb.SharedClasses.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OperaWeb.Server.DataClasses.Models
 {
@@ -21,6 +22,8 @@ namespace OperaWeb.Server.DataClasses.Models
     public decimal Percentuale { get; set; }
 
     public string Codice { get; set; }
+
+    public JobTypes JobType { get; set; }
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; }

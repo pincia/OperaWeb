@@ -25,5 +25,8 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public virtual Project Project { get; set; }
     public int ProjectID { get; set; }
+
+    public SuperCategoria? SuperCategoria {get; set; }
+    public int? SuperCategoriaId { get; set; }
   }
 }

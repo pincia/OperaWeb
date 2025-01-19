@@ -48,6 +48,10 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
 
     const dispatch = useDispatch();
 
+    const handleValidationChange = React.useCallback((formName, isValid) => {
+    //TODO: cosa fare nel caso il form sia valido
+    }, []);
+
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
     };
@@ -118,7 +122,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                     projectData={projectData}
                                     setProjectData={setProjectData}
                                     onValidationChange={(isValid) =>
-                                        setValidationState((prev) => ({ ...prev, generalForm: isValid }))
+                                        handleValidationChange('generalForm', isValid)
                                     }
                                 />
                             )}
@@ -127,7 +131,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                     projectData={projectData}
                                     setProjectData={setProjectData}
                                     onValidationChange={(isValid) =>
-                                        setValidationState((prev) => ({ ...prev, configurationsForm: isValid }))
+                                        handleValidationChange('configurationForm', isValid)
                                     }
                                 />
                             )}
@@ -136,7 +140,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                     projectData={projectData}
                                     setProjectData={setProjectData}
                                     onValidationChange={(isValid) =>
-                                        setValidationState((prev) => ({ ...prev, subjectsForm: isValid }))
+                                        handleValidationChange('subjectsForm', isValid)
                                     }
                                 />
                             )}
@@ -145,7 +149,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                     projectData={projectData}
                                     setProjectData={setProjectData}
                                     onValidationChange={(isValid) =>
-                                        setValidationState((prev) => ({ ...prev, tasksForm: isValid }))
+                                        handleValidationChange('tasksForm', isValid)
                                     }
                                 />
                             )}
@@ -154,7 +158,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                                     projectData={projectData}
                                     setProjectData={setProjectData}
                                     onValidationChange={(isValid) =>
-                                        setValidationState((prev) => ({ ...prev, economicsForm: isValid }))
+                                        handleValidationChange('economicsForm', isValid)
                                     }
                                 />
                             )}

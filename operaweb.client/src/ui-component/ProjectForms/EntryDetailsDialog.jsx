@@ -1,4 +1,4 @@
-import React from 'react';
+ï»¿import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem } from '@mui/material';
 
 export default function EntryDetailsDialog({
@@ -9,7 +9,8 @@ export default function EntryDetailsDialog({
     setTasks,
     taskId,
     setSnackbar,
-    setSelectedTaskEntries
+    setSelectedTaskEntries,
+    generateId
 }) {
     const unitOptions = ['kg', 'm', 'piece'];
 
@@ -56,7 +57,7 @@ export default function EntryDetailsDialog({
             return;
         }
 
-        const newEntry = { ...entry, id: new Date().getTime() };
+        const newEntry = { ...entry, id: generateId() };
 
         setTasks((prevTasks) => {
             const updatedTasks = addEntryToTask(prevTasks, taskId, newEntry);
@@ -98,22 +99,16 @@ export default function EntryDetailsDialog({
                         required
                     />
                     <TextField
-                        label="Unità di Misura"
+                        label="Unit di Misura"
                         name="unit"
                         value={entry.unit}
                         onChange={handleInputChange}
-                        select
                         fullWidth
                         required
                     >
-                        {unitOptions.map((option) => (
-                            <MenuItem key={option} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
                     </TextField>
                     <TextField
-                        label="Prezzo (€)"
+                        label="Prezzo â‚¬"
                         name="price"
                         value={entry.price}
                         onChange={handleInputChange}

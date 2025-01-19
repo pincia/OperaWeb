@@ -12,7 +12,6 @@
       public DateTime StartDate { get; set; } // Data di inizio del task
       public int Duration { get; set; } // Durata in giorni
       public double? Progress { get; set; } // Avanzamento tra 0 e 1
-
       // Proprietà opzionali
       public int? ParentId { get; set; } // ID del task genitore (null per i task principali)
       public bool? Open { get; set; } // Se il task è espanso o collassato (solo per task con figli)

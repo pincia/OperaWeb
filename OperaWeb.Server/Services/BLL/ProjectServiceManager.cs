@@ -43,7 +43,7 @@ namespace OperaWeb.Server.Services.BLL
     /// <param name="newProject"></param>
     /// <param name="connectionId"></param>
     /// <returns></returns>
-    public async Task<ImportResult> ImportDataAsync(string xmlString, Project newProject, string connectionId)
+    public async Task<ImportResult> ImportProjectDataAsync(string xmlString, Project newProject, string connectionId)
     {
       _logger.Log(LogLevel.Information, $"[ImportData] Start Import Data for project: {newProject}");
 
@@ -125,7 +125,8 @@ namespace OperaWeb.Server.Services.BLL
               CodFase = c.CodFase,
               Percentuale = c.Percentuale,
               Codice = c.Codice,
-              Project = importedProject.Entity
+              Project = importedProject.Entity,
+              JobType = JobTypes.Misura
             }).ToList();
 
         var subCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie
@@ -235,6 +236,20 @@ namespace OperaWeb.Server.Services.BLL
             JobType = JobTypes.Misura
           };
 
+
+          //Aggiorno gli id esterni delle categorie
+          if(voceComputo.Categoria != null && voceComputo.SuperCategoria != null && voceComputo.Categoria.SuperCategoriaId == null)
+          {
+            voceComputo.Categoria.SuperCategoria = voceComputo.SuperCategoria;
+            _context.SaveChanges();
+          }
+
+          if (voceComputo.SubCategoria != null && voceComputo.Categoria != null && voceComputo.SubCategoria.CategoriaId == null)
+          {
+            voceComputo.SubCategoria.Categoria = voceComputo.Categoria;
+            _context.SaveChanges();
+          }
+          var totVoceAmount = 0m;
           foreach (var misura in voce.PweVCMisure)
           {
             var nuovaMisura = new Misura
@@ -249,24 +264,22 @@ namespace OperaWeb.Server.Services.BLL
               Flags = misura.Flags,
               VoceComputo = voceComputo
             };
-
             misure.Add(nuovaMisura);
-            totalAmount += nuovaMisura.Quantita.GetValueOrDefault() * (voceComputo.ElencoPrezzo?.Prezzo1 ?? 0);
+            totVoceAmount += nuovaMisura.Quantita * voceComputo?.ElencoPrezzo?.Prezzo1 ?? 0;
           }
 
+          voceComputo.Prezzo = totVoceAmount;
           vociComputo.Add(voceComputo);
         }
-
+        importedProject.Entity.TotalAmount = totalAmount;
         _context.VociComputo.AddRange(vociComputo);
-        _context.Misure.AddRange(misure);
+        _context.Misure.AddRange(misure);    
         await _context.SaveChangesAsync();
         await CreateGanttTasksAsync(importedProject.Entity, vociComputo);
         result.EntitiesImported["VociComputo"] = vociComputo.Count;
         result.EntitiesImported["Misure"] = misure.Count;
 
-        // Salvataggio finale
-        importedProject.Entity.TotalAmount = totalAmount;
- 
+   
         transaction.Commit();
         result.ImportedProject = ProjectMapper.ToProjectDTO(importedProject.Entity, true);
 

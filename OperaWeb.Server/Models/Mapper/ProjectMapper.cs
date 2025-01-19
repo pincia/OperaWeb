@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Project;
 using OperaWeb.Server.Models.DTO.Project.ProjectManagement.Models.DTO;
+using OperaWeb.SharedClasses.Enums;
 using System.Diagnostics.CodeAnalysis;
 
 namespace OperaWeb.Server.Models.Mapper
@@ -134,11 +136,18 @@ namespace OperaWeb.Server.Models.Mapper
           Children = new List<JobDTO>(),
           Level = 1,
           OriginalId = -1,
-          HasEntry = false
+          HasEntry = false,
+          Entries = new List<EntryDTO>(),
         };
 
         dtoProject.Jobs.Add(lavoroAMisura);
 
+        // Creazione di un dizionario per velocizzare l'accesso ai JobDTO di SuperCategoria, Categoria e SubCategoria
+        var superCategoryLookup = new Dictionary<int, JobDTO>();
+        var categoryLookup = new Dictionary<int, JobDTO>();
+        var subCategoryLookup = new Dictionary<int, JobDTO>();
+
+        // Itera sulle SuperCategorie per creare i nodi di livello 2
         foreach (var superCategory in model.SuperCategorie)
         {
           var superCategoryDTO = new JobDTO
@@ -146,92 +155,102 @@ namespace OperaWeb.Server.Models.Mapper
             Id = superCategory.ID.ToString(),
             Description = superCategory.DesSintetica,
             Children = new List<JobDTO>(),
-            ParentId = lavoroAMisura.Id.ToString(),
-            Entries = new List<EntryDTO>(),
+            ParentId = lavoroAMisura.Id,
             Level = 2,
             OriginalId = superCategory.ID,
+            Entries = new List<EntryDTO>(),
             HasEntry = false
           };
 
+          superCategoryLookup[superCategory.ID] = superCategoryDTO;
           lavoroAMisura.Children.Add(superCategoryDTO);
+        }
 
-          if (vociComputoLookup.TryGetValue(superCategory.ID, out var vociCollegate))
+        // Itera sulle Categorie per creare i nodi di livello 3
+        foreach (var category in model.Categorie)
+        {
+          if (category.SuperCategoriaId.HasValue && superCategoryLookup.TryGetValue(category.SuperCategoriaId.Value, out var parentSuperCategory))
           {
-            foreach (var voce in vociCollegate)
+            var categoryDTO = new JobDTO
             {
-              if (!elencoPrezziLookup.TryGetValue(voce.ElencoPrezzoID, out var prezzo))
-                continue;
+              Id = category.ID.ToString(),
+              Description = category.DesSintetica,
+              Children = new List<JobDTO>(),
+              ParentId = parentSuperCategory.Id,
+              Level = 3,
+              OriginalId = category.ID,
+              HasEntry = false,
+              Entries = new List<EntryDTO>()
+            };
 
-              var entryDTO = new EntryDTO
-              {
-                Id = voce.ID,
-                Unit = prezzo.UnMisura,
-                Description = prezzo.DesBreve,
-                Code = prezzo.Tariffa,
-                Price = prezzo.Prezzo1,
-                Measurements = voce.Misure?.Select(m => new MeasurementDTO
-                {
-                  Id = m.ID,
-                  Quantita = m.Quantita ?? 0,
-                  Description = m.Descrizione,
-                  Lunghezza = m.Lunghezza ?? 0,
-                  Larghezza = m.Larghezza ?? 0,
-                  HPeso = m.HPeso ?? 0
-                }).ToList() ?? new List<MeasurementDTO>()
-              };
-
-              var parentDTO = superCategoryDTO;
-
-              if (voce.Categoria != null)
-              {
-                var categoryDTO = superCategoryDTO.Children.FirstOrDefault(j => j.Level == 3 && j.OriginalId == voce.CategoriaID);
-                if (categoryDTO == null)
-                {
-                  categoryDTO = new JobDTO
-                  {
-                    Id = voce.Categoria.ID.ToString(),
-                    Description = voce.Categoria.DesSintetica,
-                    Children = new List<JobDTO>(),
-                    Level = 3,
-                    OriginalId = voce.Categoria.ID,
-                    Entries = new List<EntryDTO>(),
-                    HasEntry = false
-                  };
-                  superCategoryDTO.Children.Add(categoryDTO);
-                }
-
-                parentDTO = categoryDTO;
-              }
-
-              if (voce.SubCategoria != null)
-              {
-                var subCategoryDTO = parentDTO.Children.FirstOrDefault(j => j.Level == 4 && j.OriginalId == voce.SubCategoriaID);
-                if (subCategoryDTO == null)
-                {
-                  subCategoryDTO = new JobDTO
-                  {
-                    Id = voce.SubCategoria.ID.ToString(),
-                    Description = voce.SubCategoria.DesSintetica,
-                    Children = new List<JobDTO>(),
-                    Level = 4,
-                    OriginalId = voce.SubCategoria.ID,
-                    Entries = new List<EntryDTO>(),
-                    HasEntry = true
-                  };
-                  parentDTO.Children.Add(subCategoryDTO);
-                }
-
-                subCategoryDTO.Entries.Add(entryDTO);
-              }
-              else
-              {
-                parentDTO.HasEntry = true;
-                parentDTO.Entries.Add(entryDTO);
-              }
-            }
+            categoryLookup[category.ID] = categoryDTO;
+            parentSuperCategory.Children.Add(categoryDTO);
           }
         }
 
+        // Itera sulle SubCategorie per creare i nodi di livello 4
+        foreach (var subCategory in model.SubCategorie)
+        {
+          if (subCategory.CategoriaId.HasValue && categoryLookup.TryGetValue(subCategory.CategoriaId.Value, out var parentCategory))
+          {
+            var subCategoryDTO = new JobDTO
+            {
+              Id = subCategory.ID.ToString(),
+              Description = subCategory.DesSintetica,
+              Children = new List<JobDTO>(),
+              ParentId = parentCategory.Id,
+              Level = 4,
+              OriginalId = subCategory.ID,
+              Entries = new List<EntryDTO>(),
+              HasEntry = true
+            };
+
+            subCategoryLookup[subCategory.ID] = subCategoryDTO;
+            parentCategory.Children.Add(subCategoryDTO);
+          }
+        }
+
+        // Itera sulle VociComputo (EntryDTO) e assegna le voci alle SubCategorie, Categorie o SuperCategorie
+        foreach (var voce in model.VociComputo)
+        {
+          var entryDTO = new EntryDTO
+          {
+            Id = voce.ID.ToString(),
+            Unit = voce.ElencoPrezzo?.UnMisura,
+            Description = voce.ElencoPrezzo?.DesBreve,
+            Code = voce.ElencoPrezzo?.Tariffa,
+            Price = voce.Prezzo,
+            OriginalVoceVomputoId = voce.ID,
+            OriginalElencoPrezzoId = voce.ElencoPrezzoID,
+            Measurements = voce.Misure?.Select(m => new MeasurementDTO
+            {
+              Id = m.ID.ToString(),
+              Quantita = m.Quantita ?? 0,
+              Description = m.Descrizione,
+              Lunghezza = m.Lunghezza ?? 0,
+              Larghezza = m.Larghezza ?? 0,
+              OriginalId = m.ID,
+              HPeso = m.HPeso ?? 0
+            }).ToList() ?? new List<MeasurementDTO>()
+          };
+
+          // Verifica a quale nodo assegnare l'EntryDTO
+          if (voce.SubCategoriaID.HasValue && subCategoryLookup.TryGetValue(voce.SubCategoriaID.Value, out var parentSubCategory))
+          {
+            parentSubCategory.HasEntry = true;
+            parentSubCategory.Entries.Add(entryDTO);
+          }
+          else if (voce.CategoriaID.HasValue && categoryLookup.TryGetValue(voce.CategoriaID.Value, out var parentCategory))
+          {
+            parentCategory.HasEntry = true;
+            parentCategory.Entries.Add(entryDTO);
+          }
+          else if (voce.SuperCategoriaID.HasValue && superCategoryLookup.TryGetValue(voce.SuperCategoriaID.Value, out var parentSuperCategory))
+          {
+            parentSuperCategory.HasEntry = true;
+            parentSuperCategory.Entries.Add(entryDTO);
+          }
+        }
         return dtoProject;
       }
       catch (Exception ex)
@@ -280,6 +299,7 @@ namespace OperaWeb.Server.Models.Mapper
           Name = task.Text,
           StartDate = task.StartDate,
           Duration = task.Duration,
+          Description = "",
           Progress = (decimal)task.Progress,
           ParentId = task.ParentId,
           EndDate = task.EndDate ?? task.StartDate.AddDays(task.Duration),
@@ -294,7 +314,6 @@ namespace OperaWeb.Server.Models.Mapper
         var subCategoryLookup = project.SubCategorie?.ToDictionary(sc => sc.ID) ?? new Dictionary<int, SubCategoria>();
         var priceListLookup = project.ElencoPrezzi?.ToDictionary(ep => ep.ID) ?? new Dictionary<int, ElencoPrezzo>();
         var vociComputoLookup = project.VociComputo?.ToDictionary(vc => vc.ID) ?? new Dictionary<int, VoceComputo>();
-
         // Lavorazioni
         foreach (var job in dto.Jobs[0].Children)
         {
@@ -303,17 +322,18 @@ namespace OperaWeb.Server.Models.Mapper
           if (superCategory == null)
           {
             superCategory = new SuperCategoria
-                {
-                  ExternalID = -1,
-                  DesSintetica = job.Description,
-                  DesEstesa = "",
-                  DataInit = DateTime.Now,
-                  Durata = 0,
-                  CodFase = "",
-                  Percentuale = 0,
-                  Codice = "",
-                  ProjectID = project.ID
-                };
+            {
+              ExternalID = -1,
+              DesSintetica = job.Description,
+              DesEstesa = "",
+              DataInit = DateTime.Now,
+              Durata = 0,
+              CodFase = "",
+              Percentuale = 0,
+              Codice = "",
+              ProjectID = project.ID,
+              JobType = JobTypes.Misura
+            };
 
             project.SuperCategorie.Add(superCategory);
           }
@@ -338,7 +358,8 @@ namespace OperaWeb.Server.Models.Mapper
                 CodFase = "",
                 Percentuale = 0,
                 Codice = "",
-                ProjectID = project.ID
+                ProjectID = project.ID,
+                SuperCategoria = superCategory
               };
 
               project.Categorie.Add(category);
@@ -360,11 +381,12 @@ namespace OperaWeb.Server.Models.Mapper
                   DesSintetica = subChildJob.Description,
                   DesEstesa = "",
                   DataInit = DateTime.Now,
-                  Durata = 0, 
+                  Durata = 0,
                   CodFase = "",
                   Percentuale = 0,
-                  Codice = "", 
-                  ProjectID = project.ID
+                  Codice = "",
+                  ProjectID = project.ID,
+                  Categoria = category
                 };
                 project.SubCategorie.Add(subCategory);
               }
@@ -375,17 +397,16 @@ namespace OperaWeb.Server.Models.Mapper
 
               foreach (var entry in subChildJob.Entries)
               {
-                var priceList = priceListLookup.GetValueOrDefault(entry.Id);
+                var priceList = priceListLookup.GetValueOrDefault(entry.OriginalElencoPrezzoId);
 
                 if (priceList == null)
                 {
                   priceList = new ElencoPrezzo
                   {
-                    ID = entry.Id,
                     UnMisura = entry.Unit,
                     DesBreve = entry.Description,
                     Tariffa = entry.Code,
-                    Prezzo1 = entry.Price
+                    Prezzo1 = entry.Price / entry.Measurements.Sum(m=>m.Quantita)
                   };
                   project.ElencoPrezzi.Add(priceList);
                 }
@@ -394,46 +415,80 @@ namespace OperaWeb.Server.Models.Mapper
                   priceList.UnMisura = entry.Unit;
                   priceList.DesBreve = entry.Description;
                   priceList.Tariffa = entry.Code;
-                  priceList.Prezzo1 = entry.Price;
+                  priceList.Prezzo1 = entry.Price / entry.Measurements.Sum(m => m.Quantita);
                 }
 
-                var voceComputo = vociComputoLookup.GetValueOrDefault(entry.Id);
+                var voceComputo = vociComputoLookup.GetValueOrDefault(entry.OriginalVoceVomputoId);
                 if (voceComputo == null)
                 {
                   voceComputo = new VoceComputo
                   {
-                    ID = entry.Id,
-                    ElencoPrezzoID = entry.Id,
-                    SuperCategoriaID = superCategory.ID,
-                    CategoriaID = category.ID,
-                    SubCategoriaID = subCategory.ID,
-                    Quantita = entry.Measurements.Sum(m => m.Quantita)
+                    SuperCategoriaID = superCategory != null ?superCategory.ID : null,
+                    CategoriaID = category != null ?category.ID : null,
+                    SubCategoriaID = subCategory != null ? subCategory.ID : null,
+                    Quantita = entry.Measurements  != null ? entry.Measurements.Sum(m => m.Quantita) : 0,
+                    ElencoPrezzo = priceList,
+                    Misure = new List<Misura>()
                   };
 
-                  foreach (var measurement in entry.Measurements)
-                  {
-                    var newMeasurement = new Misura
-                    {
-                      ID = measurement.Id,
-                      Quantita = measurement.Quantita,
-                      Descrizione = measurement.Description,
-                      Lunghezza = measurement.Lunghezza,
-                      Larghezza = measurement.Larghezza,
-                      HPeso = measurement.HPeso
-                    };
-                    voceComputo.Misure.Add(newMeasurement);
-                  }
                   project.VociComputo.Add(voceComputo);
                 }
                 else
                 {
-                  voceComputo.Quantita = entry.Measurements.Sum(m => m.Quantita);
+                  voceComputo.Quantita = entry.Measurements != null ? entry.Measurements.Sum(m => m.Quantita) : 0;
                 }
+                var totVoce = 0m;
+                if (entry.Measurements != null)
+                {
+                
+                  foreach (var measurementDto in entry.Measurements)
+                  {
+                    var measurement = voceComputo.Misure.FirstOrDefault(m => m.ID == measurementDto.OriginalId);
+                    if (measurement == null)
+                    {
+                      measurement = new Misura
+                      {
+                        Quantita = measurementDto.Quantita,
+                        Descrizione = measurementDto.Description ?? "",
+                        Lunghezza = measurementDto.Lunghezza,
+                        Larghezza = measurementDto.Larghezza,
+                        HPeso = measurementDto.HPeso
+                      };
+                      voceComputo.Misure.Add(measurement);
+                    }
+                    else
+                    {
+                      measurement.Quantita = measurementDto.Quantita;
+                      measurement.Descrizione = measurementDto.Description  ?? "";
+                      measurement.Lunghezza = measurementDto.Lunghezza;
+                      measurement.Larghezza = measurementDto.Larghezza;
+                      measurement.HPeso = measurementDto.HPeso;
+                    }
+                    totVoce += measurement?.Quantita ?? 0;
+                  }
+                }
+                voceComputo.Quantita = totVoce;
               }
             }
           }
         }
 
+        var totalAmount = project?.VociComputo?
+        .SelectMany(v => v.Misure, (v, m) => new
+        {
+          Quantita = m.Quantita,
+          Prezzo1 = v.ElencoPrezzo?.Prezzo1 ?? 0 
+        })
+        .Sum(x => x.Quantita * x.Prezzo1) ?? 0;
+
+        var misure = project?.VociComputo?.SelectMany(v => v.Misure, (v, m) => new
+        {
+          Quantita = m.Quantita,
+          Prezzo1 = v.ElencoPrezzo?.Prezzo1 ?? 0
+        });
+
+
+        project.TotalAmount = totalAmount; 
 
         // Aggiorna o crea DatiGenerali
         if (dto.City != null || dto.Province != null || dto.Object != null)
@@ -470,7 +525,7 @@ namespace OperaWeb.Server.Models.Mapper
           project.Economics.AuctionVariationPercentage = dto.Economics.AuctionVariationPercentage;
           project.Economics.AvailableSums = dto.Economics.AvailableSums;
           project.Economics.TotalProjectCalculationType = dto.Economics.TotalProjectCalculationType;
-          
+
         }
 
         // Aggiorna ResourceTeamType se presente
@@ -543,7 +598,7 @@ namespace OperaWeb.Server.Models.Mapper
         if (dto.Subjects != null)
         {
           //remove subjects if canceled
-          if(project.ProjectSubjects != null && project.ProjectSubjects.Count > 0)
+          if (project.ProjectSubjects != null && project.ProjectSubjects.Count > 0)
           {
             var deletedSubjects = project.ProjectSubjects.Where(ps => !dto.Subjects.Any(ds => ds.Email == ps.Email))
            .ToList();

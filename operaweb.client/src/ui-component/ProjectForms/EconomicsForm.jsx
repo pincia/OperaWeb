@@ -179,11 +179,11 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
                 sx={{
                     width: name === 'AuctionVariationPercentage' ? '80px' : '200px',
                     marginRight: name === 'AuctionVariationPercentage' ? '20px' : '0',
-                    marginLeft: name === 'AuctionVariationPercentage' ? 'auto' : '0', // Sposta il campo verso destra solo per questo specifico campo
+                    marginLeft: name === 'AuctionVariationPercentage' ? 'auto' : '0', 
                     backgroundColor: readOnly ? 'rgba(240, 240, 240, 0.8)' : 'inherit',
                     fontWeight: readOnly ? 'bold' : 'normal',
                     pointerEvents: readOnly ? 'none' : 'auto',
-                    border: readOnly ? '2px solid grey' : '1px solid rgba(0, 0, 0, 0.23)',
+                    // border: readOnly ? '2px solid grey' : '1px solid rgba(0, 0, 0, 0.23)',
                     borderRadius: '4px',
                 }}
                 InputProps={{

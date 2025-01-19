@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250117163026_Editcategories3")]
+    partial class Editcategories3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1206,9 +1209,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<int>("ExternalID")
                         .HasColumnType("int");
 
-                    b.Property<int>("JobType")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Percentuale")
                         .HasColumnType("decimal(18,2)");
 
@@ -1467,9 +1467,6 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.Property<int>("JobType")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Prezzo")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");

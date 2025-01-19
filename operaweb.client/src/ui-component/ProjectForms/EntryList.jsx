@@ -34,11 +34,13 @@ import EditableCell from './EditableCell'
 export default function EntryList({
     selectedTaskEntries,
     setTasks,
+    tasks,
     setProjectData,
     setSnackbar,
     taskId,
     setSelectedTaskEntries,
-    snackbar
+    snackbar,
+    generateId
 }) {
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [menuAnchor2, setMenuAnchor2] = useState(null);
@@ -98,7 +100,8 @@ export default function EntryList({
     const handleDuplicateMeasurement = (entryId, measurement) => {
         const duplicate = {
             ...measurement,
-            id: Date.now(), // Genera un nuovo ID unico
+            id: generateId(), // Genera un nuovo ID unico+
+            originalId: -1
         };
 
         const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurement) => {
@@ -153,8 +156,8 @@ export default function EntryList({
 
 
     const handleMeasurementEdit = (entryId, measurementId, field, value) => {
-        setTasks((prevTasks) => {
-            const updatedTasks = prevTasks.map((task) => {
+        const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurementId, field, value) => {
+            return tasks.map((task) => {
                 if (task.id === taskId) {
                     return {
                         ...task,
@@ -174,13 +177,39 @@ export default function EntryList({
                         }),
                     };
                 }
+
+                // Ricorsione sui figli
+                if (task.children) {
+                    return {
+                        ...task,
+                        children: updateMeasurementsInHierarchy(
+                            task.children,
+                            taskId,
+                            entryId,
+                            measurementId,
+                            field,
+                            value
+                        ),
+                    };
+                }
+
                 return task;
             });
+        };
 
-            // Aggiorna projectData
+        setTasks((prevTasks) => {
+            const updatedTasks = updateMeasurementsInHierarchy(
+                prevTasks,
+                taskId,
+                entryId,
+                measurementId,
+                field,
+                value
+            );
+
             setProjectData((prevData) => ({
                 ...prevData,
-                tasks: [...updatedTasks], // Aggiorna i dati del progetto
+                jobs: updatedTasks, // Aggiorna il projectData con i task aggiornati
             }));
 
             const updatedTask = findTask(updatedTasks, taskId);
@@ -190,9 +219,10 @@ export default function EntryList({
     };
 
 
-    const handleMenuOpen = (event, task) => {
-        setMenuAnchor(event.currentTarget); // Imposta l'ancora per il menu delle voci
-        setMenuTask(task); // Salva la voce associata al menu
+    const handleMenuOpen = (event, entry) => {
+        console.log("Opening menu for entry:", entry);
+        setMenuAnchor(event.currentTarget); // Imposta l'ancora per il menu
+        setMenuTask(entry); // Salva la voce (entry) selezionata
     };
 
     const handleMeasurementMenuOpen = (event, measurement) => {
@@ -216,7 +246,7 @@ export default function EntryList({
 
     const handleAddMeasurement = (entryId) => {
         const newMeasurement = {
-            id: Date.now(),
+            id: generateId(),
             description: '',
             lunghezza: 0,
             larghezza: 0,
@@ -224,39 +254,7 @@ export default function EntryList({
             quantita: 0,
         };
 
-        const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurement) => {
-            return tasks.map((task) => {
-                if (task.id === taskId) {
-                    return {
-                        ...task,
-                        entries: task.entries.map((entry) => {
-                            if (entry.id === entryId) {
-                                return {
-                                    ...entry,
-                                    measurements: [...(entry.measurements || []), measurement], // Aggiunge la nuova misurazione
-                                };
-                            }
-                            return entry;
-                        }),
-                    };
-                }
-
-                if (task.children) {
-                    return {
-                        ...task,
-                        children: updateMeasurementsInHierarchy(
-                            task.children,
-                            taskId,
-                            entryId,
-                            measurement
-                        ),
-                    };
-                }
-
-                return task;
-            });
-        };
-
+      
         setTasks((prevTasks) => {
             const updatedTasks = updateMeasurementsInHierarchy(
                 prevTasks,
@@ -284,6 +282,39 @@ export default function EntryList({
             open: true,
             message: 'Nuova misurazione aggiunta.',
             severity: 'success',
+        });
+    };
+
+    const updateMeasurementsInHierarchy = (tasks, taskId, entryId, measurement) => {
+        return tasks.map((task) => {
+            if (task.id === taskId) {
+                return {
+                    ...task,
+                    entries: task.entries.map((entry) => {
+                        if (entry.id === entryId) {
+                            return {
+                                ...entry,
+                                measurements: [...(entry.measurements || []), measurement], // Aggiunge la nuova misurazione
+                            };
+                        }
+                        return entry;
+                    }),
+                };
+            }
+
+            if (task.children) {
+                return {
+                    ...task,
+                    children: updateMeasurementsInHierarchy(
+                        task.children,
+                        taskId,
+                        entryId,
+                        measurement
+                    ),
+                };
+            }
+
+            return task;
         });
     };
 
@@ -395,7 +426,7 @@ export default function EntryList({
                                         </TableCell>
                                         <TableCell>{entry.code}</TableCell>
                                         <TableCell>{entry.unit}</TableCell>
-                                        <TableCell>{getEntryPrice(entry)}</TableCell>
+                                        <TableCell>{entry.price}</TableCell>
                                         <TableCell>
                                             <IconButton onClick={(e) => handleMenuOpen(e, entry)}>
                                                 <MoreVertIcon />
@@ -407,7 +438,8 @@ export default function EntryList({
                                             >
                                                 <MenuItem
                                                     onClick={() => {
-                                                        handleAddMeasurement(entry.id); // Passa l'ID della voce selezionata
+                                                        console.log("Adding measurement to entry:", menuTask.id); 
+                                                        handleAddMeasurement(menuTask.id);
                                                         handleMenuClose();
                                                     }}
                                                 >

@@ -122,7 +122,7 @@ namespace OperaWeb.Server.Services
     {
       try
       {
-        var project = _context.Projects.Include(p => p.Categorie)
+        var project = _context.Projects
             .Include(p => p.DatiGenerali)
             .Include(p=>p.ProjectResourceTeamType)
             .Include(p => p.ConfigNumeri)
@@ -271,7 +271,7 @@ namespace OperaWeb.Server.Services
             sb.Append(await reader.ReadLineAsync());
           }
 
-          res = await _projectServiceManager.ImportDataAsync(sb.ToString(), new Project()
+          res = await _projectServiceManager.ImportProjectDataAsync(sb.ToString(), new Project()
           {
             User = user,
             CreationDate = DateTime.Now,

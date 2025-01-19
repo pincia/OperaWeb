@@ -16,7 +16,7 @@ namespace OperaWeb.Server.DataClasses.Models
     public decimal Quantita { get; set; }
     public DateTime DataMis { get; set; }
     public int Flags { get; set; }
-
+    public decimal Prezzo { get; set; }  
     public virtual SuperCategoria SuperCategoria { get; set; }
     public int? SuperCategoriaID { get; set; } // Cambiato in proprietà
 

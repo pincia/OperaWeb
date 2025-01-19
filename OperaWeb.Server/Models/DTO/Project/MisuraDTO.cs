@@ -4,7 +4,7 @@ namespace OperaWeb.Server.Models.DTO.Project
 {
   public class MisuraDTO
   {
-    public int ID { get; set; }
+    public string ID { get; set; }
     public int IDVV { get; set; }
 
     public string Descrizione { get; set; }
@@ -22,5 +22,6 @@ namespace OperaWeb.Server.Models.DTO.Project
     public int Flags { get; set; }
 
     public int VoceComputoID { get; set; }
+    public int OriginalId { get; set; }
   }
 }

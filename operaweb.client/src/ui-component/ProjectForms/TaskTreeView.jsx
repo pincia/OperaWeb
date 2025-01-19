@@ -48,6 +48,7 @@ export default function TaskTreeView({
     };
 
     const handleSelectTask = (taskId) => {
+        console.log('taskid selected: '+taskId)
         const selectedTask = findTask(tasks, taskId);
         setTask(selectedTask);
         if (selectedTask && selectedTask.entries) {
