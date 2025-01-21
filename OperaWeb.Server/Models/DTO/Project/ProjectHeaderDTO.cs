@@ -20,5 +20,6 @@ namespace OperaWeb.Server.Models.DTO.Project
     public int SoaCategoryId { get; set; }
     public string SoaClassification { get; set; }
     public int SoaClassificationId { get; set; }
+    public int Status { get; set; }
   }
 }

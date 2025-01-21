@@ -92,8 +92,7 @@ namespace OperaWeb.Server.Services
     public async Task<ProjectsListDTO> GetAllProjects(string userId)
     {
       var myProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
-      //TODO: INVOLVED PROJECTS
-      // var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
+      var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Include(p => p.ProjectSubjects).Where(p => p.Deleted == false && p.ProjectSubjects.Any(s=>s.UserId == userId)).ToList();
 
 
       return new ProjectsListDTO()
@@ -264,7 +263,7 @@ namespace OperaWeb.Server.Services
           StringBuilder sb = new StringBuilder();
           using var reader = new StreamReader(file.OpenReadStream());
 
-          await reader.ReadLineAsync();
+          // var Test = await reader.ReadLineAsync();
 
           while (reader.Peek() >= 0)
           {
@@ -327,6 +326,12 @@ namespace OperaWeb.Server.Services
       existingProject = ProjectMapper.ToProject(projectDto, existingProject.UserId, existingProject);
       existingProject.LastUpdateDate = DateTime.Now;
 
+      // Al primo salvataggio metto lo stato a created
+      if(existingProject.Status == ProjectStatus.Draft)
+      {
+        existingProject.Status = ProjectStatus.Created;
+      }
+
       // Aggiorna il database
       _context.Projects.Update(existingProject);
       await _context.SaveChangesAsync();
@@ -385,7 +390,7 @@ namespace OperaWeb.Server.Services
           Name = "Check incidenza manodopera",
         };
 
-        if (importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != null)
+        if (importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != null && importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera !=0)
         {
           incidenzaManodoperaCheck.Succeeded = true;
           incidenzaManodoperaCheck.Message = "Incidenza manodopera presente";
@@ -393,7 +398,7 @@ namespace OperaWeb.Server.Services
         else
         {
           incidenzaManodoperaCheck.Succeeded = false;
-          incidenzaManodoperaCheck.Message = "Tag di incidenza manodopera non presente.\r\nSarà necessario inserire un avlore di incidenza medio nella successiva configurazione del progetto.";
+          incidenzaManodoperaCheck.Message = "Tag di incidenza manodopera non presente.\r\nSarà necessario inserire un valore di incidenza sezione conto economico della configurazione del progetto.";
         }
         result.Checks.Add(incidenzaManodoperaCheck);
 

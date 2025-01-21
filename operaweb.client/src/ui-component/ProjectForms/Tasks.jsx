@@ -87,13 +87,50 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
     };
 
     useEffect(() => {
+        const calculateEconomics = (tasks) => {
+            let measuredWorks = 0;
+            let lumpSumWorks = 0;
+
+            // Funzione ricorsiva per scorrere i tasks e calcolare i valori
+            const traverseTasks = (tasks) => {
+                tasks.forEach((task) => {
+                    if (task.entries) {
+                        task.entries.forEach((entry) => {
+                            if (entry.jobType === 0) {
+                                measuredWorks += entry.price || 0;
+                            } else if (entry.jobType === 1) {
+                                lumpSumWorks += entry.price || 0;
+                            }
+                        });
+                    }
+                    if (task.children) {
+                        traverseTasks(task.children);
+                    }
+                });
+            };
+
+            traverseTasks(tasks);
+
+            return { measuredWorks, lumpSumWorks };
+        };
+
+        const { measuredWorks, lumpSumWorks } = calculateEconomics(tasks);
+
         setProjectData((prev) => {
-            if (JSON.stringify(prev.jobs) !== JSON.stringify(tasks)) {
-                return { ...prev, jobs: tasks };
-            }
-            return prev;
+            const updatedJobs = JSON.stringify(prev.jobs) !== JSON.stringify(tasks) ? tasks : prev.jobs;
+
+            return {
+                ...prev,
+                jobs: updatedJobs,
+                economics: {
+                    ...prev.economics,
+                    measuredWorks: parseFloat(measuredWorks.toFixed(2)),
+                    lumpSumWorks: parseFloat(lumpSumWorks.toFixed(2)),
+                },
+            };
         });
     }, [tasks, setProjectData]);
+
 
     //TODO: Validare il form
     useEffect(() => {

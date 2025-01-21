@@ -198,12 +198,12 @@ const EconomicsForm = ({ projectData, setProjectData, onValidationChange }) => {
     return (
         <Stack>
             <Box p={3}>
-                <Typography variant="h5" gutterBottom>
-                    Quadro Economico
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                    Gestione somme del progetto
-                </Typography>
+                {/*<Typography variant="h5" gutterBottom>*/}
+                {/*    Quadro Economico*/}
+                {/*</Typography>*/}
+                {/*<Typography variant="subtitle1" gutterBottom>*/}
+                {/*    Gestione somme del progetto*/}
+                {/*</Typography>*/}
                 <Typography variant="h3" gutterBottom mt={1}>
                     A) LAVORI
                 </Typography>

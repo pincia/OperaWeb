@@ -11,6 +11,12 @@ namespace OperaWeb.Server.Models.Mapper
 {
   public class ProjectMapper
   {
+    /// <summary>
+    /// Converts project in to dto
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="excludeTasks"></param>
+    /// <returns></returns>
     public static ProjectDTO ToProjectDTO(Project model, bool excludeTasks = false)
     {
       try
@@ -77,7 +83,8 @@ namespace OperaWeb.Server.Models.Mapper
           },
           Latitude = model.Latitude,
           Longitude = model.Longitude,
-          CompleteAddress = model.CompleteAddress,
+          Status = (int) model.Status,
+          CompleteAddress = model.CompleteAddress ?? "",
           Subjects = model.ProjectSubjects?.Select(subject => new SubjectDTO
           {
             FirstName = subject.FirstName,
@@ -147,67 +154,75 @@ namespace OperaWeb.Server.Models.Mapper
         var categoryLookup = new Dictionary<int, JobDTO>();
         var subCategoryLookup = new Dictionary<int, JobDTO>();
 
+        if (model.SuperCategorie != null)
+        {
         // Itera sulle SuperCategorie per creare i nodi di livello 2
-        foreach (var superCategory in model.SuperCategorie)
-        {
-          var superCategoryDTO = new JobDTO
+          foreach (var superCategory in model.SuperCategorie)
           {
-            Id = superCategory.ID.ToString(),
-            Description = superCategory.DesSintetica,
-            Children = new List<JobDTO>(),
-            ParentId = lavoroAMisura.Id,
-            Level = 2,
-            OriginalId = superCategory.ID,
-            Entries = new List<EntryDTO>(),
-            HasEntry = false
-          };
-
-          superCategoryLookup[superCategory.ID] = superCategoryDTO;
-          lavoroAMisura.Children.Add(superCategoryDTO);
-        }
-
-        // Itera sulle Categorie per creare i nodi di livello 3
-        foreach (var category in model.Categorie)
-        {
-          if (category.SuperCategoriaId.HasValue && superCategoryLookup.TryGetValue(category.SuperCategoriaId.Value, out var parentSuperCategory))
-          {
-            var categoryDTO = new JobDTO
+            var superCategoryDTO = new JobDTO
             {
-              Id = category.ID.ToString(),
-              Description = category.DesSintetica,
+              Id = superCategory.ID.ToString(),
+              Description = superCategory.DesSintetica,
               Children = new List<JobDTO>(),
-              ParentId = parentSuperCategory.Id,
-              Level = 3,
-              OriginalId = category.ID,
-              HasEntry = false,
-              Entries = new List<EntryDTO>()
-            };
-
-            categoryLookup[category.ID] = categoryDTO;
-            parentSuperCategory.Children.Add(categoryDTO);
-          }
-        }
-
-        // Itera sulle SubCategorie per creare i nodi di livello 4
-        foreach (var subCategory in model.SubCategorie)
-        {
-          if (subCategory.CategoriaId.HasValue && categoryLookup.TryGetValue(subCategory.CategoriaId.Value, out var parentCategory))
-          {
-            var subCategoryDTO = new JobDTO
-            {
-              Id = subCategory.ID.ToString(),
-              Description = subCategory.DesSintetica,
-              Children = new List<JobDTO>(),
-              ParentId = parentCategory.Id,
-              Level = 4,
-              OriginalId = subCategory.ID,
+              ParentId = lavoroAMisura.Id,
+              Level = 2,
+              OriginalId = superCategory.ID,
               Entries = new List<EntryDTO>(),
-              HasEntry = true
+              HasEntry = false
             };
 
-            subCategoryLookup[subCategory.ID] = subCategoryDTO;
-            parentCategory.Children.Add(subCategoryDTO);
+            superCategoryLookup[superCategory.ID] = superCategoryDTO;
+            lavoroAMisura.Children.Add(superCategoryDTO);
           }
+        }
+
+        if (model.Categorie != null)
+        {
+          // Itera sulle Categorie per creare i nodi di livello 3
+          foreach (var category in model.Categorie)
+          {
+            if (category.SuperCategoriaId.HasValue && superCategoryLookup.TryGetValue(category.SuperCategoriaId.Value, out var parentSuperCategory))
+            {
+              var categoryDTO = new JobDTO
+              {
+                Id = category.ID.ToString(),
+                Description = category.DesSintetica,
+                Children = new List<JobDTO>(),
+                ParentId = parentSuperCategory.Id,
+                Level = 3,
+                OriginalId = category.ID,
+                HasEntry = false,
+                Entries = new List<EntryDTO>()
+              };
+
+              categoryLookup[category.ID] = categoryDTO;
+              parentSuperCategory.Children.Add(categoryDTO);
+            }
+          }
+        }
+        // Itera sulle SubCategorie per creare i nodi di livello 4
+        if(model.SubCategorie != null)
+        {
+          foreach (var subCategory in model.SubCategorie)
+          {
+            if (subCategory.CategoriaId.HasValue && categoryLookup.TryGetValue(subCategory.CategoriaId.Value, out var parentCategory))
+            {
+              var subCategoryDTO = new JobDTO
+              {
+                Id = subCategory.ID.ToString(),
+                Description = subCategory.DesSintetica,
+                Children = new List<JobDTO>(),
+                ParentId = parentCategory.Id,
+                Level = 4,
+                OriginalId = subCategory.ID,
+                Entries = new List<EntryDTO>(),
+                HasEntry = true
+              };
+
+              subCategoryLookup[subCategory.ID] = subCategoryDTO;
+              parentCategory.Children.Add(subCategoryDTO);
+            }
+          }       
         }
 
         // Itera sulle VociComputo (EntryDTO) e assegna le voci alle SubCategorie, Categorie o SuperCategorie
@@ -222,6 +237,7 @@ namespace OperaWeb.Server.Models.Mapper
             Price = voce.Prezzo,
             OriginalVoceVomputoId = voce.ID,
             OriginalElencoPrezzoId = voce.ElencoPrezzoID,
+            JobType =(int) voce.JobType,
             Measurements = voce.Misure?.Select(m => new MeasurementDTO
             {
               Id = m.ID.ToString(),
@@ -259,7 +275,14 @@ namespace OperaWeb.Server.Models.Mapper
       }
     }
 
-
+    /// <summary>
+    /// Converts dto in to project entity
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <param name="userId"></param>
+    /// <param name="existingProject"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public static Project ToProject(ProjectDTO dto, string userId, Project existingProject = null)
     {
       try
@@ -282,6 +305,7 @@ namespace OperaWeb.Server.Models.Mapper
         project.Longitude = dto.Longitude ?? 0;
         project.CompleteAddress = dto.CompleteAddress;
         project.UserId = userId;
+        project.Status = (ProjectStatus) dto.Status;
 
         if (dto.SoaCategoryId > 0)
         {
@@ -674,7 +698,6 @@ namespace OperaWeb.Server.Models.Mapper
             }
           }
         }
-
 
         return project;
       }

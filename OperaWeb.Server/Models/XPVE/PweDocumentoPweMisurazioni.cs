@@ -6,13 +6,13 @@
     public partial class PweDocumentoPweMisurazioni
     {
 
-        private PweDocumentoPweMisurazioniEPItem[] pweElencoPrezziField;
+        private PweDocumentoPweMisurazioniPweElencoPrezziEPItem[] pweElencoPrezziField;
 
         private PweDocumentoPweMisurazioniVCItem[] pweVociComputoField;
 
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayItem("EPItem", IsNullable = false)]
-        public PweDocumentoPweMisurazioniEPItem[] PweElencoPrezzi
+        public PweDocumentoPweMisurazioniPweElencoPrezziEPItem[] PweElencoPrezzi
         {
             get
             {

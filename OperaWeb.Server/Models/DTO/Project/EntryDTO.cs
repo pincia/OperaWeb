@@ -10,5 +10,6 @@
     public int OriginalVoceVomputoId { get; set; }
     public string? Code { get; set; }
     public List<MeasurementDTO>? Measurements  { get;set;}
+    public int JobType { get; set; }
   }
 }

@@ -65,6 +65,7 @@ namespace OperaWeb.Server.Services.BLL
 
       try
       {
+        newProject.Status = ProjectStatus.Draft;
         // Step 1: Deserializzazione del documento XML
         PweDocumento importedPwe;
         using (var stringReader = new StringReader(StringHelper.RemoveInvalidXmlChars(xmlString)))
@@ -100,7 +101,10 @@ namespace OperaWeb.Server.Services.BLL
 
         // Step 3: Importazione Categorie, SuperCategorie e SubCategorie
         _logger.Log(LogLevel.Information, $"[ImportData] Import Categorie e SuperCategorie");
-        var categories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGCategorie
+        var categoryLookup = new Dictionary<int, Categoria>();
+        if (importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGCategorie != null)
+        {
+          var categories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGCategorie
             .Select(c => new Categoria
             {
               ExternalID = c.ID,
@@ -113,42 +117,65 @@ namespace OperaWeb.Server.Services.BLL
               Codice = c.Codice,
               Project = importedProject.Entity
             }).ToList();
-
-        var superCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie
-            .Select(c => new SuperCategoria
-            {
-              ExternalID = c.ID,
-              DesSintetica = c.DesSintetica ?? "",
-              DesEstesa = c.DesEstesa ?? "",
-              DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", null),
+          _context.Categorie.AddRange(categories);
+          categoryLookup = categories.ToDictionary(c => c.ExternalID);
+          result.EntitiesImported["Categorie"] = categories.Count;
+        }
+        else
+        {
+          result.EntitiesImported["Categorie"] =0;
+        }
+        var superCategoryLookup = new Dictionary<int,SuperCategoria>();
+        if (importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie != null)
+        {
+          var superCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSuperCategorie
+          .Select(c => new SuperCategoria
+          {
+            ExternalID = c.ID,
+            DesSintetica = c.DesSintetica ?? "",
+            DesEstesa = c.DesEstesa ?? "",
+            DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", null),
             //  Durata = c.Durata,
-              CodFase = c.CodFase,
-              Percentuale = c.Percentuale,
-              Codice = c.Codice,
-              Project = importedProject.Entity,
-              JobType = JobTypes.Misura
-            }).ToList();
+            CodFase = c.CodFase,
+            Percentuale = c.Percentuale,
+            Codice = c.Codice,
+            Project = importedProject.Entity,
+            JobType = JobTypes.Misura
+          }).ToList();
+          result.EntitiesImported["SuperCategorie"] = superCategories.Count;
+          _context.SuperCategorie.AddRange(superCategories);
+          superCategoryLookup = superCategories.ToDictionary(c => c.ExternalID);
+        }
+        else
+        {
+          result.EntitiesImported["SuperCategorie"] = 0;
+        }
 
-        var subCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie
-            .Select(c => new SubCategoria
-            {
-              ExternalID = c.ID,
-              DesSintetica = c.DesSintetica ?? "",
-              DesEstesa = c.DesEstesa ?? "",
-              DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", null),
-             // Durata = c.Durata,
-              CodFase = c.CodFase,
-              Percentuale = c.Percentuale,
-              Codice = c.Codice,
-              Project = importedProject.Entity
-            }).ToList();
-
-        _context.Categorie.AddRange(categories);
-        _context.SuperCategorie.AddRange(superCategories);
-        _context.SubCategorie.AddRange(subCategories);
-        result.EntitiesImported["Categorie"] = categories.Count;
-        result.EntitiesImported["SuperCategorie"] = superCategories.Count;
-        result.EntitiesImported["SubCategorie"] = subCategories.Count;
+        var subCategoryLookup = new Dictionary<int, SubCategoria>();
+        if (importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie != null)
+        {
+          var subCategories = importedPwe.PweDatiGenerali.PweDGCapitoliCategorie.PweDGSubCategorie
+              .Select(c => new SubCategoria
+              {
+                ExternalID = c.ID,
+                DesSintetica = c.DesSintetica ?? "",
+                DesEstesa = c.DesEstesa ?? "",
+                DataInit = DateTime.ParseExact(c.DataInit, "dd/MM/yyyy", null),
+                // Durata = c.Durata,
+                CodFase = c.CodFase,
+                Percentuale = c.Percentuale,
+                Codice = c.Codice,
+                Project = importedProject.Entity
+              }).ToList();
+          _context.SubCategorie.AddRange(subCategories);
+          result.EntitiesImported["SubCategorie"] = subCategories.Count;
+          subCategoryLookup = subCategories.ToDictionary(c => c.ExternalID);
+        }
+        else
+        {
+          result.EntitiesImported["SubCategorie"] = 0;
+        }
+       
         await UpdateProgress();
 
         // Step 4: Importazione Elenco Prezzi
@@ -175,9 +202,7 @@ namespace OperaWeb.Server.Services.BLL
         await UpdateProgress();
 
         var elencoPrezziLookup = elencoPrezzi.ToDictionary(e => e.IDEP);
-        var categoryLookup = categories.ToDictionary(c => c.ExternalID);
-        var superCategoryLookup = superCategories.ToDictionary(c => c.ExternalID);
-        var subCategoryLookup = subCategories.ToDictionary(c => c.ExternalID);
+
         //Step5 Configurazioni
         var configNumeri = new ConfigNumeri
         {
@@ -192,7 +217,7 @@ namespace OperaWeb.Server.Services.BLL
           ConvPrezzi = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.ConvPrezzi.Split('|')[0].Split('.')[1]),
           ConvPrezziTotale = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.ConvPrezziTotale.Split('|')[0].Split('.')[1]),
           IncidenzaPercentuale = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.IncidenzaPercentuale.Split('|')[0].Split('.')[1]),
-          Aliquote = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Aliquote.Split('|')[0])
+          Aliquote = SafeConvert.ToInt32(importedPwe.PweDatiGenerali.PweDGConfigurazione.PweDGConfigNumeri.Aliquote.Split('|')[0].Split('.')[1])
         };
         configNumeri.Project = importedProject.Entity;
         newProject.ConfigNumeri = configNumeri;
@@ -217,7 +242,7 @@ namespace OperaWeb.Server.Services.BLL
 
         foreach (var voce in importedPwe.PweMisurazioni.PweVociComputo)
         {
-          if (!categoryLookup.ContainsKey(voce.IDCat)) continue;
+         // if (!categoryLookup.ContainsKey(voce.IDCat)) continue;
           var exsitsSubCategory = subCategoryLookup.TryGetValue(voce.IDSbCat, out SubCategoria subCategory);
           var exsitsSuperCategory = superCategoryLookup.TryGetValue(voce.IDSpCat, out SuperCategoria superCategory);
           var exsitsCategory = categoryLookup.TryGetValue(voce.IDCat, out Categoria category);
@@ -249,7 +274,7 @@ namespace OperaWeb.Server.Services.BLL
             voceComputo.SubCategoria.Categoria = voceComputo.Categoria;
             _context.SaveChanges();
           }
-          var totVoceAmount = 0m;
+
           foreach (var misura in voce.PweVCMisure)
           {
             var nuovaMisura = new Misura
@@ -265,15 +290,24 @@ namespace OperaWeb.Server.Services.BLL
               VoceComputo = voceComputo
             };
             misure.Add(nuovaMisura);
-            totVoceAmount += nuovaMisura.Quantita * voceComputo?.ElencoPrezzo?.Prezzo1 ?? 0;
+           
           }
-
-          voceComputo.Prezzo = totVoceAmount;
+          
+          voceComputo.Prezzo = misure.Where(m => m.VoceComputoID == voceComputo.ID).Sum(m => m.Quantita * m.VoceComputo.ElencoPrezzo?.Prezzo1 ?? 0);
+          totalAmount += voceComputo.Prezzo;
           vociComputo.Add(voceComputo);
         }
         importedProject.Entity.TotalAmount = totalAmount;
         _context.VociComputo.AddRange(vociComputo);
-        _context.Misure.AddRange(misure);    
+        _context.Misure.AddRange(misure);
+
+        // Conto economico
+        importedProject.Entity.Economics = new Economics()
+        {
+          MeasuredWorks = vociComputo.Where(x => x.JobType == JobTypes.Misura).Sum(x => x.Prezzo),
+          LaborCosts = vociComputo.Sum(x => (x.Prezzo * x.ElencoPrezzo.Manodopera ?? 0 /100)),
+          LumpSumWorks = vociComputo.Where(x => x.JobType == JobTypes.Corpo).Sum(x => x.Prezzo),
+        };
         await _context.SaveChangesAsync();
         await CreateGanttTasksAsync(importedProject.Entity, vociComputo);
         result.EntitiesImported["VociComputo"] = vociComputo.Count;
@@ -304,7 +338,7 @@ namespace OperaWeb.Server.Services.BLL
 
     private async Task CreateGanttTasksAsync(
     Project project,
-    List<VoceComputo> vociComputo)
+    List<VoceComputo> vociComputo, double incidenzaMedia = 1)
     {
       // Dizionari per risolvere rapidamente le relazioni dalle VociComputo
       var superCategoryLookup = vociComputo

@@ -38,7 +38,12 @@
     /// <summary>
     /// Progetto archiviato.
     /// </summary>
-    Archived
+    Archived,
+
+    /// <summary>
+    /// Progetto in bozza.
+    /// </summary>
+    Draft
   }
 
 }

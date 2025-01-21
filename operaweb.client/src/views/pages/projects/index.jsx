@@ -13,19 +13,34 @@ import {
     Button,
     CardMedia,
     CircularProgress,
+    Chip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { getProjects } from 'api/projects';
 import { useDispatch } from "react-redux";
 import { setCurrentProjectId } from "store/slices/project";
+
+// Colori associati a ogni stato
+const statusColors = {
+    Creato: "blue",
+    InProgress: "green",
+    Sospeso: "orange",
+    Completato: "purple",
+    Cancellato: "red",
+    PendingApproval: "yellow",
+    Archiviato: "gray",
+    Bozza: "lightgray",
+};
+
+// Styled Card Component
 const StyledCard = styled(Card)(({ theme }) => ({
     border: `1px solid ${theme.palette.divider}`,
     boxShadow: theme.shadows[1],
     borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(2),
     transition: "transform 0.2s",
-    height: "400px", // Altezza fissa per tutte le card
+    height: "400px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
@@ -36,7 +51,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const TruncatedTypography = styled(Typography)(({ theme }) => ({
     display: "-webkit-box",
-    WebkitLineClamp: 3, // Limita a 3 righe
+    WebkitLineClamp: 3,
     WebkitBoxOrient: "vertical",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -52,7 +67,7 @@ const Projects = () => {
     const projectsPerPage = 10;
 
     const navigate = useNavigate();
-    const dispatch = useDispatch(); 
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // Fetch data from API
@@ -74,7 +89,7 @@ const Projects = () => {
 
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
-        setPage(1); // Reset to page 1 when changing tabs
+        setPage(1);
     };
 
     const currentProjects = activeTab === 0 ? projectsData.myProjects : projectsData.involvedProjects;
@@ -95,10 +110,13 @@ const Projects = () => {
     );
 
     const handleOpenProject = (id) => {
-        // Imposta l'ID del progetto corrente nello stato Redux
         dispatch(setCurrentProjectId(id));
-        // Naviga alla pagina del progetto
         navigate(`/project`);
+    };
+
+    const getStatusLabel = (status) => {
+        const keys = Object.keys(statusColors);
+        return keys[status] || "Unknown";
     };
 
     if (isLoading) {
@@ -172,18 +190,28 @@ const Projects = () => {
                                 />
                             </Box>
                             <CardContent>
-                             
-                                <Typography  color="textSecondary">
+                                <Typography color="textSecondary">
                                     <b>Ente/Comune:</b> {project.city || "N/A"}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
                                     <b>Provincia:</b> {project.province || "N/A"}
                                 </Typography>
-                                <TruncatedTypography color="textSecondary" >
+                                <TruncatedTypography color="textSecondary">
                                     <b>Lavori:</b> {project.works || "No Title"}
                                 </TruncatedTypography>
                                 <Typography variant="body2" color="textSecondary">
-                                    <b>Amonut:</b> {project.totalAmount?.toLocaleString() || "0.00"}
+                                    <b>Amount:</b> {project.totalAmount?.toLocaleString() || "0.00"}
+                                </Typography>
+                                <Typography sx={{marginTop: '8px' }} variant="body2" color="textSecondary">
+                                    <b>Stato:</b>{" "}
+                                    <span
+                                        style={{
+                                            fontWeight: "bold",
+                                            color: statusColors[getStatusLabel(project.status)],
+                                        }}
+                                    >
+                                        {getStatusLabel(project.status)}
+                                    </span>
                                 </Typography>
                             </CardContent>
                             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
