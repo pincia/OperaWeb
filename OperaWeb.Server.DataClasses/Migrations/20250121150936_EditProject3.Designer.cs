@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250121150936_EditProject3")]
+    partial class EditProject3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -791,8 +794,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<decimal?>("Lunghezza")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("PartiUguali")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("PartiUguali")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Quantita")
                         .HasColumnType("decimal(18,2)");

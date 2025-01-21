@@ -41,8 +41,9 @@ namespace OperaWeb.Server.DataClasses.Context
     public virtual DbSet<Soa> Soas { get; set; }
     public virtual DbSet<SoaClassification> SoaClassifications { get; set; }
     public virtual DbSet<Models.ProjectTask> ProjectTasks { get; set; }
-    public DbSet<FigureOrganizationRoleMapping> FigureOrganizationRoleMappings { get; set; }
-
+    public virtual DbSet<FigureOrganizationRoleMapping> FigureOrganizationRoleMappings { get; set; }
+    public virtual DbSet<ProjectResourceTeamType> ProjectResourceTeamTypes { get; set; }
+    public virtual DbSet<DatiGenerali> DatiGenerali { get; set; }
     public OperaWebDbContext(DbContextOptions<OperaWebDbContext> options) : base(options)
     {
     }

@@ -78,6 +78,7 @@ namespace OperaWeb.Server.Services
           throw new Exception("Project not found!");
         }
         project.Deleted = true;
+        project.DeleteDate = DateTime.Now;
         _context.Projects.Update(project);
         await _context.SaveChangesAsync();
       }
@@ -137,7 +138,7 @@ namespace OperaWeb.Server.Services
           throw new Exception("Project not found!");
         }
 
-        var vociComputo = _context.VociComputo.Include(v => v.Misure).Where(e => e.ProjectID == id);
+        var vociComputo = _context.VociComputo.Include(v => v.Misure).Include(v => v.ElencoPrezzo).Where(e => e.ProjectID == id);
         var categorie = _context.Categorie.Where(e => e.ProjectID == id);
         var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == id);
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
@@ -160,34 +161,87 @@ namespace OperaWeb.Server.Services
     }
 
     /// <inheritdoc/>
-    public async Task HardDeleteProjectAsync(int id)
+    public async Task HardDeleteProjectAsync(int id, string userId)
     {
       try
       {
-        var project = _context.Projects
-          .Include(v => v.VociComputo)
-          .Include(v => v.Categorie)
-          .Include(v => v.SubCategorie)
-          .Include(v => v.SuperCategorie)
-          .Include(v => v.ConfigNumeri)
-          .Include(v => v.DatiGenerali)
-          .Include(v => v.ElencoPrezzi)
-          .FirstOrDefault(p => p.ID == id);
+        // Recupera il progetto con tutte le entità correlate
+        var project = await _context.Projects
+            .Include(p => p.VociComputo)
+            .Include(p => p.Categorie)
+            .Include(p => p.SubCategorie)
+            .Include(p => p.SuperCategorie)
+            .Include(p => p.ConfigNumeri)
+            .Include(p => p.DatiGenerali)
+            .Include(p => p.ElencoPrezzi)
+            .Include(p => p.Analisi)
+            .Include(p => p.ProjectSubjects)
+            .Include(p => p.ProjectTasks)
+            .Include(p => p.UserProjectAccesses)
+            .Include(p => p.ProjectResourceTeamType)
+            .Include(p => p.Economics)
+            .FirstOrDefaultAsync(p => p.ID == id);
 
         if (project == null)
         {
           _logger.LogTrace("Project not found!");
           throw new Exception("Project not found!");
         }
+
+        if (project.UserId != userId)
+        {
+          _logger.LogTrace("User Can't delete project!");
+          throw new Exception("User Can't delete project!");
+        }
+
+        // Rimuovi manualmente tutte le entità correlate
+        _context.VociComputo.RemoveRange(project.VociComputo);
+        _context.Categorie.RemoveRange(project.Categorie);
+        _context.SubCategorie.RemoveRange(project.SubCategorie);
+        _context.SuperCategorie.RemoveRange(project.SuperCategorie);
+        _context.ElencoPrezzi.RemoveRange(project.ElencoPrezzi);
+        _context.ProjectSubjects.RemoveRange(project.ProjectSubjects);
+        _context.ProjectTasks.RemoveRange(project.ProjectTasks);
+        _context.UserProjectAccess.RemoveRange(project.UserProjectAccesses);
+
+        if (project.ConfigNumeri != null)
+        {
+          _context.ConfigNumeri.Remove(project.ConfigNumeri);
+        }
+
+        if (project.DatiGenerali != null)
+        {
+          _context.DatiGenerali.Remove(project.DatiGenerali);
+        }
+
+        if (project.Analisi != null)
+        {
+          _context.Analisi.Remove(project.Analisi);
+        }
+
+        if (project.ProjectResourceTeamType != null)
+        {
+          _context.ProjectResourceTeamTypes.Remove(project.ProjectResourceTeamType);
+        }
+
+        if (project.Economics != null)
+        {
+          _context.Economics.Remove(project.Economics);
+        }
+
+        // Infine, rimuovi il progetto stesso
         _context.Projects.Remove(project);
+
+        // Salva le modifiche al database
         await _context.SaveChangesAsync();
       }
       catch (Exception ex)
       {
         _logger.LogError(ex, "An error occurred while deleting the Project item.");
-        throw new Exception("An error occurred while creating the Project item.");
+        throw new Exception("An error occurred while deleting the Project item.");
       }
     }
+
 
     // Recupera i 5 progetti recenti per un utente
     public async Task<List<ProjectHeaderDTO>> GetRecentProjectsAsync(string userId)
@@ -416,5 +470,53 @@ namespace OperaWeb.Server.Services
         return result;
       }
     }
+
+    /// <inheritdoc/>
+    public async Task RestoreProject(int id)
+    {
+      try
+      {
+        var project = await _context.Projects.FirstOrDefaultAsync(p => p.ID == id);
+
+        if (project == null)
+        {
+          throw new Exception("Project not found.");
+        }
+
+        project.Deleted = false;
+        project.LastUpdateDate = DateTime.UtcNow;
+
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "An error occurred while restoring the project.");
+        throw new Exception("An error occurred while restoring the project.");
+      }
+    }
+
+    /// <inheritdoc/>
+    public async Task<List<ProjectHeaderDTO>> GetDeletedProjects(string userId)
+    {
+      try
+      {
+        // Recupera i progetti eliminati per l'utente specifico
+        var deletedProjects = await _context.Projects
+            .Include(p => p.SoaCategory)
+            .Include(p => p.SoaClassification)
+            .Where(p => p.Deleted && p.User.Id == userId)
+            .ToListAsync();
+
+        // Mappa i progetti eliminati nel DTO ProjectHeaderDTO
+        return deletedProjects.Select(project => _mapper.Map<ProjectHeaderDTO>(project)).ToList();
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "An error occurred while retrieving deleted projects.");
+        throw new Exception("An error occurred while retrieving deleted projects.", ex);
+      }
+    }
+
   }
 }

@@ -159,3 +159,64 @@ export const checkXPWEFile = async (file) => {
         throw error; // Propaga l'errore per gestirlo nel componente chiamante
     }
 };
+
+/**
+ * Esegue l'hard delete di un progetto specifico
+ * @param {number|string} projectId - L'ID del progetto da eliminare definitivamente
+ * @returns {Promise<object>} - La risposta dell'API
+ * @throws {Error} - Se la richiesta all'API fallisce
+ */
+export async function hardDeleteProject(projectId) {
+    try {
+        if (!projectId) {
+            throw new Error('È necessario fornire un ID del progetto.');
+        }
+
+        const response = await axios.delete(`/api/projects/hard-delete`, {
+            params: { id: projectId },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Errore durante la cancellazione definitiva del progetto:', error);
+        throw error;
+    }
+}
+
+/**
+ * Ripristina un progetto cancellato impostando Deleted a false
+ * @param {number|string} projectId - L'ID del progetto da ripristinare
+ * @returns {Promise<object>} - La risposta dell'API
+ * @throws {Error} - Se la richiesta all'API fallisce
+ */
+export async function restoreProject(projectId) {
+    try {
+        if (!projectId) {
+            throw new Error('È necessario fornire un ID del progetto.');
+        }
+
+        const response = await axios.post('/api/projects/restore', {
+            id: projectId,
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Errore durante il ripristino del progetto:', error);
+        throw error;
+    }
+}
+
+/**
+ * Recupera tutti i progetti eliminati
+ * @returns {Promise<object>} - I progetti eliminati
+ * @throws {Error} - Se la richiesta fallisce
+ */
+export async function getDeletedProjects() {
+    try {
+        const response = await axios.get('/api/projects/deleted');
+        return response.data || []; 
+    } catch (error) {
+        console.error("Error fetching deleted projects:", error);
+        throw error;
+    }
+}

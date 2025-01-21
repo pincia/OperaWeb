@@ -281,7 +281,7 @@ namespace OperaWeb.Server.Services.BLL
             {
               IDVV = misura.IDVV,
               Descrizione = misura.Descrizione,
-              PartiUguali = misura.PartiUguali,
+              PartiUguali = SafeConvert.ToDecimal(misura.PartiUguali),
               Lunghezza = SafeConvert.ToDecimal(misura.Lunghezza),
               Larghezza = SafeConvert.ToDecimal(misura.Larghezza),
               HPeso = SafeConvert.ToDecimal(misura.HPeso),

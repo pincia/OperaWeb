@@ -135,15 +135,9 @@ namespace OperaWeb.Server.Controllers
     public async Task<IActionResult> HardDeleteProjectAsync(int id)
     {
       var userId = User.FindFirstValue("Id");
-      var project = _projectService.GetProjectById(id, userId);
-      if (project == null)
-      {
-        return BadRequest(new { message = "No Project found" });
-      }
-
       try
       {
-        await _projectService.HardDeleteProjectAsync(id);
+        await _projectService.HardDeleteProjectAsync(id, userId);
         return Ok(new { message = "Project successfully deleted" });
 
       }
@@ -231,6 +225,48 @@ namespace OperaWeb.Server.Controllers
       catch (Exception ex)
       {
         return StatusCode(500, new { message = "An error occurred while checking the file", error = ex.Message });
+      }
+    }
+
+    [HttpPost]
+    [Route("restore")]
+    public async Task<IActionResult> RestoreProjectAsync([FromBody] RestoreProjectRequestDTO req)
+    {
+      try
+      {
+        var userId = User.FindFirstValue("Id");
+        var project = await _projectService.GetProjectById(req.Id, userId);
+
+        if (project == null)
+        {
+          return NotFound(new { message = "No Project found with the provided ID." });
+        }
+
+        await _projectService.RestoreProject(req.Id);
+        return Ok(new { message = "Project successfully restored." });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = "An error occurred while restoring the project.", error = ex.Message });
+      }
+    }
+
+    [HttpGet("deleted")]
+    public async Task<IActionResult> GetDeletedProjects()
+    {
+      try
+      {
+        var userId = User.FindFirstValue("Id");
+
+        // Chiama il servizio per ottenere i progetti eliminati
+        var deletedProjects = await _projectService.GetDeletedProjects(userId);
+
+        // Restituisci i dati con un messaggio di successo
+        return Ok(new { message = "Successfully retrieved deleted projects", data = deletedProjects });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { message = "An error occurred while retrieving deleted projects", error = ex.Message });
       }
     }
 

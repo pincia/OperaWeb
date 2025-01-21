@@ -85,7 +85,7 @@ export default function EntryList({
             });
         };
 
-       
+
         setTasks((prevTasks) => {
             const updatedTasks = removeEntryFromHierarchy(prevTasks, taskId, entryId);
             const updatedTask = findTask(updatedTasks, taskId);
@@ -254,7 +254,7 @@ export default function EntryList({
             quantita: 0,
         };
 
-      
+
         setTasks((prevTasks) => {
             const updatedTasks = updateMeasurementsInHierarchy(
                 prevTasks,
@@ -406,10 +406,11 @@ export default function EntryList({
                         <TableHead>
                             <TableRow>
                                 <TableCell>Voce</TableCell>
-                                <TableCell>Codice</TableCell>
-                                <TableCell>U.Misura</TableCell>
+                                <TableCell>NProg</TableCell>
+                                <TableCell>Codice/Descrizione</TableCell>
+                                <TableCell>Quantità</TableCell>
                                 <TableCell>Prezzo</TableCell>
-                                <TableCell>Azione</TableCell>
+                                <TableCell>Importo</TableCell>
                             </TableRow>
                         </TableHead><TableBody>
                             {selectedTaskEntries.map((entry) => (
@@ -422,11 +423,47 @@ export default function EntryList({
                                             >
                                                 {expandedEntries[entry.id] ? <ExpandMoreIcon /> : <ChevronRightIcon />}
                                             </IconButton>
-                                            {entry.description}
                                         </TableCell>
-                                        <TableCell>{entry.code}</TableCell>
-                                        <TableCell>{entry.unit}</TableCell>
-                                        <TableCell>{entry.price}</TableCell>
+                                        <TableCell>
+                                            {entry.nProg}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                    {entry.code}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {entry.description}
+                                                </Typography>
+                                            </div></TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                    {entry.unit}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {entry.quantity}
+                                                </Typography>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell> <div>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                Euro / {entry.unit}
+                                            </Typography>
+                                            <Typography variant="body2" color="textSecondary">
+                                                {entry.price}
+                                            </Typography>
+                                        </div></TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                    Euro
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {entry.totalPrice}
+                                                </Typography>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <IconButton onClick={(e) => handleMenuOpen(e, entry)}>
                                                 <MoreVertIcon />
@@ -438,7 +475,7 @@ export default function EntryList({
                                             >
                                                 <MenuItem
                                                     onClick={() => {
-                                                        console.log("Adding measurement to entry:", menuTask.id); 
+                                                        console.log("Adding measurement to entry:", menuTask.id);
                                                         handleAddMeasurement(menuTask.id);
                                                         handleMenuClose();
                                                     }}

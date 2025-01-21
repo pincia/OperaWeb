@@ -16,6 +16,7 @@ namespace OperaWeb.Server.Models.DTO.Project
     public string? CUP { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime LastUpdateDate { get; set; }
+    public DateTime DeleteDate { get; set; }
     public string SoaCategory { get; set; }
     public int SoaCategoryId { get; set; }
     public string SoaClassification { get; set; }

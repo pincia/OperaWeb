@@ -44,14 +44,21 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="id"></param>
     /// <returns></returns>
     Task DeleteProjectAsync(int id);
-    
+
+    /// <summary>
+    /// Restore a deleted project.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RestoreProject(int id);
 
     /// <summary>
     /// Hard delete project
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="userId"></param>
     /// <returns></returns>
-    Task HardDeleteProjectAsync(int id);
+    Task HardDeleteProjectAsync(int id, string userId);
 
     /// <summary>
     /// Import project from XPWE
@@ -88,5 +95,12 @@ namespace OperaWeb.Server.Abstractions
     /// <param name="file"></param>
     /// <returns></returns>
     Task<FileCheckResponseDTO> CheckXPWEFile(IFormFile file);
+
+    /// <summary>
+    /// Recupera tutti i progetti eliminati per un utente specifico.
+    /// </summary>
+    /// <param name="userId">ID dell'utente</param>
+    /// <returns>Lista di progetti eliminati</returns>
+    Task<List<ProjectHeaderDTO>> GetDeletedProjects(string userId);
   }
 }

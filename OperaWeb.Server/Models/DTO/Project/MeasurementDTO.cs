@@ -9,5 +9,6 @@
     public decimal HPeso { get; set; }
     public decimal Quantita { get; set; }
     public int OriginalId { get; set; }
+    public decimal Npu { get; set; }
   }
 }

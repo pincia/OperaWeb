@@ -10,7 +10,7 @@ namespace OperaWeb.Server.DataClasses.Models
 
     public string Descrizione { get; set; }
 
-    public string? PartiUguali { get; set; }
+    public decimal? PartiUguali { get; set; }
 
     public decimal? Lunghezza { get; set; }
 

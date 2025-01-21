@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Tab, Box, CircularProgress, Grid, Typography } from '@mui/material';
+import { Tabs, Tab, Box, CircularProgress, Grid } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import { ThemeMode } from 'config';
@@ -8,6 +8,7 @@ import { getProject } from 'api/projects';
 import ProjectOverview from './ProjectOverview';
 import ProjectSummary from './ProjectSummary';
 import GanttChart from 'ui-component/GanttChart';
+import ProjectActions from './ProjectActions'; // Importa il componente ProjectActions
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 
 function a11yProps(index) {
@@ -50,11 +51,10 @@ const ProjectDashboard = () => {
         fetchProjectData();
     }, [currentProjectId, dispatch]);
 
-    useEffect(() => {
-        if (projectData && Object.keys(projectData).length === 0) {
-            setProjectData(initialProjectData); 
-        }
-    }, [projectData]);
+    const handleDeleteProject = (projectId) => {
+        console.log(`Progetto con ID ${projectId} eliminato.`);
+        // Qui puoi aggiungere la logica per eliminare il progetto (chiamata API o aggiornamento dello stato)
+    };
 
     if (isLoading) {
         return (
@@ -74,7 +74,7 @@ const ProjectDashboard = () => {
     return (
         <Grid container spacing={3}>
             <Grid item xs={12}>
-                <Box>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
                     {/* Tabs */}
                     <Tabs
                         sx={{
@@ -117,12 +117,15 @@ const ProjectDashboard = () => {
                         />
                     </Tabs>
 
-                    {/* Tab Content */}
-                    <Box sx={{ mt: 3 }}>
-                        {activeTab === 0 && <ProjectOverview projectData={projectData} isLoading={isLoading} />}
-                        {activeTab === 1 && <ProjectSummary projectData={projectData} setProjectData={setProjectData} isLoading={isLoading} />}
-                        {activeTab === 2 && <GanttChart projectData={projectData} />}
-                    </Box>
+                    {/* Project Actions */}
+                    <ProjectActions onDelete={() => handleDeleteProject(currentProjectId)} />
+                </Box>
+
+                {/* Tab Content */}
+                <Box sx={{ mt: 3 }}>
+                    {activeTab === 0 && <ProjectOverview projectData={projectData} isLoading={isLoading} />}
+                    {activeTab === 1 && <ProjectSummary projectData={projectData} setProjectData={setProjectData} isLoading={isLoading} />}
+                    {activeTab === 2 && <GanttChart projectData={projectData} />}
                 </Box>
             </Grid>
         </Grid>

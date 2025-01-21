@@ -224,6 +224,7 @@ namespace OperaWeb.Server.Models.Mapper
             }
           }       
         }
+        int nProg = 0;
 
         // Itera sulle VociComputo (EntryDTO) e assegna le voci alle SubCategorie, Categorie o SuperCategorie
         foreach (var voce in model.VociComputo)
@@ -231,10 +232,13 @@ namespace OperaWeb.Server.Models.Mapper
           var entryDTO = new EntryDTO
           {
             Id = voce.ID.ToString(),
+            NProg = nProg++,
             Unit = voce.ElencoPrezzo?.UnMisura,
-            Description = voce.ElencoPrezzo?.DesBreve,
+            Description = voce.ElencoPrezzo?.DesEstesa,
             Code = voce.ElencoPrezzo?.Tariffa,
-            Price = voce.Prezzo,
+            TotalPrice = voce.Prezzo,
+            Price = voce.ElencoPrezzo.Prezzo1,
+            Quantity = voce.Quantita,
             OriginalVoceVomputoId = voce.ID,
             OriginalElencoPrezzoId = voce.ElencoPrezzoID,
             JobType =(int) voce.JobType,
@@ -246,7 +250,8 @@ namespace OperaWeb.Server.Models.Mapper
               Lunghezza = m.Lunghezza ?? 0,
               Larghezza = m.Larghezza ?? 0,
               OriginalId = m.ID,
-              HPeso = m.HPeso ?? 0
+              HPeso = m.HPeso ?? 0,
+              Npu = m.PartiUguali ?? 0
             }).ToList() ?? new List<MeasurementDTO>()
           };
 
@@ -430,7 +435,7 @@ namespace OperaWeb.Server.Models.Mapper
                     UnMisura = entry.Unit,
                     DesBreve = entry.Description,
                     Tariffa = entry.Code,
-                    Prezzo1 = entry.Price / entry.Measurements.Sum(m=>m.Quantita)
+                    Prezzo1 = entry.TotalPrice / entry.Measurements.Sum(m=>m.Quantita)
                   };
                   project.ElencoPrezzi.Add(priceList);
                 }
@@ -439,7 +444,7 @@ namespace OperaWeb.Server.Models.Mapper
                   priceList.UnMisura = entry.Unit;
                   priceList.DesBreve = entry.Description;
                   priceList.Tariffa = entry.Code;
-                  priceList.Prezzo1 = entry.Price / entry.Measurements.Sum(m => m.Quantita);
+                  priceList.Prezzo1 = entry.TotalPrice / entry.Measurements.Sum(m => m.Quantita);
                 }
 
                 var voceComputo = vociComputoLookup.GetValueOrDefault(entry.OriginalVoceVomputoId);
@@ -476,7 +481,8 @@ namespace OperaWeb.Server.Models.Mapper
                         Descrizione = measurementDto.Description ?? "",
                         Lunghezza = measurementDto.Lunghezza,
                         Larghezza = measurementDto.Larghezza,
-                        HPeso = measurementDto.HPeso
+                        HPeso = measurementDto.HPeso,
+                        PartiUguali = measurementDto.Npu
                       };
                       voceComputo.Misure.Add(measurement);
                     }
