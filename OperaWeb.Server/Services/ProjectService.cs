@@ -67,16 +67,10 @@ namespace OperaWeb.Server.Services
 
 
     /// <inheritdoc/>
-    public async Task DeleteProjectAsync(int id)
+    public async Task DeleteProjectAsync(Project project)
     {
       try
       {
-        var project = _context.Projects.FirstOrDefault(p => p.ID == id);
-        if (project == null)
-        {
-          _logger.LogTrace("Project not found!");
-          throw new Exception("Project not found!");
-        }
         project.Deleted = true;
         project.DeleteDate = DateTime.Now;
         _context.Projects.Update(project);
@@ -93,7 +87,7 @@ namespace OperaWeb.Server.Services
     public async Task<ProjectsListDTO> GetAllProjects(string userId)
     {
       var myProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Where(p => p.Deleted == false && p.User.Id == userId).ToList();
-      var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Include(p => p.ProjectSubjects).Where(p => p.Deleted == false && p.ProjectSubjects.Any(s=>s.UserId == userId)).ToList();
+      var involvedProjects = _context.Projects.Include(p => p.SoaCategory).Include(p => p.SoaClassification).Include(p => p.ProjectSubjects).Where(p => p.Deleted == false && p.ProjectSubjects.Any(s => s.UserId == userId)).ToList();
 
 
       return new ProjectsListDTO()
@@ -124,7 +118,7 @@ namespace OperaWeb.Server.Services
       {
         var project = _context.Projects
             .Include(p => p.DatiGenerali)
-            .Include(p=>p.ProjectResourceTeamType)
+            .Include(p => p.ProjectResourceTeamType)
             .Include(p => p.ConfigNumeri)
             .Include(p => p.Economics)
             .Include(p => p.ElencoPrezzi)
@@ -144,7 +138,7 @@ namespace OperaWeb.Server.Services
         var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
         var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
         var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
-        var subjects = _context.ProjectSubjects.Include(s=>s.User).Include(u=>u.User.Company).Include(s=>s.ProjectSubjectRole).Where(e => e.ProjectId == id);
+        var subjects = _context.ProjectSubjects.Include(s => s.User).Include(u => u.User.Company).Include(s => s.ProjectSubjectRole).Where(e => e.ProjectId == id);
         project.VociComputo = vociComputo.ToList();
         project.Categorie = categorie.ToList();
         project.SubCategorie = subCategorie.ToList();
@@ -167,20 +161,30 @@ namespace OperaWeb.Server.Services
       {
         // Recupera il progetto con tutte le entità correlate
         var project = await _context.Projects
-            .Include(p => p.VociComputo)
-            .Include(p => p.Categorie)
-            .Include(p => p.SubCategorie)
-            .Include(p => p.SuperCategorie)
             .Include(p => p.ConfigNumeri)
             .Include(p => p.DatiGenerali)
-            .Include(p => p.ElencoPrezzi)
             .Include(p => p.Analisi)
             .Include(p => p.ProjectSubjects)
-            .Include(p => p.ProjectTasks)
             .Include(p => p.UserProjectAccesses)
             .Include(p => p.ProjectResourceTeamType)
             .Include(p => p.Economics)
             .FirstOrDefaultAsync(p => p.ID == id);
+
+        var vociComputo = _context.VociComputo.Include(v => v.Misure).Include(v => v.ElencoPrezzo).Where(e => e.ProjectID == id);
+        var categorie = _context.Categorie.Where(e => e.ProjectID == id);
+        var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == id);
+        var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == id);
+        var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == id);
+        var projectTasks = _context.ProjectTasks.Where(e => e.ProjectId == id);
+        var subjects = _context.ProjectSubjects.Include(s => s.User).Include(u => u.User.Company).Include(s => s.ProjectSubjectRole).Where(e => e.ProjectId == id);
+       
+        project.VociComputo = vociComputo.ToList();
+        project.Categorie = categorie.ToList();
+        project.SubCategorie = subCategorie.ToList();
+        project.SuperCategorie = superCategorie.ToList();
+        project.ProjectSubjects = subjects.ToList();
+        project.ProjectTasks = projectTasks.ToList();
+        project.ElencoPrezzi = elencoPrezzi.ToList();
 
         if (project == null)
         {
@@ -350,48 +354,62 @@ namespace OperaWeb.Server.Services
     /// <inheritdoc/>
     public async Task<ProjectDTO> UpdateProjectAsync(ProjectDTO projectDto)
     {
-      var existingProject = await _context.Projects.Include(p => p.Categorie)
+      using var transaction = await _context.Database.BeginTransactionAsync();
+      try
+      {
+        var existingProject = await _context.Projects.Include(p => p.Categorie)
       .Include(p => p.Analisi)
       .Include(p => p.DatiGenerali)
       .Include(p => p.ConfigNumeri)
-      .Include(p => p.ProjectSubjects).ThenInclude(p=>p.ProjectSubjectRole)
+      .Include(p => p.ProjectSubjects).ThenInclude(p => p.ProjectSubjectRole)
       .Include(p => p.Economics)
-      .Include(p=>p.ProjectResourceTeamType)
+      .Include(p => p.ProjectResourceTeamType)
+      .Include(p => p.ProjectTasks)
       .FirstOrDefaultAsync(p => p.ID == projectDto.Id);
 
-      if (existingProject == null)
-      {
-        _logger.LogTrace("Project not found!");
-        throw new Exception("Project not found!");
+        if (existingProject == null)
+        {
+          _logger.LogTrace("Project not found!");
+          throw new Exception("Project not found!");
+        }
+        var vociComputo = _context.VociComputo.Include(v => v.Misure).Include(v => v.ElencoPrezzo).Where(e => e.ProjectID == existingProject.ID);
+        var categorie = _context.Categorie.Where(e => e.ProjectID == existingProject.ID);
+        var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == existingProject.ID);
+        var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == existingProject.ID);
+        var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == existingProject.ID);
+        existingProject.VociComputo = vociComputo.ToList();
+        existingProject.Categorie = categorie.ToList();
+        existingProject.SubCategorie = subCategorie.ToList();
+        existingProject.SuperCategorie = superCategorie.ToList();
+        existingProject.ElencoPrezzi = elencoPrezzi.ToList();
+
+
+        // Mappatura dal DTO all'entità
+        existingProject = ProjectMapper.ToProject(projectDto, existingProject.UserId, existingProject);
+        existingProject.LastUpdateDate = DateTime.Now;
+
+        // Al primo salvataggio metto lo stato a created
+        if (existingProject.Status == ProjectStatus.Draft)
+        {
+          existingProject.Status = ProjectStatus.Created;
+        }
+
+        // Aggiorna il database
+        _context.Projects.Update(existingProject);
+        await _context.SaveChangesAsync();
+
+        // Conferma la transazione
+        await transaction.CommitAsync();
+
+        // Ritorna il progetto aggiornato come DTO
+        return ProjectMapper.ToProjectDTO(existingProject);
       }
-      var vociComputo = _context.VociComputo.Include(v => v.Misure).Where(e => e.ProjectID == existingProject.ID);
-      var categorie = _context.Categorie.Where(e => e.ProjectID == existingProject.ID);
-      var subCategorie = _context.SubCategorie.Where(e => e.ProjectID == existingProject.ID);
-      var superCategorie = _context.SuperCategorie.Where(e => e.ProjectID == existingProject.ID);
-      var elencoPrezzi = _context.ElencoPrezzi.Where(e => e.ProjectID == existingProject.ID);
-      existingProject.VociComputo = vociComputo.ToList();
-      existingProject.Categorie = categorie.ToList();
-      existingProject.SubCategorie = subCategorie.ToList();
-      existingProject.SuperCategorie = superCategorie.ToList();
-      existingProject.ElencoPrezzi = elencoPrezzi.ToList();
-
-
-      // Mappatura dal DTO all'entità
-      existingProject = ProjectMapper.ToProject(projectDto, existingProject.UserId, existingProject);
-      existingProject.LastUpdateDate = DateTime.Now;
-
-      // Al primo salvataggio metto lo stato a created
-      if(existingProject.Status == ProjectStatus.Draft)
+      catch (Exception ex)
       {
-        existingProject.Status = ProjectStatus.Created;
+        await transaction.RollbackAsync();
+        _logger.LogError($"Errore durante l'aggiornamento del progetto: {ex.Message}", ex);
+        throw;
       }
-
-      // Aggiorna il database
-      _context.Projects.Update(existingProject);
-      await _context.SaveChangesAsync();
-
-      // Ritorna il progetto aggiornato come DTO
-      return ProjectMapper.ToProjectDTO(existingProject);
     }
 
     /// <summary>
@@ -427,7 +445,7 @@ namespace OperaWeb.Server.Services
       catch (Exception ex)
       {
         _logger.LogError(ex.Message);
-        wellFormattedXmlCheck.Message = "Errore di formattazione "+ ex.Message;
+        wellFormattedXmlCheck.Message = "Errore di formattazione " + ex.Message;
         wellFormattedXmlCheck.Succeeded = false;
         result.CanBeImported = false;
         return result;
@@ -444,7 +462,7 @@ namespace OperaWeb.Server.Services
           Name = "Check incidenza manodopera",
         };
 
-        if (importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != null && importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera !=0)
+        if (importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != null && importedPwe.PweMisurazioni.PweElencoPrezzi[0].Manodopera != 0)
         {
           incidenzaManodoperaCheck.Succeeded = true;
           incidenzaManodoperaCheck.Message = "Incidenza manodopera presente";

@@ -194,5 +194,6 @@
   "organization": "Organization",
   "cup": "CUP",
   "gig": "GIG",
-  "locationLabel": "Localization"
+  "locationLabel": "Localization",
+  "trash": "Trash"
 }

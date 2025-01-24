@@ -83,7 +83,6 @@ namespace OperaWeb.Server.Controllers
       catch (Exception ex)
       {
         return StatusCode(500, new { message = "An error occurred while retrieving projects", error = ex.Message });
-
       }
     }
 
@@ -111,7 +110,7 @@ namespace OperaWeb.Server.Controllers
     public async Task<IActionResult> DeleteProjectAsync(DeleteProjectRequestDTO req)
     {
       var userId = User.FindFirstValue("Id");
-      var project = _projectService.GetProjectById(req.Id, userId);
+      var project = await _projectService.GetProjectById(req.Id, userId);
       if (project == null)
       {
         return BadRequest(new { message = "No Project found for user" });
@@ -119,7 +118,7 @@ namespace OperaWeb.Server.Controllers
 
       try
       {
-        await _projectService.DeleteProjectAsync(req.Id);
+        await _projectService.DeleteProjectAsync(project);
         return Ok(new { message = "Project successfully deleted" });
 
       }

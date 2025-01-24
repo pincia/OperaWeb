@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OperaWeb.Server.DataClasses.Models;
 using OperaWeb.Server.Models.DTO.Project;
@@ -444,7 +445,7 @@ namespace OperaWeb.Server.Models.Mapper
                   priceList.UnMisura = entry.Unit;
                   priceList.DesBreve = entry.Description;
                   priceList.Tariffa = entry.Code;
-                  priceList.Prezzo1 = entry.TotalPrice / entry.Measurements.Sum(m => m.Quantita);
+                  priceList.Prezzo1 = entry.Measurements.Any() ? entry.TotalPrice / entry.Measurements.Sum(m => m.Quantita) : priceList.Prezzo1;
                 }
 
                 var voceComputo = vociComputoLookup.GetValueOrDefault(entry.OriginalVoceVomputoId);
@@ -516,7 +517,6 @@ namespace OperaWeb.Server.Models.Mapper
           Quantita = m.Quantita,
           Prezzo1 = v.ElencoPrezzo?.Prezzo1 ?? 0
         });
-
 
         project.TotalAmount = totalAmount; 
 
@@ -705,13 +705,137 @@ namespace OperaWeb.Server.Models.Mapper
           }
         }
 
+        // Projec tasks
+
+        if (project.ProjectTasks == null || !project.ProjectTasks.Any())
+        {
+          CreateGanttTasksAsync(project);
+        }
         return project;
       }
       catch (Exception ex)
       {
-        throw new Exception("Errore durante la mappatura del DTO su Project", ex);
+        throw;
       }
     }
+
+    /// <summary>
+    /// Crea i ProjecTask a partiure dalle lavorazioni, dal costo della manodopera e dalla squadra tipo
+    /// </summary>
+    /// <param name="project"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    private static void CreateGanttTasksAsync(Project project)
+    {
+      if (project.ProjectResourceTeamType == null ||
+          (project.ProjectResourceTeamType.CommonQuantity == 0 &&
+           project.ProjectResourceTeamType.SpecializedQuantity == 0 &&
+           project.ProjectResourceTeamType.QualifiedQuantity == 0) ||
+          (project.ProjectResourceTeamType.QualifiedHourlyRate == 0 &&
+           project.ProjectResourceTeamType.SpecializedHourlyRate == 0 &&
+           project.ProjectResourceTeamType.CommonHourlyRate == 0))
+      {
+        throw new InvalidOperationException("La squadra tipo non è configurata correttamente per questo progetto.");
+      }
+
+      var teamType = project.ProjectResourceTeamType;
+      var teamHourlyRate = ((teamType.SpecializedQuantity * teamType.SpecializedHourlyRate) +
+                            (teamType.QualifiedQuantity * teamType.QualifiedHourlyRate) +
+                            (teamType.CommonQuantity * teamType.CommonHourlyRate));
+
+      if (teamHourlyRate <= 0)
+      {
+        throw new InvalidOperationException("Il costo orario della squadra tipo deve essere maggiore di zero.");
+      }
+
+      var economics = project.Economics;
+      if (economics == null)
+      {
+        throw new InvalidOperationException("I dati economici del progetto non sono configurati.");
+      }
+
+      var incidenzaMedia = (economics.LaborCosts / (economics.MeasuredWorks + economics.LumpSumWorks)) * 100;
+
+      if (project.ProjectTasks == null)
+      {
+        project.ProjectTasks = new List<ProjectTask>();
+      }
+
+      // Variabile per tracciare la data di fine della lavorazione precedente
+      var previousEndDate = project.CreationDate;
+
+      void CreateTasksForLevel(IEnumerable<dynamic> items, ProjectTask parent, string type)
+      {
+        foreach (var item in items)
+        {
+          var associatedVociComputo = project.VociComputo.Where(vc =>
+              (type == "SuperCategoria" && vc.SuperCategoriaID == item.ID) ||
+              (type == "Categoria" && vc.CategoriaID == item.ID) ||
+              (type == "SubCategoria" && vc.SubCategoriaID == item.ID));
+
+          int duration;
+          if (associatedVociComputo.Any())
+          {
+            var totalManodopera = associatedVociComputo.Sum(vc =>
+            {
+              var manodopera = vc.ElencoPrezzo.Manodopera == null || vc.ElencoPrezzo.Manodopera == 0
+                  ? (decimal)incidenzaMedia
+                  : vc.ElencoPrezzo.Manodopera ?? 0;
+              return vc.Prezzo * (manodopera / 100);
+            });
+            duration = (int)Math.Ceiling(totalManodopera / (teamHourlyRate * 8));
+          }
+          else
+          {
+            duration = 0;
+          }
+
+          // Imposta la StartDate uguale alla EndDate della lavorazione precedente
+          var taskStartDate = previousEndDate;
+
+          var task = new ProjectTask
+          {
+            Name = item.DesSintetica,
+            Description = item.DesEstesa,
+            StartDate = taskStartDate,
+            EndDate = taskStartDate.AddDays(duration),
+            Duration = duration,
+            Progress = 0,
+            Parent = parent,
+            ProjectId = project.ID,
+            Type = type
+          };
+
+          project.ProjectTasks.Add(task);
+
+          // Aggiorna la variabile previousEndDate
+          previousEndDate = task.EndDate;
+
+          if (type == "SuperCategoria")
+          {
+            CreateTasksForLevel(project.Categorie.Where(c => c.SuperCategoriaId == item.ID), task, "Categoria");
+          }
+          else if (type == "Categoria")
+          {
+            CreateTasksForLevel(project.SubCategorie.Where(sc => sc.CategoriaId == item.ID), task, "SubCategoria");
+          }
+
+          if (!associatedVociComputo.Any())
+          {
+            task.Duration = project.ProjectTasks.Where(t => t.ParentId == task.Id).Sum(t => t.Duration);
+            task.EndDate = task.StartDate.AddDays(task.Duration);
+            previousEndDate = task.EndDate;
+          }
+        }
+      }
+
+      CreateTasksForLevel(project.SuperCategorie, null, "SuperCategoria");
+
+      project.ProjectTasks = project.ProjectTasks
+          .OrderBy(t => t.ParentId.HasValue ? 1 : 0)
+          .ThenBy(t => t.StartDate)
+          .ToList();
+    }
+
 
   }
 }

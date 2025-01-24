@@ -26,6 +26,7 @@ const ProfilePage = Loadable(lazy(() => import('views/pages/profile')));
 const SettingsPage = Loadable(lazy(() => import('views/pages/settings')));
 const AddTaskPage = Loadable(lazy(() => import('views/pages/addtask')));
 const Templates = Loadable(lazy(() => import('views/pages/templates')));
+const TrashComponent = Loadable(lazy(() => import('ui-component/TrashComponent')));
 
 
 const MainRoutes = {
@@ -75,7 +76,11 @@ const MainRoutes = {
         {
             path: '/templates',
             element: <Templates />
-        }
+        },
+        {
+            path: '/trash',
+            element: <TrashComponent />
+        },
         
     ]
 };

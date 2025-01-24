@@ -114,7 +114,7 @@ export async function deleteProject(projectId) {
 export async function saveProject(projectId, projectData) {
     try {
         const response = await axios.put(`/api/projects/${projectId}`, projectData);
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Errore durante il salvataggio del progetto:', error);
         throw error;

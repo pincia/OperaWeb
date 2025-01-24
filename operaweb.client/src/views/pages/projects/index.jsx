@@ -12,14 +12,13 @@ import {
     Button,
     CardMedia,
     CircularProgress,
-    Chip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { getProjects, getDeletedProjects } from "api/projects";
+import { getProjects } from "api/projects";
 import { useDispatch } from "react-redux";
 import { setCurrentProjectId } from "store/slices/project";
-import TrashComponent from "./TrashComponent";
+import TrashComponent from "../../../ui-component/TrashComponent";
 
 // Colori associati a ogni stato
 const statusColors = {
@@ -62,7 +61,6 @@ const Projects = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
     const [projectsData, setProjectsData] = useState({ myProjects: [], involvedProjects: [] });
-    const [deletedProjects, setDeletedProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const projectsPerPage = 10;
@@ -84,17 +82,7 @@ const Projects = () => {
             }
         };
 
-        const fetchDeletedProjects = async () => {
-            try {
-                const response = await getDeletedProjects();
-                setDeletedProjects(response.data || []);
-            } catch (err) {
-                console.error("Error fetching deleted projects:", err);
-            }
-        };
-
         fetchProjects();
-        fetchDeletedProjects();
     }, []);
 
     const handleTabChange = (event, newValue) => {
@@ -182,7 +170,6 @@ const Projects = () => {
             >
                 <Tab label="I Tuoi Progetti" />
                 <Tab label="Progetti In cui sei coinvolto" />
-                <Tab label="Cestino" />
             </Tabs>
 
             {activeTab !== 2 && (
@@ -255,13 +242,6 @@ const Projects = () => {
                         sx={{ marginTop: 3, display: "flex", justifyContent: "center" }}
                     />
                 </>
-            )}
-
-            {activeTab === 2 && (
-                <TrashComponent
-                    deletedProjects={deletedProjects}
-                    setDeletedProjects={setDeletedProjects}
-                />
             )}
         </Box>
     );

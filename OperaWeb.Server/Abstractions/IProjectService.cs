@@ -41,9 +41,9 @@ namespace OperaWeb.Server.Abstractions
     /// <summary>
     /// Delete project
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="project"></param>
     /// <returns></returns>
-    Task DeleteProjectAsync(int id);
+    Task DeleteProjectAsync(Project project);
 
     /// <summary>
     /// Restore a deleted project.

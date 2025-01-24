@@ -1,21 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Button,
     Typography,
-    CircularProgress,
+    CircularProgress
 } from "@mui/material";
+import MainCard from 'ui-component/cards/MainCard';
 import { DataGrid } from "@mui/x-data-grid";
 import { restoreProject, hardDeleteProject } from "api/projects";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "store/slices/snackbar";
+import {  getDeletedProjects } from "api/projects";
 
-const TrashComponent = ({ deletedProjects, setDeletedProjects }) => {
+const TrashComponent = () => {
     const dispatch = useDispatch();
-
+    const [deletedProjects, setDeletedProjects] = useState([]);
     // Stato per gestire il caricamento separato per ripristino ed eliminazione
     const [loadingStates, setLoadingStates] = useState({});
+    useEffect(() => {
+      
+        const fetchDeletedProjects = async () => {
+            try {
+                const response = await getDeletedProjects();
+                setDeletedProjects(response.data || []);
+            } catch (err) {
+                console.error("Error fetching deleted projects:", err);
+            }
+        };
 
+        fetchDeletedProjects();
+    }, []);
     const setLoadingState = (id, action, isLoading) => {
         setLoadingStates((prev) => ({
             ...prev,
@@ -76,14 +90,31 @@ const TrashComponent = ({ deletedProjects, setDeletedProjects }) => {
 
     const columns = [
         {
-            field: "works",
-            headerName: "Nome Progetto",
+            field: "object",
+            headerName: "Oggetto",
             flex: 1,
         },
         {
-            field: "lastUpdated",
+            field: "works",
+            headerName: "Opere",
+            flex: 1,
+        },
+        {
+            field: "deleteDate",
             headerName: "Data Eliminazione",
             flex: 1,
+            renderCell: (params) => {
+                const formattedDate = params.value
+                    ? new Intl.DateTimeFormat("it-IT", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }).format(new Date(params.value))
+                    : "N/A";
+                return <span>{formattedDate}</span>;
+            },
         },
         {
             field: "actions",
@@ -115,18 +146,33 @@ const TrashComponent = ({ deletedProjects, setDeletedProjects }) => {
                         >
                             {isDeleteLoading ? <CircularProgress size={20} /> : "Elimina Definitivamente"}
                         </Button>
-                    </Box>
+                        </Box>
                 );
             },
         },
     ];
 
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                Progetti Eliminati
-            </Typography>
-            <Box sx={{ height: 400, marginTop: 2 }}>
+        <MainCard
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh', // Altezza totale della pagina
+                overflow: 'hidden' // Previene overflow se necessario
+            }}
+        >
+            <Box>
+                <Typography variant="h4" gutterBottom>
+                    Progetti Eliminati
+                </Typography>
+            </Box>
+            <Box
+                sx={{
+                    flexGrow: 1, // Rende questa sezione responsiva
+                    marginTop: 2,
+                    overflow: 'auto' // Aggiunge lo scroll per i contenuti che superano l'altezza
+                }}
+            >
                 <DataGrid
                     rows={deletedProjects}
                     columns={columns}
@@ -134,7 +180,8 @@ const TrashComponent = ({ deletedProjects, setDeletedProjects }) => {
                     getRowId={(row) => row.id}
                 />
             </Box>
-        </Box>
+        </MainCard>
+
     );
 };
 

@@ -2,12 +2,13 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconFileAnalytics , IconHome, IconFolder } from '@tabler/icons-react';
+import { IconFileAnalytics , IconHome, IconFolder, IconTrash } from '@tabler/icons-react';
 
 const icons = {
     IconFileAnalytics: IconFileAnalytics ,
     IconFolder: IconFolder,
-    IconHome: IconHome
+    IconHome: IconHome,
+    IconTrash: IconTrash
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -40,6 +41,14 @@ const generale = {
             type: 'item',
             url: 'projects',
             icon: icons.IconFolder,
+            breadcrumbs: false
+        },
+        {
+            id: 'trash',
+            title: <FormattedMessage id="trash" />,
+            type: 'item',
+            url: 'trash',
+            icon: icons.IconTrash,
             breadcrumbs: false
         }
     ]

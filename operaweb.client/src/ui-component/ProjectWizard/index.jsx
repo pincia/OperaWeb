@@ -54,7 +54,7 @@ const ProjectWizard = () => {
                 projectId = result.data.projectId;
                 setProjectData((prev) => ({ ...prev, id: projectId }));
             } else {
-                await saveProject(projectData.id, projectData);
+                var response = await saveProject(projectData.id, projectData);
                 projectId = projectData.id;
             }
             dispatch(setCurrentProjectId(projectId));
@@ -68,7 +68,7 @@ const ProjectWizard = () => {
         } catch (error) {
             dispatch(  openSnackbar({
                 open: true,
-                message: 'Errore durante il salvataggio del progetto.',
+                message: 'Errore durante il salvataggio del progetto.\r\n' + response,
                 variant: 'alert',
                 alert: { color: 'error' },
             }));

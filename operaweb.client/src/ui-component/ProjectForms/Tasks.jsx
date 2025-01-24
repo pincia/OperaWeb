@@ -97,9 +97,9 @@ export default function TasksForm({ projectData, setProjectData, onValidationCha
                     if (task.entries) {
                         task.entries.forEach((entry) => {
                             if (entry.jobType === 0) {
-                                measuredWorks += entry.price || 0;
+                                measuredWorks += entry.totalPrice || 0;
                             } else if (entry.jobType === 1) {
-                                lumpSumWorks += entry.price || 0;
+                                lumpSumWorks += entry.totalPrice || 0;
                             }
                         });
                     }

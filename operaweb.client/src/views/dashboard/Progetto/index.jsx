@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Tabs, Tab, Box, CircularProgress, Grid } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
@@ -9,7 +9,12 @@ import ProjectOverview from './ProjectOverview';
 import ProjectSummary from './ProjectSummary';
 import GanttChart from 'ui-component/GanttChart';
 import ProjectActions from './ProjectActions'; // Importa il componente ProjectActions
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import { deleteProject } from "api/projects";
+import { openSnackbar } from "store/slices/snackbar";
+import { useNavigate } from 'react-router-dom';
 
 function a11yProps(index) {
     return {
@@ -21,8 +26,9 @@ function a11yProps(index) {
 const ProjectDashboard = () => {
     const [isLoading, setLoading] = useState(true);
     const [projectData, setProjectData] = useState(null);
+    const [loadingStates, setLoadingStates] = useState({});
     const [activeTab, setActiveTab] = useState(0);
-
+    const navigate = useNavigate();
     const theme = useTheme();
     const currentProjectId = useSelector((state) => state.project.currentProjectId);
     const dispatch = useDispatch();
@@ -51,9 +57,26 @@ const ProjectDashboard = () => {
         fetchProjectData();
     }, [currentProjectId, dispatch]);
 
-    const handleDeleteProject = (projectId) => {
-        console.log(`Progetto con ID ${projectId} eliminato.`);
-        // Qui puoi aggiungere la logica per eliminare il progetto (chiamata API o aggiornamento dello stato)
+    const handleDeleteProject = async (projectId) => {
+        try {
+            await deleteProject(projectData.id);
+            dispatch(openSnackbar({
+                open: true,
+                message: 'Progetto eliminato con successo!',
+                variant: 'alert',
+                alert: { color: 'success' },
+            }));
+        } catch (error) {
+            console.error("Errore nel ripristino del progetto:", error);
+            dispatch(openSnackbar({
+                open: true,
+                message: 'Errore nel ripristino del progetto.',
+                variant: 'alert',
+                alert: { color: 'error' },
+            }));
+        } finally {
+            navigate('/');
+        }
     };
 
     if (isLoading) {
@@ -102,23 +125,27 @@ const ProjectDashboard = () => {
                     >
                         <Tab
                             label="Panoramica"
-                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            icon={<AssessmentOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
                             {...a11yProps(0)}
                         />
                         <Tab
                             label="Dettagli"
-                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            icon={<DescriptionOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
                             {...a11yProps(1)}
                         />
                         <Tab
                             label="Cronoprogramma"
-                            icon={<PersonOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
+                            icon={<CalendarMonthOutlinedIcon sx={{ fontSize: '1.3rem' }} />}
                             {...a11yProps(2)}
                         />
                     </Tabs>
-
-                    {/* Project Actions */}
-                    <ProjectActions onDelete={() => handleDeleteProject(currentProjectId)} />
+                    {(activeTab === 1 || activeTab === 2) && (
+                        <ProjectActions
+                            onDelete={() => handleDeleteProject(currentProjectId)}
+                            projectData={projectData}
+                            setProjectData={setProjectData}
+                        />
+                    )}
                 </Box>
 
                 {/* Tab Content */}

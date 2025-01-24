@@ -3,14 +3,12 @@ import {
     Box,
     Typography,
     IconButton,
-    Tooltip,
     Button,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
     DialogContentText,
-    TextField,
     Table,
     TableBody,
     TableCell,
@@ -31,6 +29,16 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditableCell from './EditableCell'
+import { styled } from "@mui/system";
+const TruncatedTypography = styled(Typography)(({ theme }) => ({
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+}));
+
+
 export default function EntryList({
     selectedTaskEntries,
     setTasks,
@@ -56,6 +64,7 @@ export default function EntryList({
         larghezza: '',
         hPeso: '',
         quantita: '',
+        npu: '',
     });
     const [currentEntryId, setCurrentEntryId] = useState(null);
 
@@ -100,7 +109,7 @@ export default function EntryList({
     const handleDuplicateMeasurement = (entryId, measurement) => {
         const duplicate = {
             ...measurement,
-            id: generateId(), // Genera un nuovo ID unico+
+            id: generateId(),
             originalId: -1
         };
 
@@ -252,6 +261,7 @@ export default function EntryList({
             larghezza: 0,
             hPeso: 0,
             quantita: 0,
+            npu: 0
         };
 
 
@@ -393,8 +403,8 @@ export default function EntryList({
         <Box
             sx={{
                 minHeight: '400px',
-                maxHeight: '550px', // Limita l'altezza
-                overflowY: 'auto', // Scroll interno
+                maxHeight: '550px', 
+                overflowY: 'auto', 
                 border: '1px solid #ddd',
                 borderRadius: '4px',
                 padding: 2,
@@ -411,6 +421,7 @@ export default function EntryList({
                                 <TableCell>Quantità</TableCell>
                                 <TableCell>Prezzo</TableCell>
                                 <TableCell>Importo</TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
                         </TableHead><TableBody>
                             {selectedTaskEntries.map((entry) => (
@@ -432,9 +443,9 @@ export default function EntryList({
                                                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                                     {entry.code}
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <TruncatedTypography variant="body2" color="textSecondary">
                                                     {entry.description}
-                                                </Typography>
+                                                </TruncatedTypography>
                                             </div></TableCell>
                                         <TableCell>
                                             <div>
@@ -499,7 +510,7 @@ export default function EntryList({
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell colSpan={4}>
+                                        <TableCell colSpan={7}>
                                             <Collapse in={expandedEntries[entry.id]} timeout="auto" unmountOnExit>
                                                 <Box sx={{ margin: 1 }}>
                                                     <Typography variant="h6" gutterBottom>
@@ -508,24 +519,26 @@ export default function EntryList({
                                                     <Table size="small">
                                                         <TableHead>
                                                             <TableRow>
-                                                                <TableCell>Descrizione</TableCell>
-                                                                <TableCell>Lunghezza</TableCell>
-                                                                <TableCell>Larghezza</TableCell>
-                                                                <TableCell>HPeso</TableCell>
-                                                                <TableCell>Quantità</TableCell>
-                                                                <TableCell>Azione</TableCell>
+                                                                <TableCell className='table-cell-compact'>Descrizione</TableCell>
+                                                                <TableCell className='table-cell-compact'>NPU</TableCell>
+                                                                <TableCell className='table-cell-compact'>Lunghezza</TableCell>
+                                                                <TableCell className='table-cell-compact'>Larghezza</TableCell>
+                                                                <TableCell className='table-cell-compact'>HPeso</TableCell>
+                                                                <TableCell className='table-cell-compact'>Quantità</TableCell>
+                                                                <TableCell className='table-cell-compact'>Azione</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
                                                             {(entry.measurements || []).map((m) => (
                                                                 <TableRow
                                                                     key={m.id}
+                                                                    className="measurement-row"
                                                                     sx={{
                                                                         backgroundColor: m.id === highlightedMeasurementId ? 'rgba(0, 128, 255, 0.2)' : 'inherit',
                                                                         transition: 'background-color 0.3s ease',
                                                                     }}
                                                                 >
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <EditableCell
                                                                             value={m.description}
                                                                             onSave={(value) =>
@@ -533,7 +546,15 @@ export default function EntryList({
                                                                             }
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
+                                                                        <EditableCell
+                                                                            value={m.npu}
+                                                                            onSave={(value) =>
+                                                                                handleMeasurementEdit(entry.id, m.id, 'npu', value)
+                                                                            }
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <EditableCell
                                                                             value={m.lunghezza}
                                                                             onSave={(value) =>
@@ -541,7 +562,7 @@ export default function EntryList({
                                                                             }
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <EditableCell
                                                                             value={m.larghezza}
                                                                             onSave={(value) =>
@@ -549,7 +570,7 @@ export default function EntryList({
                                                                             }
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <EditableCell
                                                                             value={m.hPeso}
                                                                             onSave={(value) =>
@@ -557,7 +578,7 @@ export default function EntryList({
                                                                             }
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <EditableCell
                                                                             value={m.quantita}
                                                                             onSave={(value) =>
@@ -565,7 +586,7 @@ export default function EntryList({
                                                                             }
                                                                         />
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell className='table-cell-compact'>
                                                                         <IconButton onClick={(e) => handleMeasurementMenuOpen(e, m)}>
                                                                             <MoreVertIcon />
                                                                         </IconButton>

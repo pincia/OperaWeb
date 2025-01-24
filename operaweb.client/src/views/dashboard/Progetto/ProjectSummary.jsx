@@ -56,32 +56,32 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
         setActiveTab(newValue);
     };
 
-    const handleSaveProject = async () => {
-        setIsSaving(true);
-        try {
-            await saveProject(projectData.id, projectData);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: 'Progetto salvato con successo!',
-                    variant: 'alert',
-                    alert: { color: 'success' },
-                })
-            );
-        } catch (error) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: 'Errore durante il salvataggio del progetto.',
-                    variant: 'alert',
-                    alert: { color: 'error' },
-                })
-            );
-        } finally {
-            setIsSaving(false);
-            setIsConfirmOpen(false);
-        }
-    };
+    //const handleSaveProject = async () => {
+    //    setIsSaving(true);
+    //    try {
+    //        await saveProject(projectData.id, projectData);
+    //        dispatch(
+    //            openSnackbar({
+    //                open: true,
+    //                message: 'Progetto salvato con successo!',
+    //                variant: 'alert',
+    //                alert: { color: 'success' },
+    //            })
+    //        );
+    //    } catch (error) {
+    //        dispatch(
+    //            openSnackbar({
+    //                open: true,
+    //                message: 'Errore durante il salvataggio del progetto.',
+    //                variant: 'alert',
+    //                alert: { color: 'error' },
+    //            })
+    //        );
+    //    } finally {
+    //        setIsSaving(false);
+    //        setIsConfirmOpen(false);
+    //    }
+    //};
 
     const isFormValid = Object.values(validationState).every((isValid) => isValid);
 
@@ -90,9 +90,6 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
             <MainCard content={false}>
                 <Box sx={{ p: 3 }}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <Typography variant="h4">Dettagli Progetto</Typography>
-                        </Grid>
                         <Grid item xs={12}>
                             <Tabs
                                 value={activeTab}
@@ -166,7 +163,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                     </Grid>
                 </Box>
             </MainCard>
-            <Button
+            {/*} <Button
                 variant="contained"
                 onClick={() => setIsConfirmOpen(true)}
                 disabled={!isFormValid}
@@ -192,7 +189,7 @@ const ProjectSummary = ({ projectData, setProjectData, isLoading }) => {
                         {isSaving ? 'Salvataggio...' : 'Conferma'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog>*/}
         </>
     );
 };

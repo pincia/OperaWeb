@@ -305,11 +305,10 @@ namespace OperaWeb.Server.Services.BLL
         importedProject.Entity.Economics = new Economics()
         {
           MeasuredWorks = vociComputo.Where(x => x.JobType == JobTypes.Misura).Sum(x => x.Prezzo),
-          LaborCosts = vociComputo.Sum(x => (x.Prezzo * x.ElencoPrezzo.Manodopera ?? 0 /100)),
+          LaborCosts = vociComputo.Sum(x => ((x.Prezzo * x.ElencoPrezzo.Manodopera ?? 0) /100)),
           LumpSumWorks = vociComputo.Where(x => x.JobType == JobTypes.Corpo).Sum(x => x.Prezzo),
         };
-        await _context.SaveChangesAsync();
-        await CreateGanttTasksAsync(importedProject.Entity, vociComputo);
+        await _context.SaveChangesAsync();        
         result.EntitiesImported["VociComputo"] = vociComputo.Count;
         result.EntitiesImported["Misure"] = misure.Count;
 
@@ -334,108 +333,6 @@ namespace OperaWeb.Server.Services.BLL
 
       return result;
     }
-
-
-    private async Task CreateGanttTasksAsync(
-    Project project,
-    List<VoceComputo> vociComputo, double incidenzaMedia = 1)
-    {
-      // Dizionari per risolvere rapidamente le relazioni dalle VociComputo
-      var superCategoryLookup = vociComputo
-          .Where(vc => vc.SuperCategoria != null)
-          .GroupBy(vc => vc.SuperCategoria.ID)
-          .ToDictionary(g => g.Key, g => g.First().SuperCategoria);
-
-      var tasks = new List<ProjectTask>();
-
-      // Inserisci prima i task di livello 1 (SuperCategorie)
-      var superCategoryTasks = superCategoryLookup.Values.Select(superCategory => new ProjectTask
-      {
-        Name = superCategory.DesSintetica,
-        Description = superCategory.DesEstesa,
-        StartDate = project.CreationDate,
-        Duration = 10,
-        Progress = superCategory.Percentuale / 100m,
-        ParentId = null, // Root node
-        ProjectId = project.ID,
-        Type = "SuperCategoria"
-      }).ToList();
-
-      tasks.AddRange(superCategoryTasks);
-
-      // Salva le SuperCategorie per ottenere gli ID generati
-      _context.ProjectTasks.AddRange(superCategoryTasks);
-      await _context.SaveChangesAsync();
-
-      // Crea un dizionario per mappare le SuperCategorie con i loro ID
-      var superCategoryTaskMap = superCategoryTasks.ToDictionary(t => t.Name, t => t.Id);
-
-      // Inserisci i task di livello 2 (Categorie)
-      foreach (var superCategory in superCategoryLookup.Values)
-      {
-        var superCategoryTaskId = superCategoryTaskMap[superCategory.DesSintetica];
-
-        var associatedCategories = vociComputo
-            .Where(vc => vc.SuperCategoria.ID == superCategory.ID && vc.Categoria != null)
-            .Select(vc => vc.Categoria)
-            .Distinct();
-
-        var categoryTasks = associatedCategories.Select(category => new ProjectTask
-        {
-          Name = category.DesSintetica,
-          Description = category.DesEstesa,
-          StartDate = project.CreationDate,
-          Duration = 10,
-          Progress = category.Percentuale / 100m,
-          ParentId = superCategoryTaskId, // Relazione con il parent SuperCategoria
-          ProjectId = project.ID,
-          Type = "Categoria"
-        }).ToList();
-
-        tasks.AddRange(categoryTasks);
-
-        // Salva le Categorie per ottenere gli ID generati
-        _context.ProjectTasks.AddRange(categoryTasks);
-        await _context.SaveChangesAsync();
-
-        // Crea un dizionario per mappare le Categorie con i loro ID
-        var categoryTaskMap = categoryTasks.ToDictionary(t => t.Name, t => t.Id);
-
-        // Inserisci i task di livello 3 (SubCategorie)
-        foreach (var category in associatedCategories)
-        {
-          var categoryTaskId = categoryTaskMap[category.DesSintetica];
-
-          var associatedSubCategories = vociComputo
-              .Where(vc => vc.Categoria.ID == category.ID && vc.SubCategoria != null)
-              .Select(vc => vc.SubCategoria)
-              .Distinct();
-
-          var subCategoryTasks = associatedSubCategories.Select(subCategory => new ProjectTask
-          {
-            Name = subCategory.DesSintetica,
-            Description = subCategory.DesEstesa,
-            StartDate = subCategory.DataInit,
-            Duration = 10,
-            Progress = subCategory.Percentuale / 100m,
-            ParentId = categoryTaskId, // Relazione con il parent Categoria
-            ProjectId = project.ID,
-            Type = "SubCategoria"
-          }).ToList();
-
-          tasks.AddRange(subCategoryTasks);
-
-          // Salva le SubCategorie
-          _context.ProjectTasks.AddRange(subCategoryTasks);
-          await _context.SaveChangesAsync();
-        }
-      }
-
-      // Aggiungi tutti i task al progetto
-      project.ProjectTasks = tasks;
-    }
-
-
 
     static bool IsValidXmlString(string text)
     {
