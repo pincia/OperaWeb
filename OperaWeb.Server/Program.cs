@@ -22,7 +22,11 @@ builder.Services.AddDbContext<OperaWebDbContext>(options =>
 {
   options.LogTo(Console.WriteLine, LogLevel.Information)  // Mostra le query SQL
                .EnableSensitiveDataLogging();
-  options.UseSqlServer(connectionString, x => x.MigrationsAssembly("OperaWeb.Server.DataClasses"));
+  options.UseSqlServer(connectionString, x =>
+  {
+    x.MigrationsAssembly("OperaWeb.Server.DataClasses");
+    x.CommandTimeout(180);
+  });
 });
 
 // Add services to the container.

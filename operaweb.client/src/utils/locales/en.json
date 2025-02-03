@@ -195,5 +195,8 @@
   "cup": "CUP",
   "gig": "GIG",
   "locationLabel": "Localization",
-  "trash": "Trash"
+  "trash": "Trash",
+  "dati generali": "General Data",
+  "cronoprogramma": "Gantt",
+  "configurations":  "Configurations"
 }

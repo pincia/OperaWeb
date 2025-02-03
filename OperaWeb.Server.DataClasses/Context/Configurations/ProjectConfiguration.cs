@@ -15,7 +15,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
     builder.HasOne(p => p.ProjectResourceTeamType)
        .WithOne(r => r.Project)
-       .HasForeignKey<ProjectResourceTeamType>(r => r.ProjectId)
+       .HasForeignKey<ProjectResourceTeamType>(r => r.ProjectID)
        .OnDelete(DeleteBehavior.Restrict);
 
     builder.HasMany(p => p.ElencoPrezzi)

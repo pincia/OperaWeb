@@ -114,7 +114,7 @@ const Projects = () => {
 
     const handleOpenProject = (id) => {
         dispatch(setCurrentProjectId(id));
-        navigate(`/project`);
+        navigate(`/project/overview`);
     };
 
 

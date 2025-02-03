@@ -1,4 +1,5 @@
-﻿using OperaWeb.SharedClasses.Enums;
+﻿using OperaWeb.Server.DataClasses.Models.User;
+using OperaWeb.SharedClasses.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OperaWeb.Server.DataClasses.Models
@@ -18,7 +19,11 @@ namespace OperaWeb.Server.DataClasses.Models
     public decimal ConfQuantita { get; set; }
     public AnalisiMetodi Metodo { get; set; }
     public AnalisiApplicataA ApplicataA { get; set; }
-    public virtual Project Project { get; set; }
-    public int ProjectID { get; set; }
+    public virtual Project? Project { get; set; }
+    public int? ProjectID { get; set; }
+    /// <summary>
+    /// Default configuration
+    /// </summary>
+    public bool IsDefault { get; set; }
   }
 }

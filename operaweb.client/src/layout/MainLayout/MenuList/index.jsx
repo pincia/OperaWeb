@@ -1,53 +1,52 @@
 import { memo, useLayoutEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // project imports
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
-import menuItem from 'menu-items';
+import getMenuItem from 'menu-items';
 import useConfig from 'hooks/useConfig';
-
+import { setCurrentProject, setCurrentProjectId } from 'store/slices/project'; // Import Redux actions
 import { MenuOrientation } from 'config';
-import { Menu } from 'menu-items/widget';
 import { HORIZONTAL_MAX_ITEM } from 'config';
-import { useGetMenu, useGetMenuMaster } from 'api/menu';
 
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 
 const MenuList = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const currentProjectId = useSelector((state) => state.project.currentProjectId);
     const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
-
     const { menuOrientation } = useConfig();
-    const { menuLoading } = useGetMenu();
-    const { menuMaster } = useGetMenuMaster();
-    const drawerOpen = menuMaster.isDashboardDrawerOpened;
+
     const isHorizontal = menuOrientation === MenuOrientation.HORIZONTAL && !downMD;
 
     const [selectedID, setSelectedID] = useState('');
     const [menuItems, setMenuItems] = useState({ items: [] });
 
-    let widgetMenu = Menu();
-
     useLayoutEffect(() => {
-        const isFound = menuItem.items.some((element) => {
-            if (element.id === 'group-widget') {
-                return true;
-            }
-            return false;
-        });
-        setMenuItems({ items: [...menuItem.items] });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [menuLoading]);
+        const updatedMenuItems = getMenuItem(currentProjectId);
+        setMenuItems({ items: [...updatedMenuItems.items] });
+    }, [currentProjectId]);
 
-    // last menu-item to show in horizontal menu bar
+    const handleCloseProject = () => {
+        // Resetta lo stato di Redux
+        dispatch(setCurrentProject(null));
+        dispatch(setCurrentProjectId(null));
+        // Naviga alla root
+        navigate('/');
+    };
+
     const lastItem = isHorizontal ? HORIZONTAL_MAX_ITEM : null;
-
     let lastItemIndex = menuItems.items.length - 1;
     let remItems;
     let lastItemId;
@@ -68,15 +67,6 @@ const MenuList = () => {
     const navItems = menuItems.items.slice(0, lastItemIndex + 1).map((item, index) => {
         switch (item.type) {
             case 'group':
-                if (item.url && item.id !== lastItemId) {
-                    return (
-                        <List key={item.id}>
-                            <NavItem item={item} level={1} isParents setSelectedID={() => setSelectedID('')} />
-                            {!isHorizontal && index !== 0 && <Divider sx={{ py: 0.5 }} />}
-                        </List>
-                    );
-                }
-
                 return (
                     <NavGroup
                         key={item.id}
@@ -97,7 +87,29 @@ const MenuList = () => {
         }
     });
 
-    return !isHorizontal ? <Box {...(drawerOpen && { sx: { mt: 1.5 } })}>{navItems}</Box> : <>{navItems}</>;
+    return (
+        <Box {...(menuOrientation === MenuOrientation.VERTICAL && { sx: { mt: 1.5 } })}>
+            {navItems}
+
+            {/* Close Project Button */}
+            {currentProjectId && (
+                <Box textAlign="center" sx={{ mt: 2 }}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleCloseProject}
+                        sx={{
+                            width: '80%',
+                            fontWeight: 'bold',
+                            textTransform: 'none'
+                        }}
+                    >
+                        Chiudi Progetto
+                    </Button>
+                </Box>
+            )}
+        </Box>
+    );
 };
 
 export default memo(MenuList);

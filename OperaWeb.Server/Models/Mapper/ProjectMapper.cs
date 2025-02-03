@@ -57,7 +57,7 @@ namespace OperaWeb.Server.Models.Mapper
                       Aliquote = model.ConfigNumeri.Aliquote,
                       Valuta = model.ConfigNumeri.Valuta,
                     }
-                    : new ConfigNumeriDTO(),
+                    : null,
             Analisi = model.Analisi != null
                     ? new ConfigAnalisiDTO
                     {
@@ -69,18 +69,18 @@ namespace OperaWeb.Server.Models.Mapper
                       Metodo = model.Analisi.Metodo,
                       ApplicataA = model.Analisi.ApplicataA
                     }
-                    : new ConfigAnalisiDTO(),
+                    : null,
             ResourceTeamType = model.ProjectResourceTeamType != null ? new ResourceTeamTypeDTO
             {
               Id = model.ProjectResourceTeamType.Id,
-              ProjectId = model.ProjectResourceTeamType.ProjectId,
+              ProjectId = model.ProjectResourceTeamType.ProjectID ?? -1,
               SpecializedQuantity = model.ProjectResourceTeamType.SpecializedQuantity,
               SpecializedHourlyRate = model.ProjectResourceTeamType.SpecializedHourlyRate,
               QualifiedQuantity = model.ProjectResourceTeamType.QualifiedQuantity,
               QualifiedHourlyRate = model.ProjectResourceTeamType.QualifiedHourlyRate,
               CommonQuantity = model.ProjectResourceTeamType.CommonQuantity,
               CommonHourlyRate = model.ProjectResourceTeamType.CommonHourlyRate
-            } : new ResourceTeamTypeDTO()
+            } : null
           },
           Latitude = model.Latitude,
           Longitude = model.Longitude,
@@ -566,7 +566,7 @@ namespace OperaWeb.Server.Models.Mapper
           {
             project.ProjectResourceTeamType = new ProjectResourceTeamType
             {
-              ProjectId = project.ID
+              ProjectID = project.ID
             };
           }
 

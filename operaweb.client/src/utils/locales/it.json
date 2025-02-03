@@ -41,7 +41,7 @@
   "edit": "Edit",
   "crm": "CRM",
   "lead-management": "Lead Management",
-  "overview": "Overview",
+  "overview": "Panoramica",
   "lead-list": "Lead List",
   "contact-management": "Contact Management",
   "contact-card": "Contact Card",
@@ -169,7 +169,7 @@
   "sample-page": "Sample Page",
   "documentation": "Documentation",
   "roadmap": "Roadmap",
-
+  "project": "Progetto",
   "title": "Multi Language",
   "home": "Home",
   "change": "Change Language",
@@ -198,5 +198,8 @@
   "cup": "CUP",
   "gig": "GIG",
   "locationLabel": "Localizzazione",
-  "trash": "Cestino"
+  "trash": "Cestino",
+  "dati generali": "Dati Generali",
+  "cronoprogramma": "Cronoprogramma",
+  "configurations":  "Configurazioni"
 }

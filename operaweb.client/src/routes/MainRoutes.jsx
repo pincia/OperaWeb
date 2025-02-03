@@ -15,11 +15,9 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 
 //projects
 const Projects = Loadable(lazy(() => import('views/pages/projects')));
-const ProjectWizard = Loadable(lazy(() => import('ui-component/ProjectWizard')));
-const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/Progetto')));
-
-//origanization
-const OrganizationPage = Loadable(lazy(() => import('views/pages/organization')));
+const ImportProjectWizard = Loadable(lazy(() => import('ui-component/ProjectWizard/ImportProjectWizard')));
+const ProjectWizard = Loadable(lazy(() => import('ui-component/ProjectWizard/ProjectWizard')));
+const ProjectDashboard = Loadable(lazy(() => import('views/dashboard/project')));
 
 //user
 const ProfilePage = Loadable(lazy(() => import('views/pages/profile')));
@@ -27,7 +25,10 @@ const SettingsPage = Loadable(lazy(() => import('views/pages/settings')));
 const AddTaskPage = Loadable(lazy(() => import('views/pages/addtask')));
 const Templates = Loadable(lazy(() => import('views/pages/templates')));
 const TrashComponent = Loadable(lazy(() => import('ui-component/TrashComponent')));
-
+const ProjectOverview = Loadable(lazy(() => import('views/pages/project/ProjectOverview')));
+const ProjectSummary = Loadable(lazy(() => import('views/pages/project/ProjectSummary')));
+const ProjectGanttChart = Loadable(lazy(() => import('views/pages/project/ProjectGanttChart')));
+const ConfigurationPage = Loadable(lazy(() => import('views/pages/configurations')));
 
 const MainRoutes = {
     element: (
@@ -42,24 +43,33 @@ const MainRoutes = {
             element: <Projects />
         },
         {
-            path: '/general/default',
+            path: 'general/default',
             element: <DashboardDefault />
+        },
+        {
+            path: '/project/import-wizard/',
+            element: <ImportProjectWizard />
         },
         {
             path: '/project/create/',
             element: <ProjectWizard />
         },
         {
-            path: '/project/create/:id',
-            element: <ProjectWizard />
-        },
-        {
             path: '/project',
             element: <ProjectDashboard />
+        
         },
         {
-            path: '/organization',
-            element: <OrganizationPage />
+            path: '/project/overview',
+            element: <ProjectOverview />
+        },
+        {
+            path: '/project/summary',
+            element: <ProjectSummary />
+        },
+        {
+            path: '/project/gantt',
+            element: <ProjectGanttChart />
         },
         {
             path: '/user/profile',
@@ -80,6 +90,10 @@ const MainRoutes = {
         {
             path: '/trash',
             element: <TrashComponent />
+        },
+        {
+            path: '/configurations',
+            element: <ConfigurationPage />
         },
         
     ]

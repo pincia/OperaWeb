@@ -6,8 +6,6 @@ import storage from 'redux-persist/lib/storage';
 // project imports
 import snackbarReducer from './slices/snackbar';
 import customerReducer from './slices/customer';
-import contactReducer from './slices/contact';
-import productReducer from './slices/product';
 import chatReducer from './slices/chat';
 import calendarReducer from './slices/calendar';
 import mailReducer from './slices/mail';
@@ -30,8 +28,6 @@ const reducer = combineReducers({
     ),
     kanban: kanbanReducer,
     customer: customerReducer,
-    contact: contactReducer,
-    product: productReducer,
     chat: chatReducer,
     calendar: calendarReducer,
     mail: mailReducer,

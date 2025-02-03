@@ -7,6 +7,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using OperaWeb.Server.Models.Mapper;
 using Microsoft.EntityFrameworkCore;
+using OperaWeb.Server.Services;
+using Newtonsoft.Json;
 
 namespace OperaWeb.Server.Controllers
 {
@@ -16,9 +18,10 @@ namespace OperaWeb.Server.Controllers
   public class ProjectsController : ControllerBase
   {
     private readonly IProjectService _projectService;
-
-    public ProjectsController(IProjectService projectService)
+    private readonly ILogger<ProjectService> _logger;
+    public ProjectsController(IProjectService projectService, ILogger<ProjectService> logger)
     {
+      _logger = logger;
       _projectService = projectService;
     }
 
@@ -48,6 +51,7 @@ namespace OperaWeb.Server.Controllers
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectDTO projectDto)
     {
+      _logger.Log(LogLevel.Information,$"UpdateProject START - project -> {JsonConvert.SerializeObject(projectDto)}");
       if (id != projectDto.Id)
       {
         return BadRequest("ID del progetto nella URL e nel body non corrispondono.");
@@ -61,6 +65,7 @@ namespace OperaWeb.Server.Controllers
           return NotFound($"Progetto con ID {id} non trovato.");
         }
 
+        _logger.Log(LogLevel.Information,$"UpdateProject END");
         return Ok(result);
       }
       catch (Exception ex)

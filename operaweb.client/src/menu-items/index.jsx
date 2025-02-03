@@ -1,16 +1,13 @@
-import dashboard from './dashboard';
-import application from './application';
-import forms from './forms';
-import elements from './elements';
-import samplePage from './sample-page';
-import pages from './pages';
-import utilities from './utilities';
-import support from './support';
-import generale from './generale';
-import projects from './projects';
+import general from './general';
+import project from './project';
+
 // ==============================|| MENU ITEMS ||============================== //
 
-const menuItems = {
-    items: [generale,dashboard/*, application, forms, elements, samplePage, pages, utilities, support, other*/]
+const getMenuItems = (currentProjectId) => {
+
+    return {
+        items: currentProjectId ? [project] : [general],
+    };
 };
-export default menuItems;
+
+export default getMenuItems;

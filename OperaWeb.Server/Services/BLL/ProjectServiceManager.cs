@@ -95,8 +95,6 @@ namespace OperaWeb.Server.Services.BLL
         newProject.DatiGenerali = datiGenerali;
         var importedProject = _context.Projects.Add(newProject);
         datiGenerali.Project = importedProject.Entity;
-     
-        result.EntitiesImported["Projects"] = 1;
         await UpdateProgress();
 
         // Step 3: Importazione Categorie, SuperCategorie e SubCategorie

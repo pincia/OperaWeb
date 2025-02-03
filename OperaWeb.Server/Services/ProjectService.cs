@@ -334,7 +334,7 @@ namespace OperaWeb.Server.Services
             CreationDate = DateTime.Now,
             LastUpdateDate = DateTime.Now,
             Status = ProjectStatus.Created,
-            ProjectResourceTeamType = new ProjectResourceTeamType()
+            //ProjectResourceTeamType = new ProjectResourceTeamType()
           }, connectionId);
 
         }

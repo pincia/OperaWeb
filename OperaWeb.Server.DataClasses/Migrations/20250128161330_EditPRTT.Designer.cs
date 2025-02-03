@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OperaWeb.Server.DataClasses.Context;
 
@@ -11,9 +12,11 @@ using OperaWeb.Server.DataClasses.Context;
 namespace OperaWeb.Server.DataClasses.Migrations
 {
     [DbContext(typeof(OperaWebDbContext))]
-    partial class OperaWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250128161330_EditPRTT")]
+    partial class EditPRTT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1010,7 +1013,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ProjectID")
+                    b.Property<int?>("ProjectId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<decimal>("QualifiedHourlyRate")
@@ -1027,9 +1031,8 @@ namespace OperaWeb.Server.DataClasses.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectID")
-                        .IsUnique()
-                        .HasFilter("[ProjectID] IS NOT NULL");
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
 
                     b.ToTable("ProjectResourceTeamType");
                 });
@@ -1966,8 +1969,9 @@ namespace OperaWeb.Server.DataClasses.Migrations
                 {
                     b.HasOne("OperaWeb.Server.DataClasses.Models.Project", "Project")
                         .WithOne("ProjectResourceTeamType")
-                        .HasForeignKey("OperaWeb.Server.DataClasses.Models.ProjectResourceTeamType", "ProjectID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("OperaWeb.Server.DataClasses.Models.ProjectResourceTeamType", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });

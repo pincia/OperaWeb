@@ -35,38 +35,9 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const connectToHub = async () => {
-            const hubUrl = import.meta.env.VITE_SIGNALR_URL || '/hubs/import';
-            const conn = new HubConnectionBuilder()
-                .withUrl(hubUrl)
-                .withAutomaticReconnect()
-                .build();
-
-            conn.on('UpdateProgress', (progress) => {
-                setProgress(progress);
-            });
-
-            try {
-                await conn.start();
-                setConnection(conn);
-            } catch (error) {
-                console.error('SignalR connection error:', error);
-            }
-        };
-
-        connectToHub();
-
-        return () => {
-            if (connection) {
-                connection.stop();
-            }
-        };
-    }, []);
-
     const handleCompleteProject = () => {
         handleCloseDialog(true);
-        navigate('/project/create');
+        navigate('/project/import-wizard/');
     };
 
     const resetState = () => {
@@ -111,13 +82,28 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
     };
 
     const handleSubmit = async () => {
-        if (!file || !connection) return;
+        if (!file) return;
 
         setProgress(0);
         setIsUploading(true);
 
+        // Crea una nuova connessione SignalR
+        const hubUrl = import.meta.env.VITE_SIGNALR_URL || '/hubs/import';
+        const conn = new HubConnectionBuilder()
+            .withUrl(hubUrl)
+            .withAutomaticReconnect()
+            .build();
+
+        conn.on('UpdateProgress', (progress) => {
+            setProgress(progress);
+        });
+
         try {
-            const response = await importXPWE(file, connection.connectionId);
+            await conn.start(); // Avvia la connessione
+            setConnection(conn); // Memorizza la connessione nello stato
+
+            // Importa il file usando SignalR connectionId
+            const response = await importXPWE(file, conn.connectionId);
             setImportResult(response);
 
             dispatch(setImportedProject(response.importedProject));
@@ -131,7 +117,6 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
                 })
             );
         } catch (error) {
-            handleClose();
             dispatch(
                 openSnackbar({
                     open: true,
@@ -142,9 +127,14 @@ const ImportXpwe = ({ open, handleCloseDialog }) => {
                 })
             );
         } finally {
+            // Disconnetti SignalR al termine dell'importazione
+            if (conn) {
+                conn.stop();
+            }
             setIsUploading(false);
         }
     };
+
 
     return (
         <Dialog open={open} maxWidth="sm" fullWidth>

@@ -18,7 +18,7 @@ const TrashComponent = () => {
     // Stato per gestire il caricamento separato per ripristino ed eliminazione
     const [loadingStates, setLoadingStates] = useState({});
     useEffect(() => {
-      
+
         const fetchDeletedProjects = async () => {
             try {
                 const response = await getDeletedProjects();
@@ -146,11 +146,36 @@ const TrashComponent = () => {
                         >
                             {isDeleteLoading ? <CircularProgress size={20} /> : "Elimina Definitivamente"}
                         </Button>
-                        </Box>
+                    </Box>
                 );
             },
         },
     ];
+
+    if (deletedProjects.length==0) {
+        return (
+             <MainCard
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh', // Altezza totale della pagina
+                overflow: 'hidden' // Previene overflow se necessario
+            }}
+        >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh',
+                    }}
+                >
+                    No Projects
+                </Box>
+        </MainCard>
+     
+        );
+    }
 
     return (
         <MainCard

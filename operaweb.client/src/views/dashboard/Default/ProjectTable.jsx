@@ -32,7 +32,7 @@ const ProjectTable = () => {
 
     const handleOpenProject = (projectId) => {
         dispatch(setCurrentProjectId(projectId)); // Setta il progetto corrente
-        navigate('/project/'); // Naviga alla pagina del progetto
+        navigate('/project/overview/'); // Naviga alla pagina del progetto
     };
 
     const columns = [

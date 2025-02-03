@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 
 import UserProfile from './UserProfile';
 import CompanyProfile from './CompanyProfile';
+import Organization from 'ui-component/Profile/Organization'
 import useConfig from 'hooks/useConfig';
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -21,6 +22,7 @@ import { gridSpacing } from 'store/constant';
 import { ThemeMode } from 'config';
 
 // assets
+import CorporateFareTwoToneIcon from '@mui/icons-material/CorporateFareTwoTone';
 import PersonOutlineTwoToneIcon from '@mui/icons-material/PersonOutlineTwoTone';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessOutlined';
 
@@ -57,6 +59,11 @@ const tabsOption = [
         label: 'Azienda',
         icon: <BusinessTwoToneIcon />,
         caption: 'Informazioni azienda'
+    },
+    {
+        label: 'Organizzazione',
+        icon: <CorporateFareTwoToneIcon />,
+        caption: 'Organigramma Aziendale'
     }
 ];
 
@@ -75,7 +82,7 @@ const ProfilePage = () => {
             <Grid item xs={12}>
                 <MainCard title="Profili" content={false}>
                     <Grid container spacing={gridSpacing}>
-                        <Grid item xs={12} lg={4}>
+                        <Grid item xs={12} lg={3}>
                             <CardContent>
                                 <Tabs
                                     value={value}
@@ -138,7 +145,7 @@ const ProfilePage = () => {
                                 </Tabs>
                             </CardContent>
                         </Grid>
-                        <Grid item xs={12} lg={8}>
+                        <Grid item xs={12} lg={9}>
                             <CardContent
                                 sx={{
                                     borderLeft: '1px solid',
@@ -151,6 +158,9 @@ const ProfilePage = () => {
                                 </TabPanel>
                                 <TabPanel value={value} index={1}>
                                     <CompanyProfile />
+                                </TabPanel>
+                                <TabPanel value={value} index={2}>
+                                    <Organization />
                                 </TabPanel>
                             </CardContent>
                         </Grid>

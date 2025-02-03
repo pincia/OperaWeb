@@ -82,18 +82,19 @@ export default function EntryDetailsDialog({
             <DialogTitle>Aggiungi Voce</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'grid', gap: 2, marginTop: 2 }}>
+
                     <TextField
-                        label="Descrizione"
-                        name="description"
-                        value={entry.description}
+                        label="Codice"
+                        name="code"
+                        value={entry.code}
                         onChange={handleInputChange}
                         fullWidth
                         required
                     />
                     <TextField
-                        label="Codice"
-                        name="code"
-                        value={entry.code}
+                        label="Descrizione"
+                        name="description"
+                        value={entry.description}
                         onChange={handleInputChange}
                         fullWidth
                         required

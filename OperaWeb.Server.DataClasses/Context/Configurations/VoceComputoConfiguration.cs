@@ -8,6 +8,7 @@ public class VoceComputoConfiguration : IEntityTypeConfiguration<VoceComputo>
   {
     builder.HasKey(vc => vc.ID);
 
+    // Configurazione delle relazioni
     builder.HasOne(vc => vc.SuperCategoria)
            .WithMany()
            .HasForeignKey(vc => vc.SuperCategoriaID)
@@ -27,5 +28,12 @@ public class VoceComputoConfiguration : IEntityTypeConfiguration<VoceComputo>
            .WithMany(p => p.VociComputo)
            .HasForeignKey(vc => vc.ProjectID)
            .OnDelete(DeleteBehavior.Restrict);
+
+    // Configurazione dei tipi di colonna per il tipo 'decimal'
+    builder.Property(vc => vc.Prezzo)
+           .HasColumnType("decimal(18, 2)");
+
+    builder.Property(vc => vc.Quantita)
+           .HasColumnType("decimal(18, 2)");
   }
 }

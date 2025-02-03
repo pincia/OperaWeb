@@ -1,4 +1,5 @@
 ﻿using OperaWeb.Server.DataClasses.Models;
+using OperaWeb.Server.DataClasses.Models.User;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,17 +13,9 @@ namespace OperaWeb.Server.DataClasses.Models
     [Key]
     public int Id { get; set; }
 
-    /// <summary>
-    /// Foreign key for the associated project.
-    /// </summary>
-    [Required]
-    public int ProjectId { get; set; }
+    public int? ProjectID { get; set; }
 
-    /// <summary>
-    /// Navigation property for the associated project.
-    /// </summary>
-    [ForeignKey(nameof(ProjectId))]
-    public virtual Project Project { get; set; }
+    public virtual Project? Project { get; set; }
 
     /// <summary>
     /// Quantity of specialized manpower.
@@ -62,5 +55,10 @@ namespace OperaWeb.Server.DataClasses.Models
     [Required]
     [Column(TypeName = "decimal(18, 2)")]
     public decimal CommonHourlyRate { get; set; }
+
+    /// <summary>
+    /// Default configuration
+    /// </summary>
+    public bool IsDefault { get; set; }
   }
 }
